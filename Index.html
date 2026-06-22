@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ArtNonimu's — Pracownia Portretu na Zamówienie</title>
+<meta name="description" content="Ręcznie malowane i rysowane portrety zwierząt i ludzi na zamówienie. Malarstwo na drewnie, rysunek ołówkiem, karykatury. Wysyłka po całej Polsce.">
+<meta name="theme-color" content="#050508">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,400;1,9..144,500&family=Outfit:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{
+  bg:'#050508',panel:'#0C0C14',frame:'#16162A',
+  cyan:'#00F5FF',pink:'#FF2D78',violet:'#8B00FF',gold:'#FFD700',
+  bone:'#E8E8FF',bonedim:'#6A6A8A'
+},fontFamily:{
+  display:['"Fraunces"','serif'],
+  body:['"Outfit"','sans-serif'],
+  mono:['"JetBrains Mono"','monospace']
+}}}}
+</script>
+<style>
+/* ── ROOT & BASE ────────────────────────────────────── */
+:root{
+  --mx:50%;--my:35%;--header-h:72px;
+  --c-cyan:#00F5FF;--c-pink:#FF2D78;--c-violet:#8B00FF;--c-gold:#FFD700;
+  --glow-cyan:0 0 12px rgba(0,245,255,.7),0 0 30px rgba(0,245,255,.3);
+  --glow-pink:0 0 12px rgba(255,45,120,.7),0 0 30px rgba(255,45,120,.3);
+  --glow-violet:0 0 12px rgba(139,0,255,.7),0 0 30px rgba(139,0,255,.3);
+}
+html{scroll-behavior:smooth;}
+body{background:#050508;font-family:'Outfit',sans-serif;overscroll-behavior-y:none;color:#E8E8FF;}
+section[id]{scroll-margin-top:var(--header-h);}
+body.no-scroll{overflow:hidden;height:100%;}
+
+/* ── CYBERPUNK GRID BACKGROUND ─────────────────────── */
+#cp-grid{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  perspective:600px;transform-style:preserve-3d;
+}
+#cp-grid::before{
+  content:'';position:absolute;inset:-50%;width:200%;height:200%;
+  background-image:
+    linear-gradient(rgba(0,245,255,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,245,255,.06) 1px,transparent 1px);
+  background-size:60px 60px;
+  transform:rotateX(55deg) translateZ(0);
+  animation:gridScroll 18s linear infinite;
+  transform-origin:50% 0;
+}
+#cp-grid::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(139,0,255,.12),transparent 70%),
+             radial-gradient(ellipse 50% 40% at 50% 0%,rgba(0,245,255,.07),transparent 60%);
+}
+@keyframes gridScroll{from{transform:rotateX(55deg) translateY(0);}to{transform:rotateX(55deg) translateY(60px);}}
+
+/* ── SCANLINES ─────────────────────────────────────── */
+#scanlines{
+  position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,245,255,.012) 3px,rgba(0,245,255,.012) 4px);
+  animation:scanMove 8s linear infinite;
+}
+@keyframes scanMove{
+  0%{background-position:0 0;}
+  100%{background-position:0 100%;}
+}
+
+/* ── NOISE OVERLAY ─────────────────────────────────── */
+#noise{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ── SPLASH ────────────────────────────────────────── */
+#splash{
+  position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  background:#050508;
+  transition:opacity .8s ease,visibility .8s ease;
+}
+#splash.splash-hide{opacity:0;visibility:hidden;pointer-events:none;}
+.splash-logo-ring{
+  width:90px;height:90px;border-radius:50%;
+  border:1px solid rgba(0,245,255,.4);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--glow-cyan);
+  animation:splashPulse 2s ease-in-out infinite;
+  margin-bottom:2rem;
+  position:relative;
+}
+.splash-logo-ring::before{
+  content:'';position:absolute;inset:-8px;border-radius:50%;
+  border:1px solid rgba(255,45,120,.25);
+  animation:splashRingOuter 2s ease-in-out infinite reverse;
+}
+@keyframes splashPulse{
+  0%,100%{box-shadow:0 0 10px rgba(0,245,255,.4),0 0 30px rgba(0,245,255,.15);}
+  50%{box-shadow:0 0 25px rgba(0,245,255,.8),0 0 60px rgba(0,245,255,.3);}
+}
+@keyframes splashRingOuter{
+  0%,100%{transform:scale(1);opacity:.4;}
+  50%{transform:scale(1.08);opacity:.8;}
+}
+.splash-monogram{
+  font-family:'Fraunces',serif;font-style:italic;font-size:1.6rem;
+  color:var(--c-cyan);text-shadow:var(--glow-cyan);
+  animation:glitch .1s steps(2) infinite;
+  animation-play-state:paused;
+}
+.splash-monogram.glitch-active{animation-play-state:running;}
+.splash-sys-text{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.25em;
+  color:rgba(0,245,255,.7);text-transform:uppercase;margin-bottom:.75rem;
+  white-space:nowrap;overflow:hidden;
+  border-right:1px solid var(--c-cyan);
+  animation:typewriter 1.8s steps(36) forwards;
+  max-width:0;
+}
+@keyframes typewriter{to{max-width:400px;}}
+.splash-progress-bar{
+  width:240px;height:2px;background:rgba(0,245,255,.15);border-radius:0;
+  overflow:hidden;margin-top:.5rem;
+}
+.splash-progress-bar::after{
+  content:'';display:block;height:100%;background:var(--c-cyan);
+  box-shadow:0 0 8px var(--c-cyan);
+  animation:progressFill 2.2s cubic-bezier(.4,0,.2,1) forwards;
+  width:0;
+}
+@keyframes progressFill{to{width:100%;}}
+.splash-pct{
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(0,245,255,.5);
+  margin-top:.4rem;letter-spacing:.15em;
+}
+
+/* ── GLITCH ANIMATION ─────────────────────────────── */
+@keyframes glitch{
+  0%{text-shadow:2px 0 var(--c-pink),-2px 0 var(--c-cyan);}
+  20%{text-shadow:-2px 0 var(--c-pink),2px 0 var(--c-cyan);}
+  40%{text-shadow:2px 2px var(--c-violet),-2px -1px var(--c-pink);}
+  60%{text-shadow:-1px 0 var(--c-cyan),1px 0 var(--c-pink);}
+  80%{text-shadow:1px -1px var(--c-violet),-1px 1px var(--c-cyan);}
+  100%{text-shadow:2px 0 var(--c-pink),-2px 0 var(--c-cyan);}
+}
+.glitch-title{position:relative;display:inline-block;}
+.glitch-title:hover{animation:glitch .08s steps(2) infinite;}
+.glitch-title:hover::before,.glitch-title:hover::after{
+  content:attr(data-glitch);position:absolute;inset:0;
+  font-family:inherit;font-size:inherit;font-weight:inherit;font-style:inherit;
+  white-space:pre-wrap;word-break:break-word;
+}
+.glitch-title:hover::before{
+  color:var(--c-pink);clip-path:polygon(0 30%,100% 30%,100% 50%,0 50%);
+  transform:translateX(-2px);animation:glitch .12s steps(2) infinite;
+}
+.glitch-title:hover::after{
+  color:var(--c-cyan);clip-path:polygon(0 60%,100% 60%,100% 75%,0 75%);
+  transform:translateX(2px);animation:glitch .1s steps(2) infinite reverse;
+}
+
+/* ── HEADER ────────────────────────────────────────── */
+#site-header{
+  height:var(--header-h);position:fixed;top:0;inset-x:0;z-index:50;
+  transition:background .4s,border-color .4s;
+}
+#site-header.scrolled{
+  background:rgba(5,5,8,.88);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(0,245,255,.2);
+}
+#site-header:not(.scrolled){border-bottom:1px solid transparent;}
+.nav-link{
+  position:relative;color:#6A6A8A;font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  transition:color .25s;
+}
+.nav-link::after{
+  content:'';position:absolute;left:0;right:0;bottom:-5px;height:1px;
+  background:var(--c-cyan);box-shadow:0 0 6px var(--c-cyan);
+  transform:scaleX(0);transform-origin:left;transition:transform .35s;
+}
+.nav-link:hover{color:#E8E8FF;}
+.nav-link:hover::after,.nav-link.is-active::after{transform:scaleX(1);}
+.nav-link.is-active{color:var(--c-cyan);text-shadow:0 0 8px rgba(0,245,255,.5);}
+
+.lang-pill{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:#6A6A8A;border:1px solid rgba(0,245,255,.18);
+  padding:.2rem .5rem;border-radius:2px;transition:all .2s;
+}
+.lang-pill:hover{color:#E8E8FF;border-color:rgba(0,245,255,.5);}
+.lang-pill.is-active{color:#050508;background:var(--c-cyan);border-color:var(--c-cyan);text-shadow:none;}
+
+/* ── BUTTONS ────────────────────────────────────────── */
+.btn-cyber{
+  position:relative;overflow:hidden;
+  background:transparent;border:1px solid var(--c-cyan);
+  color:var(--c-cyan);font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  padding:.85rem 1.75rem;border-radius:2px;
+  transition:all .3s;
+  text-shadow:0 0 8px rgba(0,245,255,.5);
+}
+.btn-cyber::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--c-cyan),var(--c-pink));
+  opacity:0;transition:opacity .35s;
+}
+.btn-cyber:hover::before{opacity:.12;}
+.btn-cyber:hover{
+  box-shadow:var(--glow-cyan);
+  transform:translateY(-2px);
+}
+.btn-cyber:active{transform:translateY(0);}
+
+.btn-cyber-filled{
+  position:relative;overflow:hidden;
+  background:var(--c-cyan);border:1px solid var(--c-cyan);
+  color:#050508;font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  padding:.85rem 1.75rem;border-radius:2px;
+  font-weight:600;
+  transition:all .3s;
+}
+.btn-cyber-filled:hover{
+  background:var(--c-pink);border-color:var(--c-pink);
+  box-shadow:var(--glow-pink);transform:translateY(-2px);
+}
+.btn-cyber-filled:active{transform:translateY(0);}
+
+/* ── MOBILE NAV ─────────────────────────────────────── */
+#mobile-nav{
+  position:fixed;inset:0;z-index:160;
+  background:rgba(5,5,8,.97);backdrop-filter:blur(20px);
+  flex-direction:column;
+  transition:opacity .4s,visibility .4s;
+  display:flex;
+}
+#mobile-nav.is-open{opacity:1;visibility:visible;}
+#mobile-nav:not(.is-open){opacity:0;visibility:hidden;}
+#mobile-nav .mnav-link{
+  font-family:'Fraunces',serif;font-style:italic;font-size:2.4rem;
+  color:#E8E8FF;opacity:0;transform:translateX(-20px);
+  transition:opacity .4s,transform .4s,color .2s;
+}
+#mobile-nav.is-open .mnav-link{opacity:1;transform:translateX(0);}
+#mobile-nav .mnav-link:hover{color:var(--c-cyan);text-shadow:var(--glow-cyan);}
+
+/* ── HERO ───────────────────────────────────────────── */
+.hero-spotlight{
+  background:radial-gradient(600px circle at var(--mx) var(--my),rgba(255,45,120,.1),transparent 55%);
+  pointer-events:none;position:absolute;inset:0;z-index:0;
+}
+.hero-frame-wrap{
+  animation:floatY 7s ease-in-out infinite;
+  will-change:transform;
+}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(-.8deg);}50%{transform:translateY(-14px) rotate(.4deg);}}
+.neon-border-box{
+  position:relative;padding:3px;border-radius:3px;
+  background:linear-gradient(135deg,var(--c-cyan),var(--c-pink),var(--c-violet));
+}
+.neon-border-box::before{
+  content:'';position:absolute;inset:1px;background:#0C0C14;border-radius:2px;z-index:0;
+}
+.neon-border-box>*{position:relative;z-index:1;}
+
+/* ── MARQUEE ────────────────────────────────────────── */
+.marquee-track{animation:marquee 32s linear infinite;}
+.marquee-track:hover{animation-play-state:paused;}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ── SECTION DIVIDERS ───────────────────────────────── */
+.section-divider{
+  height:1px;width:100%;
+  background:linear-gradient(90deg,transparent,var(--c-cyan),var(--c-pink),var(--c-violet),transparent);
+  opacity:.35;
+}
+
+/* ── REVEAL ─────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+.reveal.is-visible{opacity:1;transform:translateY(0);}
+
+/* ── PROCESS STEPS ──────────────────────────────────── */
+.process-card{
+  border:1px solid rgba(0,245,255,.15);background:rgba(12,12,20,.7);
+  border-radius:3px;padding:1.5rem;position:relative;overflow:hidden;
+  transition:border-color .35s,box-shadow .35s;
+}
+.process-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--c-cyan),var(--c-pink));
+  opacity:0;transition:opacity .35s;
+}
+.process-card:hover{border-color:rgba(0,245,255,.45);box-shadow:0 0 30px rgba(0,245,255,.08);}
+.process-card:hover::before{opacity:1;}
+
+/* ── FILTER PILLS ───────────────────────────────────── */
+.filter-pill{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  border:1px solid rgba(0,245,255,.2);color:#6A6A8A;
+  padding:.4rem 1rem;border-radius:2px;transition:all .25s;
+}
+.filter-pill:hover{color:#E8E8FF;border-color:rgba(0,245,255,.5);}
+.filter-pill.is-active{
+  background:var(--c-cyan);color:#050508;border-color:var(--c-cyan);
+  box-shadow:0 0 12px rgba(0,245,255,.5);font-weight:600;
+}
+
+/* ── MASONRY GALLERY ────────────────────────────────── */
+.masonry{column-count:1;column-gap:1rem;}
+@media(min-width:640px){.masonry{column-count:2;}}
+@media(min-width:1024px){.masonry{column-count:3;}}
+@media(min-width:1400px){.masonry{column-count:4;}}
+.masonry-item{break-inside:avoid;margin-bottom:1rem;}
+.masonry-item.is-hidden{display:none;}
+
+/* Gallery card neon frame */
+.gallery-card{
+  position:relative;border-radius:3px;overflow:hidden;cursor:pointer;
+  border:1px solid rgba(0,245,255,.15);
+  transition:border-color .4s,box-shadow .4s,transform .4s;
+}
+.gallery-card img{transition:transform .7s cubic-bezier(.16,1,.3,1);display:block;width:100%;height:auto;}
+.gallery-card:hover img{transform:scale(1.05);}
+.gallery-card:hover{
+  border-color:var(--c-cyan);
+  box-shadow:0 0 0 1px var(--c-cyan),var(--glow-cyan),0 0 40px rgba(255,45,120,.15);
+  transform:translateY(-2px);
+}
+
+/* Neon scan line on hover */
+.gallery-card::after{
+  content:'';position:absolute;top:-100%;left:0;right:0;height:40%;
+  background:linear-gradient(180deg,transparent,rgba(0,245,255,.08),transparent);
+  transition:top .5s;pointer-events:none;
+}
+.gallery-card:hover::after{top:120%;}
+
+/* Surrounding dimming when one card is hovered */
+.masonry:has(.gallery-card:hover) .gallery-card:not(:hover){opacity:.55;transition:opacity .35s;}
+.masonry:not(:has(.gallery-card:hover)) .gallery-card{opacity:1;transition:opacity .35s;}
+
+/* Gallery overlay */
+.gallery-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(5,5,8,.95) 100%);
+  opacity:0;transition:opacity .4s;display:flex;align-items:flex-end;padding:1rem;
+}
+.gallery-card:hover .gallery-overlay,.gallery-card:focus-within .gallery-overlay{opacity:1;}
+.gallery-overlay-btn{transform:translateY(8px);opacity:0;transition:all .35s .05s;}
+.gallery-card:hover .gallery-overlay-btn,.gallery-card:focus-within .gallery-overlay-btn{transform:translateY(0);opacity:1;}
+
+/* Figcaption — neon flicker on hover */
+.gallery-caption{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;margin-top:.6rem;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 .1rem;transition:all .3s;
+}
+.masonry-item:hover .gallery-caption .cap-title{color:#E8E8FF;}
+.masonry-item:hover .gallery-caption .cap-tech{
+  color:var(--c-cyan);text-shadow:var(--glow-cyan);
+  animation:flicker .2s steps(1) 3;
+}
+@keyframes flicker{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ── LIGHTBOX ───────────────────────────────────────── */
+#lightbox{
+  position:fixed;inset:0;z-index:180;
+  background:rgba(5,5,8,.96);backdrop-filter:blur(18px);
+  display:flex;align-items:center;justify-content:center;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  transition:opacity .4s,visibility .4s;
+}
+#lightbox.is-open{opacity:1;visibility:visible;}
+#lightbox:not(.is-open){opacity:0;visibility:hidden;pointer-events:none;}
+
+.lb-inner{
+  display:grid;grid-template-columns:1fr;
+  max-width:1100px;width:100%;max-height:95dvh;
+  gap:0;
+  border:1px solid rgba(0,245,255,.25);border-radius:3px;overflow:hidden;
+  box-shadow:0 0 60px rgba(0,245,255,.12),0 0 120px rgba(255,45,120,.08);
+}
+@media(min-width:768px){
+  .lb-inner{grid-template-columns:1fr 340px;max-height:90dvh;}
+}
+.lb-img-wrap{
+  position:relative;background:#08080F;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  min-height:300px;
+}
+.lb-img-wrap::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,245,255,.04),transparent 50%,rgba(255,45,120,.04));
+  pointer-events:none;
+}
+#lightbox-img{
+  max-width:100%;max-height:80dvh;object-fit:contain;
+  display:block;border-radius:0;
+}
+@media(min-width:768px){#lightbox-img{max-height:90dvh;}}
+
+.lb-info{
+  background:#0C0C14;border-left:1px solid rgba(0,245,255,.15);
+  padding:1.75rem;display:flex;flex-direction:column;gap:1.25rem;
+  justify-content:space-between;
+}
+.lb-badge{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.25em;text-transform:uppercase;padding:.3rem .7rem;
+  border:1px solid rgba(0,245,255,.4);color:var(--c-cyan);border-radius:2px;
+  text-shadow:0 0 6px rgba(0,245,255,.5);
+}
+.lb-status{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;
+  text-transform:uppercase;color:rgba(0,255,128,.8);
+  display:flex;align-items:center;gap:.5rem;
+}
+.lb-status::before{
+  content:'';width:6px;height:6px;border-radius:50%;background:#00FF80;
+  box-shadow:0 0 6px #00FF80;animation:statusBlink 2s ease-in-out infinite;
+}
+@keyframes statusBlink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* CTA button with animated neon gradient */
+.lb-cta-btn{
+  display:block;text-align:center;
+  padding:1rem 1.5rem;border-radius:2px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:#050508;font-weight:600;
+  background:linear-gradient(135deg,var(--c-cyan),var(--c-pink));
+  background-size:200% 200%;
+  animation:gradientShift 3s ease infinite;
+  box-shadow:0 0 20px rgba(0,245,255,.4),0 0 40px rgba(255,45,120,.2);
+  transition:transform .3s,box-shadow .3s;
+}
+.lb-cta-btn:hover{
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:0 0 30px rgba(0,245,255,.7),0 0 60px rgba(255,45,120,.4);
+  animation:gradientShift .8s ease infinite,ctaPulse .6s ease-in-out infinite;
+}
+@keyframes gradientShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+@keyframes ctaPulse{0%,100%{box-shadow:0 0 30px rgba(0,245,255,.7),0 0 60px rgba(255,45,120,.4);}50%{box-shadow:0 0 50px rgba(0,245,255,1),0 0 90px rgba(255,45,120,.7);}}
+
+.lb-nav-btn{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  border:1px solid rgba(0,245,255,.3);background:rgba(5,5,8,.7);backdrop-filter:blur(8px);
+  color:#E8E8FF;display:flex;align-items:center;justify-content:center;
+  transition:all .25s;
+  padding:env(safe-area-inset-top) 0 0 0;
+}
+.lb-nav-btn:hover{border-color:var(--c-cyan);box-shadow:var(--glow-cyan);color:var(--c-cyan);}
+#lb-prev{left:.75rem;} #lb-next{right:.75rem;}
+#lb-close{
+  position:absolute;top:calc(.75rem + env(safe-area-inset-top));right:.75rem;
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(255,45,120,.4);background:rgba(5,5,8,.8);
+  color:#E8E8FF;display:flex;align-items:center;justify-content:center;
+  transition:all .25s;z-index:10;
+}
+#lb-close:hover{border-color:var(--c-pink);box-shadow:var(--glow-pink);color:var(--c-pink);}
+
+/* ── CTA SECTION ────────────────────────────────────── */
+.cta-glow-bg{
+  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(139,0,255,.12),transparent 70%),
+             radial-gradient(ellipse 50% 40% at 30% 50%,rgba(0,245,255,.07),transparent 60%),
+             radial-gradient(ellipse 50% 40% at 70% 50%,rgba(255,45,120,.07),transparent 60%);
+}
+
+/* ── WA FLOAT ───────────────────────────────────────── */
+#wa-float{
+  position:fixed;z-index:40;right:1.25rem;
+  bottom:calc(1.25rem + env(safe-area-inset-bottom));
+  animation:waFloat 3s ease-in-out infinite;
+}
+@media(min-width:768px){#wa-float{right:2rem;bottom:calc(2rem + env(safe-area-inset-bottom));}}
+@keyframes waFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+.wa-btn{
+  width:60px;height:60px;border-radius:50%;
+  background:#050508;border:1px solid var(--c-cyan);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--glow-cyan);position:relative;
+  transition:box-shadow .3s;
+}
+.wa-btn:hover{box-shadow:0 0 25px rgba(0,245,255,1),0 0 50px rgba(0,245,255,.5);}
+.wa-pulse{
+  position:absolute;inset:0;border-radius:50%;background:rgba(0,245,255,.15);
+  animation:waPulse 2.4s ease-out infinite;
+}
+@keyframes waPulse{0%{transform:scale(.85);opacity:.6;}100%{transform:scale(1.85);opacity:0;}}
+
+/* ── FOOTER ─────────────────────────────────────────── */
+footer a:hover{color:var(--c-cyan);}
+
+/* ── ABOUT AVATAR ───────────────────────────────────── */
+.about-avatar{
+  border:1px solid rgba(0,245,255,.3);
+  box-shadow:inset 0 0 40px rgba(0,245,255,.04),0 0 40px rgba(0,245,255,.08);
+}
+
+/* ── ACCESSIBILITY ──────────────────────────────────── */
+a:focus-visible,button:focus-visible{outline:2px solid var(--c-cyan);outline-offset:3px;border-radius:2px;}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important;}
+}
+
+/* ── SCROLLBAR ──────────────────────────────────────── */
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:#050508;}
+::-webkit-scrollbar-thumb{background:#16162A;border-radius:4px;border:1px solid rgba(0,245,255,.15);}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,245,255,.2);}
+</style>
+</head>
+
+<body class="text-bone font-body antialiased no-scroll">
+
+<!-- Fixed BG layers (below z-10) -->
+<div id="cp-grid"></div>
+<div id="noise"></div>
+<div id="scanlines"></div>
+
+<!-- ══════════════════════════════════════════════════
+     SPLASH — Cyberpunk OS boot screen
+     ══════════════════════════════════════════════════ -->
+<div id="splash" aria-hidden="true">
+  <div class="splash-logo-ring">
+    <span class="splash-monogram" id="splash-mono">AN</span>
+  </div>
+  <p class="splash-sys-text" id="splash-sys" data-i18n="splash_sys">INITIALIZING PORTRAIT GALLERY SYSTEM...</p>
+  <div class="splash-progress-bar"></div>
+  <p class="splash-pct" id="splash-pct">0%</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     HEADER
+     ══════════════════════════════════════════════════ -->
+<header id="site-header" class="fixed top-0 inset-x-0 z-50">
+  <div class="max-w-7xl mx-auto h-full px-5 md:px-8 flex items-center justify-between">
+
+    <!-- Logo -->
+    <a href="#home" class="flex items-center gap-3 shrink-0">
+      <span class="w-9 h-9 rounded-full border flex items-center justify-center font-display italic text-sm"
+            style="border-color:rgba(0,245,255,.4);color:var(--c-cyan);box-shadow:0 0 12px rgba(0,245,255,.25);">AN</span>
+      <span class="font-display italic text-lg hidden sm:block" style="color:#E8E8FF;">ArtNonimu's</span>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="hidden lg:flex items-center gap-8">
+      <a href="#home"            class="nav-link" data-i18n="nav_home">Start</a>
+      <a href="#about"           class="nav-link" data-i18n="nav_about">Pracownia</a>
+      <a href="#process"         class="nav-link" data-i18n="nav_process">Proces</a>
+      <a href="#galeria-zwierzeta" class="nav-link" data-i18n="nav_gallery_a">Zwierzęta</a>
+      <a href="#galeria-ludzie"  class="nav-link" data-i18n="nav_gallery_b">Ludzie</a>
+      <a href="#kontakt"         class="nav-link" data-i18n="nav_contact">Kontakt</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <!-- Lang switcher -->
+      <div class="lang-switch flex gap-1" role="group">
+        <button type="button" data-lang="pl" class="lang-pill">PL</button>
+        <button type="button" data-lang="en" class="lang-pill">EN</button>
+        <button type="button" data-lang="es" class="lang-pill">ES</button>
+      </div>
+      <!-- Header CTA (desktop) -->
+      <a href="#" target="_blank" rel="noopener" class="js-wa-generic btn-cyber hidden md:inline-flex items-center gap-2">
+        <span data-i18n="header_cta">Napisz na WhatsApp</span>
+      </a>
+      <!-- Mobile menu toggle -->
+      <button id="menu-toggle" type="button" class="lg:hidden p-2" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav" style="color:#E8E8FF;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     MOBILE NAV
+     ══════════════════════════════════════════════════ -->
+<div id="mobile-nav" class="fixed inset-0 z-[160]" style="padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);">
+  <div class="flex items-center justify-between px-5 h-[72px] border-b" style="border-color:rgba(0,245,255,.15);">
+    <span class="font-display italic text-lg" style="color:#E8E8FF;">ArtNonimu's</span>
+    <button id="menu-close" type="button" class="p-2" style="color:#E8E8FF;" aria-label="Close">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+    </button>
+  </div>
+  <nav class="flex-1 flex flex-col justify-center items-start gap-5 px-8">
+    <a href="#home"              class="mnav-link" data-i18n="nav_home">Start</a>
+    <a href="#about"             class="mnav-link" data-i18n="nav_about">Pracownia</a>
+    <a href="#process"           class="mnav-link" data-i18n="nav_process">Proces</a>
+    <a href="#galeria-zwierzeta" class="mnav-link" data-i18n="nav_gallery_a">Zwierzęta</a>
+    <a href="#galeria-ludzie"    class="mnav-link" data-i18n="nav_gallery_b">Ludzie</a>
+    <a href="#kontakt"           class="mnav-link" data-i18n="nav_contact">Kontakt</a>
+  </nav>
+  <div class="px-8 pb-10 flex flex-col gap-4">
+    <div class="flex gap-2">
+      <button type="button" data-lang="pl" class="lang-pill">PL</button>
+      <button type="button" data-lang="en" class="lang-pill">EN</button>
+      <button type="button" data-lang="es" class="lang-pill">ES</button>
+    </div>
+    <a href="#" target="_blank" rel="noopener" class="js-wa-generic btn-cyber-filled text-center">
+      <span data-i18n="header_cta">Napisz na WhatsApp</span>
+    </a>
+  </div>
+</div>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════
+     HERO
+     ══════════════════════════════════════════════════ -->
+<section id="home" class="relative min-h-[100svh] flex items-center pt-[var(--header-h)] overflow-hidden">
+  <div class="hero-spotlight"></div>
+  <div class="max-w-7xl mx-auto w-full px-5 md:px-8 grid lg:grid-cols-12 gap-12 items-center py-16 relative z-10">
+
+    <div class="lg:col-span-7">
+      <p class="reveal font-mono text-[10px] uppercase tracking-[.3em] mb-5" style="color:var(--c-cyan);text-shadow:0 0 8px rgba(0,245,255,.5);" data-i18n="hero_eyebrow">Pracownia portretu · Polska</p>
+
+      <h1 class="reveal font-display font-medium text-[2.4rem] leading-[1.08] sm:text-5xl lg:text-[3.8rem] lg:leading-[1.06]"
+          style="color:#E8E8FF;"
+          data-i18n-html="hero_title">
+        <span class="glitch-title" data-glitch="Twoje wspomnienia,">Twoje wspomnienia,</span>
+        <em class="italic" style="color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.45);">namalowane</em> ręcznie.
+      </h1>
+
+      <p class="reveal mt-6 max-w-xl text-base sm:text-lg leading-relaxed" style="color:#6A6A8A;" data-i18n="hero_subtitle">
+        Zamieniam zdjęcia ulubionych zwierząt i bliskich osób w unikatowe dzieła.
+      </p>
+
+      <div class="reveal mt-10 flex flex-wrap gap-4">
+        <a href="#" target="_blank" rel="noopener" class="js-wa-generic btn-cyber-filled inline-flex items-center gap-2">
+          <span data-i18n="hero_cta_primary">Zamów swój portret</span>
+        </a>
+        <a href="#galeria-zwierzeta" class="btn-cyber inline-flex items-center gap-2">
+          <span data-i18n="hero_cta_secondary">Przejdź do galerii</span>
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="reveal mt-12 flex flex-wrap gap-8">
+        <div>
+          <p class="font-mono text-2xl font-semibold" style="color:var(--c-cyan);text-shadow:var(--glow-cyan);">100%</p>
+          <p class="font-mono text-[10px] uppercase tracking-[.2em]" style="color:#6A6A8A;" data-i18n="stat_handmade">Ręcznie tworzone</p>
+        </div>
+        <div>
+          <p class="font-mono text-2xl font-semibold" style="color:var(--c-pink);text-shadow:var(--glow-pink);">1/1</p>
+          <p class="font-mono text-[10px] uppercase tracking-[.2em]" style="color:#6A6A8A;" data-i18n="stat_unique">Unikatowy oryginał</p>
+        </div>
+        <div>
+          <p class="font-mono text-2xl font-semibold" style="color:var(--c-gold);text-shadow:0 0 12px rgba(255,215,0,.6);">PL</p>
+          <p class="font-mono text-[10px] uppercase tracking-[.2em]" style="color:#6A6A8A;" data-i18n="stat_shipping">Wysyłka w Polsce</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero artwork -->
+    <div class="lg:col-span-5 reveal flex justify-center">
+      <div class="hero-frame-wrap w-full max-w-xs sm:max-w-sm">
+        <div class="neon-border-box">
+          <img src="https://i.ibb.co/ks3g5d7K/IMG-20260620-WA0017.jpg"
+               alt="Portret na zamówienie — ArtNonimu's"
+               class="w-full object-cover rounded-[2px]" style="max-height:460px;object-fit:cover;" loading="eager">
+        </div>
+        <div class="flex justify-between items-center mt-2 px-1">
+          <span class="font-mono text-[9px] uppercase tracking-[.25em]" style="color:#6A6A8A;">ArtNonimu's</span>
+          <span class="font-mono text-[9px] uppercase tracking-[.2em]" style="color:var(--c-cyan);">Oryginał · 01/01</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Marquee -->
+  <div class="absolute bottom-0 inset-x-0 overflow-hidden py-3 border-t" style="background:rgba(5,5,8,.85);backdrop-filter:blur(10px);border-color:rgba(0,245,255,.12);">
+    <div id="marquee-track" class="marquee-track flex whitespace-nowrap font-mono text-[10px] uppercase tracking-[.25em] gap-10" style="color:#6A6A8A;"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     ABOUT
+     ══════════════════════════════════════════════════ -->
+<section id="about" class="py-28 md:py-36 relative z-10">
+  <div class="section-divider mb-0"></div>
+  <div class="max-w-7xl mx-auto px-5 md:px-8 grid lg:grid-cols-12 gap-14 items-center py-28 md:py-36">
+
+    <div class="lg:col-span-5 reveal order-2 lg:order-1 flex justify-center">
+      <div class="about-avatar w-full max-w-sm aspect-[4/5] rounded-sm flex items-center justify-center"
+           style="background:rgba(12,12,20,.9);border-radius:3px;">
+        <div class="flex flex-col items-center gap-4">
+          <span class="w-28 h-28 rounded-full flex items-center justify-center font-display italic text-4xl"
+                style="border:1px solid rgba(0,245,255,.35);color:var(--c-cyan);background:#050508;box-shadow:var(--glow-cyan);">AN</span>
+          <span class="font-mono text-[10px] uppercase tracking-[.25em]" style="color:#6A6A8A;">ArtNonimu's · Studio</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7 order-1 lg:order-2">
+      <p class="reveal font-mono text-[10px] uppercase tracking-[.3em] mb-5" style="color:var(--c-cyan);" data-i18n="about_eyebrow">O pracowni</p>
+      <h2 class="reveal font-display font-medium text-3xl sm:text-4xl lg:text-5xl leading-tight"
+          style="color:#E8E8FF;"
+          data-i18n-html="about_title">
+        Ręka, oko <em class="italic" style="color:var(--c-pink);text-shadow:0 0 16px rgba(255,45,120,.4);">i odrobina czasu</em>.
+      </h2>
+      <p class="reveal mt-7 text-base sm:text-lg leading-relaxed max-w-2xl" style="color:#6A6A8A;" data-i18n="about_text">
+        Każdy portret zaczyna się od zwykłego zdjęcia.
+      </p>
+      <p class="reveal mt-8 font-display italic text-xl" style="color:#E8E8FF;">ArtNonimu's</p>
+    </div>
+  </div>
+  <div class="section-divider"></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PROCESS
+     ══════════════════════════════════════════════════ -->
+<section id="process" class="py-28 md:py-36 relative z-10" style="background:rgba(12,12,20,.5);">
+  <div class="max-w-7xl mx-auto px-5 md:px-8">
+    <div class="max-w-2xl mb-14 reveal">
+      <p class="font-mono text-[10px] uppercase tracking-[.3em] mb-5" style="color:var(--c-cyan);" data-i18n="process_eyebrow">Jak to działa</p>
+      <h2 class="font-display font-medium text-3xl sm:text-4xl lg:text-5xl" style="color:#E8E8FF;" data-i18n="process_title">Trzy kroki do Twojego dzieła</h2>
+    </div>
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div class="process-card reveal">
+        <span class="block font-mono text-xs mb-4" style="color:var(--c-cyan);">[ 01 ]</span>
+        <h3 class="font-display text-2xl mb-3" style="color:#E8E8FF;" data-i18n="process_step1_title">Wyślij zdjęcie</h3>
+        <p class="text-sm leading-relaxed" style="color:#6A6A8A;" data-i18n="process_step1_text">Prześlij ulubione zdjęcie przez WhatsApp.</p>
+      </div>
+      <div class="process-card reveal">
+        <span class="block font-mono text-xs mb-4" style="color:var(--c-pink);">[ 02 ]</span>
+        <h3 class="font-display text-2xl mb-3" style="color:#E8E8FF;" data-i18n="process_step2_title">Wybierz technikę</h3>
+        <p class="text-sm leading-relaxed" style="color:#6A6A8A;" data-i18n="process_step2_text">Razem dobierzemy najlepszą formę.</p>
+      </div>
+      <div class="process-card reveal">
+        <span class="block font-mono text-xs mb-4" style="color:var(--c-violet);">[ 03 ]</span>
+        <h3 class="font-display text-2xl mb-3" style="color:#E8E8FF;" data-i18n="process_step3_title">Odbierz dzieło</h3>
+        <p class="text-sm leading-relaxed" style="color:#6A6A8A;" data-i18n="process_step3_text">Tworzę portret ręcznie i bezpiecznie go wysyłam.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     GALLERY A — Animals
+     ══════════════════════════════════════════════════ -->
+<section id="galeria-zwierzeta" class="py-28 md:py-36 relative z-10">
+  <div class="section-divider mb-0"></div>
+  <div class="max-w-7xl mx-auto px-5 md:px-8 pt-16">
+    <div class="max-w-2xl mb-10 reveal">
+      <p class="font-mono text-[10px] uppercase tracking-[.3em] mb-5" style="color:var(--c-cyan);" data-i18n="cat_a_eyebrow">Rozdział I</p>
+      <h2 class="font-display font-medium text-3xl sm:text-4xl lg:text-5xl" style="color:#E8E8FF;" data-i18n="cat_a_title">Portrety Zwierząt</h2>
+      <p class="mt-4 text-base" style="color:#6A6A8A;" data-i18n="cat_a_subtitle">Psy, koty i inni czworonożni bohaterowie.</p>
+    </div>
+    <div id="filters-a" class="flex flex-wrap gap-2 mb-8 reveal"></div>
+    <div id="grid-a" class="masonry"></div>
+    <p id="empty-a" class="hidden font-mono text-xs uppercase tracking-widest py-10 text-center" style="color:#6A6A8A;" data-i18n="gallery_empty"></p>
+  </div>
+  <div class="section-divider mt-16"></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     GALLERY B — People
+     ══════════════════════════════════════════════════ -->
+<section id="galeria-ludzie" class="py-28 md:py-36 relative z-10" style="background:rgba(12,12,20,.4);">
+  <div class="max-w-7xl mx-auto px-5 md:px-8">
+    <div class="max-w-2xl mb-10 reveal">
+      <p class="font-mono text-[10px] uppercase tracking-[.3em] mb-5" style="color:var(--c-pink);" data-i18n="cat_b_eyebrow">Rozdział II</p>
+      <h2 class="font-display font-medium text-3xl sm:text-4xl lg:text-5xl" style="color:#E8E8FF;" data-i18n="cat_b_title">Portrety Ludzi</h2>
+      <p class="mt-4 text-base" style="color:#6A6A8A;" data-i18n="cat_b_subtitle">Portrety bliskich osób.</p>
+    </div>
+    <div id="filters-b" class="flex flex-wrap gap-2 mb-8 reveal"></div>
+    <div id="grid-b" class="masonry"></div>
+    <p id="empty-b" class="hidden font-mono text-xs uppercase tracking-widest py-10 text-center" style="color:#6A6A8A;" data-i18n="gallery_empty"></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     FINAL CTA
+     ══════════════════════════════════════════════════ -->
+<section id="kontakt" class="py-28 md:py-36 relative z-10 cta-glow-bg overflow-hidden">
+  <div class="section-divider mb-0"></div>
+  <div class="max-w-4xl mx-auto px-5 md:px-8 text-center pt-16 pb-4">
+    <p class="reveal font-mono text-[10px] uppercase tracking-[.3em] mb-5" style="color:var(--c-cyan);" data-i18n="final_cta_eyebrow">Zaproszenie</p>
+    <h2 class="reveal font-display font-medium text-4xl sm:text-5xl lg:text-6xl leading-tight"
+        style="color:#E8E8FF;"
+        data-i18n-html="final_cta_title">
+      Stwórzmy coś, co <em class="italic" style="color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.5);">zostanie</em> na zawsze.
+    </h2>
+    <p class="reveal mt-6 text-base sm:text-lg leading-relaxed max-w-xl mx-auto" style="color:#6A6A8A;" data-i18n="final_cta_subtitle">
+      Napisz teraz i otrzymaj bezpłatną wycenę.
+    </p>
+    <a href="#" target="_blank" rel="noopener" class="js-wa-generic reveal lb-cta-btn inline-block mt-10 px-10 py-4 text-sm" data-i18n="final_cta_button">
+      Napisz na WhatsApp
+    </a>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════════════════ -->
+<footer class="relative z-10 py-16 border-t" style="border-color:rgba(0,245,255,.1);background:rgba(5,5,8,.9);">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <div>
+      <a href="#home" class="flex items-center gap-3 mb-4">
+        <span class="w-8 h-8 rounded-full border flex items-center justify-center font-display italic text-sm"
+              style="border-color:rgba(0,245,255,.35);color:var(--c-cyan);">AN</span>
+        <span class="font-display italic text-base" style="color:#E8E8FF;">ArtNonimu's</span>
+      </a>
+      <p class="text-sm leading-relaxed" style="color:#6A6A8A;" data-i18n="footer_made">Tworzone ręcznie w Polsce.</p>
+    </div>
+    <div>
+      <p class="font-mono text-[10px] uppercase tracking-[.25em] mb-4" style="color:var(--c-cyan);" data-i18n="footer_nav_title">Nawigacja</p>
+      <ul class="space-y-3 text-sm" style="color:#6A6A8A;">
+        <li><a href="#about"             class="transition-colors" data-i18n="nav_about">Pracownia</a></li>
+        <li><a href="#galeria-zwierzeta" class="transition-colors" data-i18n="nav_gallery_a">Zwierzęta</a></li>
+        <li><a href="#galeria-ludzie"    class="transition-colors" data-i18n="nav_gallery_b">Ludzie</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="font-mono text-[10px] uppercase tracking-[.25em] mb-4" style="color:var(--c-cyan);" data-i18n="footer_contact_title">Kontakt</p>
+      <ul class="space-y-3 text-sm" style="color:#6A6A8A;">
+        <li><a href="#" target="_blank" rel="noopener" class="js-wa-generic transition-colors">WhatsApp · +48 692 971 895</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="font-mono text-[10px] uppercase tracking-[.25em] mb-4" style="color:var(--c-cyan);" data-i18n="footer_follow_title">Obserwuj</p>
+      <div class="flex gap-3">
+        <a href="https://www.facebook.com/share/1HShtjirCN/" target="_blank" rel="noopener" aria-label="Facebook"
+           class="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+           style="border:1px solid rgba(0,245,255,.2);color:#6A6A8A;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06C2 17.08 5.66 21.23 10.44 22v-7.03H7.9v-2.91h2.54V9.84c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.91h-2.33V22C18.34 21.23 22 17.08 22 12.06Z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/artnonimu_s?igsh=M2w1aDN4M3E5aGsy" target="_blank" rel="noopener" aria-label="Instagram"
+           class="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+           style="border:1px solid rgba(0,245,255,.2);color:#6A6A8A;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-5 md:px-8 mt-12 pt-8 border-t flex flex-col sm:flex-row gap-3 justify-between font-mono text-xs"
+       style="border-color:rgba(0,245,255,.08);color:#6A6A8A;">
+    <span>© <span id="footer-year"></span> ArtNonimu's. <span data-i18n="footer_rights">Wszelkie prawa zastrzeżone.</span></span>
+    <span>Made in Poland 🇵🇱</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════
+     WA FLOAT BUTTON
+     ══════════════════════════════════════════════════ -->
+<a id="wa-float" href="#" target="_blank" rel="noopener" aria-label="WhatsApp" class="js-wa-generic">
+  <div class="wa-btn">
+    <span class="wa-pulse"></span>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.84.5 3.56 1.36 5.03L2 22l5.21-1.46a9.85 9.85 0 0 0 4.82 1.27h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Z"
+            fill="none" stroke="var(--c-cyan)" stroke-width="1.4"/>
+      <path d="M9 10.5c.5 1.2 1.4 2.5 2.5 3.2m0 0c1 .6 2 .9 3 .8m-3-.8-.2.8m-5-4.5c.1-.6.5-1 1-1.2.4-.1.8 0 1 .3l.8 1.5c.1.3 0 .6-.2.8l-.5.5c.5 1 1.3 1.8 2.3 2.3l.5-.5c.2-.2.5-.3.8-.2l1.5.8c.3.2.4.6.3 1-.2.5-.6.9-1.2 1C10 16.5 7.5 14 7.5 11Z"
+            fill="none" stroke="var(--c-cyan)" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </div>
+</a>
+
+<!-- ══════════════════════════════════════════════════
+     LIGHTBOX
+     ══════════════════════════════════════════════════ -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Podgląd pracy">
+  <button id="lb-close" aria-label="Zamknij">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+  </button>
+
+  <div class="lb-inner relative" style="margin:0 auto;">
+    <!-- Image side -->
+    <div class="lb-img-wrap">
+      <button id="lb-prev" class="lb-nav-btn" aria-label="Poprzednia">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <img id="lightbox-img" src="" alt="" loading="lazy">
+      <button id="lb-next" class="lb-nav-btn" aria-label="Następna">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+    </div>
+
+    <!-- Info side -->
+    <div class="lb-info">
+      <div class="flex flex-col gap-4">
+        <span class="lb-badge" data-i18n="cat_a_eyebrow">Rozdział I</span>
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[.2em] mb-1" style="color:#6A6A8A;">
+            <span data-i18n="piece_label_lb">Tytuł</span>
+          </p>
+          <p id="lightbox-title" class="font-display text-2xl" style="color:#E8E8FF;"></p>
+        </div>
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[.2em] mb-1" style="color:#6A6A8A;" data-i18n="lb_technique_label">Technika</p>
+          <p id="lightbox-technique" class="font-mono text-sm" style="color:var(--c-cyan);text-shadow:0 0 8px rgba(0,245,255,.4);"></p>
+        </div>
+        <div class="lb-status" data-i18n="lb_status">Dostępne na zamówienie</div>
+      </div>
+
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-[.2em] mb-3" style="color:#6A6A8A;" data-i18n="lb_cta_label">Zamów tę pracę</p>
+        <a id="lightbox-cta" href="#" target="_blank" rel="noopener" class="lb-cta-btn" data-i18n="lightbox_cta">
+          Zamów tę pracę
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+     ══════════════════════════════════════════════════ -->
+<script>
+(function(){"use strict";
+
+/* ── CONFIG ─────────────────────────────────────────── */
+const WHATSAPP_NUMBER = "48692971895";
+
+const galleryData = {
+  a:[
+    {src:"https://i.ibb.co/ks3g5d7K/IMG-20260620-WA0017.jpg",   subcat:"wood"},
+    {src:"https://i.ibb.co/DHPdyq5K/IMG-20260620-WA0067.jpg",   subcat:"wood"},
+    {src:"https://i.ibb.co/jvZxQTDS/IMG-20260620-WA0065.jpg",   subcat:"pencil"},
+    {src:"https://i.ibb.co/xTdFkgH/IMG-20260620-WA0018.jpg",    subcat:"pencil"},
+    {src:"https://i.ibb.co/prZ0vPPV/FB-IMG-1781952288967.jpg",  subcat:"bw"},
+    {src:"https://i.ibb.co/VhCG4DW/FB-IMG-1781951275111.jpg",   subcat:"bw"},
+    {src:"https://i.ibb.co/4ZDyWMzp/FB-IMG-1781890667100.jpg",  subcat:"color"},
+    {src:"https://i.ibb.co/Ld0fy84w/FB-IMG-1781890658916.jpg",  subcat:"color"}
+  ],
+  b:[
+    {src:"https://i.ibb.co/PsNq3hRD/IMG-20260614-WA0005-1.jpg", subcat:"wood"},
+    {src:"https://i.ibb.co/G4CJH7qt/IMG-20260614-WA0004-1.jpg", subcat:"pencil"},
+    {src:"https://i.ibb.co/WvpjN2d7/IMG-20260614-WA0003-1.jpg", subcat:"bw"}
+  ]
+};
+const SUBCATS = ["wood","pencil","bw","color"];
+
+/* ── TRANSLATIONS ───────────────────────────────────── */
+const translations = {
+  pl:{
+    nav_home:"Start",nav_about:"Pracownia",nav_process:"Proces",nav_gallery_a:"Zwierzęta",nav_gallery_b:"Ludzie",nav_contact:"Kontakt",
+    header_cta:"Napisz na WhatsApp",
+    splash_sys:"INITIALIZING PORTRAIT GALLERY SYSTEM...",
+    hero_eyebrow:"Pracownia portretu · Polska",
+    hero_title:"Twoje wspomnienia, <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.45);\">namalowane</em> ręcznie.",
+    hero_subtitle:"Zamieniam zdjęcia ulubionych zwierząt i bliskich osób w unikatowe dzieła — malowane na drewnie, rysowane ołówkiem lub przedstawione jako karykatura. Każda praca powstaje od podstaw, w jednym egzemplarzu.",
+    hero_cta_primary:"Zamów swój portret",hero_cta_secondary:"Przejdź do galerii",
+    stat_handmade:"Ręcznie tworzone",stat_unique:"Unikatowy oryginał",stat_shipping:"Wysyłka w Polsce",
+    about_eyebrow:"O pracowni",
+    about_title:"Ręka, oko <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 16px rgba(255,45,120,.4);\">i odrobina czasu</em>.",
+    about_text:"Każdy portret zaczyna się od zwykłego zdjęcia — i kilkudziesięciu godzin pracy. Maluję na desce lipowej, rysuję grafitem, kreślę karykatury z humorem i czułością. Bez druku, bez kopii — tylko oryginał, który trafia bezpośrednio do Ciebie, gdziekolwiek jesteś w Polsce.",
+    process_eyebrow:"Jak to działa",process_title:"Trzy kroki do Twojego dzieła",
+    process_step1_title:"Wyślij zdjęcie",process_step1_text:"Prześlij ulubione zdjęcie swojego zwierzaka lub bliskiej osoby przez WhatsApp — im wyraźniejsze, tym lepiej.",
+    process_step2_title:"Wybierz technikę",process_step2_text:"Razem dobierzemy najlepszą formę: malarstwo na drewnie, rysunek ołówkiem albo karykaturę czarno-białą lub kolorową.",
+    process_step3_title:"Odbierz dzieło",process_step3_text:"Tworzę portret ręcznie, pokazując po drodze postępy, a gotową pracę bezpiecznie pakuję i wysyłam do Ciebie.",
+    cat_a_eyebrow:"Rozdział I",cat_a_title:"Portrety Zwierząt",cat_a_subtitle:"Psy, koty i inni czworonożni bohaterowie — uwiecznieni z czułością i uwagą na każdy szczegół.",
+    cat_b_eyebrow:"Rozdział II",cat_b_title:"Portrety Ludzi",cat_b_subtitle:"Portrety bliskich osób — od realistycznego rysunku po żartobliwą karykaturę.",
+    filter_all:"Wszystkie",subcat_wood:"Malarstwo na drewnie",subcat_pencil:"Rysunek ołówkiem",subcat_bw:"Karykatura cz.-biała",subcat_color:"Karykatura kolorowa",
+    card_cta:"Zapytaj o wycenę",lightbox_cta:"Zamów tę pracę",gallery_empty:"Wkrótce więcej przykładów w tej kategorii.",piece_label:"Praca",
+    piece_label_lb:"Tytuł",lb_technique_label:"Technika",lb_status:"Dostępne na zamówienie",lb_cta_label:"Zamów tę pracę",
+    final_cta_eyebrow:"Zaproszenie",
+    final_cta_title:"Stwórzmy coś, co <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.5);\">zostanie</em> na zawsze.",
+    final_cta_subtitle:"Napisz teraz, opowiedz o swoim pomyśle i otrzymaj bezpłatną wycenę w kilka minut.",final_cta_button:"Napisz na WhatsApp",
+    footer_nav_title:"Nawigacja",footer_contact_title:"Kontakt",footer_follow_title:"Obserwuj",footer_rights:"Wszelkie prawa zastrzeżone.",footer_made:"Tworzone ręcznie w Polsce.",
+    wa_generic:"Cześć! Chcę zamówić portret. Proszę o więcej informacji.",
+    wa_template:"Cześć! Interesuje mnie ta praca: {title} ({technique}). Poproszę o wycenę i czas realizacji."
+  },
+  en:{
+    nav_home:"Home",nav_about:"Studio",nav_process:"Process",nav_gallery_a:"Pets",nav_gallery_b:"People",nav_contact:"Contact",
+    header_cta:"Message on WhatsApp",
+    splash_sys:"INITIALIZING PORTRAIT GALLERY SYSTEM...",
+    hero_eyebrow:"Portrait studio · Poland",
+    hero_title:"Your memories, <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.45);\">hand-painted</em>.",
+    hero_subtitle:"I turn photos of beloved pets and people into one-of-a-kind artworks — painted on wood, drawn in pencil, or reimagined as caricature. Every piece is made from scratch, in a single original copy.",
+    hero_cta_primary:"Order your portrait",hero_cta_secondary:"Go to the gallery",
+    stat_handmade:"Handmade",stat_unique:"Unique original",stat_shipping:"Shipping in Poland",
+    about_eyebrow:"About the studio",
+    about_title:"A hand, an eye, <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 16px rgba(255,45,120,.4);\">and a little time</em>.",
+    about_text:"Every portrait starts with an ordinary photo — and dozens of hours of work. I paint on linden wood panels, draw in graphite, and sketch caricatures with humour and care. No prints, no copies — just an original piece, shipped safely anywhere in Poland.",
+    process_eyebrow:"How it works",process_title:"Three steps to your artwork",
+    process_step1_title:"Send a photo",process_step1_text:"Send your favourite photo of your pet or loved one over WhatsApp — the sharper, the better.",
+    process_step2_title:"Choose a technique",process_step2_text:"Together we'll pick the right form: painting on wood, pencil drawing, or a B&W or colour caricature.",
+    process_step3_title:"Receive your piece",process_step3_text:"I create the portrait by hand, sharing progress along the way, then pack and ship it carefully to you.",
+    cat_a_eyebrow:"Chapter I",cat_a_title:"Pet Portraits",cat_a_subtitle:"Dogs, cats and other four-legged heroes, captured with care and attention to every detail.",
+    cat_b_eyebrow:"Chapter II",cat_b_title:"People Portraits",cat_b_subtitle:"Portraits of the people you love — from realistic drawing to playful caricature.",
+    filter_all:"All",subcat_wood:"Painting on wood",subcat_pencil:"Pencil drawing",subcat_bw:"B&W caricature",subcat_color:"Colour caricature",
+    card_cta:"Ask for a quote",lightbox_cta:"Order this piece",gallery_empty:"More examples coming soon.",piece_label:"Piece",
+    piece_label_lb:"Title",lb_technique_label:"Technique",lb_status:"Available on request",lb_cta_label:"Order this piece",
+    final_cta_eyebrow:"Invitation",
+    final_cta_title:"Let's create something <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.5);\">that lasts</em>.",
+    final_cta_subtitle:"Message me now, share your idea, and get a free quote within minutes.",final_cta_button:"Message on WhatsApp",
+    footer_nav_title:"Navigation",footer_contact_title:"Contact",footer_follow_title:"Follow",footer_rights:"All rights reserved.",footer_made:"Handmade in Poland.",
+    wa_generic:"Hi! I'd like to order a portrait. Could you tell me more?",
+    wa_template:"Hi! I'm interested in this piece: {title} ({technique}). Could you give me a quote and turnaround time?"
+  },
+  es:{
+    nav_home:"Inicio",nav_about:"Estudio",nav_process:"Proceso",nav_gallery_a:"Mascotas",nav_gallery_b:"Personas",nav_contact:"Contacto",
+    header_cta:"Escribir por WhatsApp",
+    splash_sys:"INICIALIZANDO SISTEMA DE GALERÍA DE RETRATOS...",
+    hero_eyebrow:"Estudio de retratos · Polonia",
+    hero_title:"Tus recuerdos, <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.45);\">pintados</em> a mano.",
+    hero_subtitle:"Convierto fotos de mascotas y seres queridos en obras únicas — pintadas sobre madera, dibujadas a lápiz o reinterpretadas como caricatura. Cada pieza se crea desde cero, en un único ejemplar original.",
+    hero_cta_primary:"Encarga tu retrato",hero_cta_secondary:"Ver la galería",
+    stat_handmade:"Hecho a mano",stat_unique:"Original único",stat_shipping:"Envío en Polonia",
+    about_eyebrow:"Sobre el estudio",
+    about_title:"Una mano, un ojo <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 16px rgba(255,45,120,.4);\">y algo de tiempo</em>.",
+    about_text:"Cada retrato empieza con una foto cualquiera — y decenas de horas de trabajo. Pinto sobre tablas de tilo, dibujo con grafito y trazo caricaturas con humor y cariño. Sin impresiones ni copias: solo una pieza original, enviada con cuidado a cualquier punto de Polonia.",
+    process_eyebrow:"Cómo funciona",process_title:"Tres pasos hacia tu obra",
+    process_step1_title:"Envía una foto",process_step1_text:"Envíame tu foto favorita de tu mascota o de un ser querido por WhatsApp — cuanto más nítida, mejor.",
+    process_step2_title:"Elige una técnica",process_step2_text:"Juntos elegimos la forma adecuada: pintura sobre madera, dibujo a lápiz o caricatura en blanco y negro o a color.",
+    process_step3_title:"Recibe tu obra",process_step3_text:"Creo el retrato a mano, compartiendo el progreso en el camino, y lo empaco y envío con cuidado hasta ti.",
+    cat_a_eyebrow:"Capítulo I",cat_a_title:"Retratos de Mascotas",cat_a_subtitle:"Perros, gatos y otros héroes de cuatro patas, retratados con cariño y atención al detalle.",
+    cat_b_eyebrow:"Capítulo II",cat_b_title:"Retratos de Personas",cat_b_subtitle:"Retratos de las personas que quieres — del dibujo realista a la caricatura más divertida.",
+    filter_all:"Todas",subcat_wood:"Pintura sobre madera",subcat_pencil:"Dibujo a lápiz",subcat_bw:"Caricatura B/N",subcat_color:"Caricatura a color",
+    card_cta:"Pedir cotización",lightbox_cta:"Encargar esta obra",gallery_empty:"Pronto más ejemplos en esta categoría.",piece_label:"Obra",
+    piece_label_lb:"Título",lb_technique_label:"Técnica",lb_status:"Disponible bajo pedido",lb_cta_label:"Encargar esta obra",
+    final_cta_eyebrow:"Invitación",
+    final_cta_title:"Creemos algo <em class=\"italic\" style=\"color:var(--c-pink);text-shadow:0 0 20px rgba(255,45,120,.5);\">que perdure</em>.",
+    final_cta_subtitle:"Escríbeme ahora, cuéntame tu idea y recibe una cotización gratuita en minutos.",final_cta_button:"Escribir por WhatsApp",
+    footer_nav_title:"Navegación",footer_contact_title:"Contacto",footer_follow_title:"Síguenos",footer_rights:"Todos los derechos reservados.",footer_made:"Hecho a mano en Polonia.",
+    wa_generic:"¡Hola! Quiero encargar un retrato. ¿Podrías darme más información?",
+    wa_template:"¡Hola! Me interesa esta obra: {title} ({technique}). ¿Podrías indicarme el precio y el tiempo de entrega?"
+  }
+};
+
+let currentLang="pl";
+
+/* ── WHATSAPP ───────────────────────────────────────── */
+function waLink(msg){return "https://wa.me/"+WHATSAPP_NUMBER+"?text="+encodeURIComponent(msg);}
+function updateGenericWaLinks(){
+  const msg=translations[currentLang].wa_generic;
+  document.querySelectorAll(".js-wa-generic").forEach(el=>el.setAttribute("href",waLink(msg)));
+}
+function buildPieceMessage(title,tech){
+  return translations[currentLang].wa_template.replace("{title}",title).replace("{technique}",tech);
+}
+
+/* ── i18n ───────────────────────────────────────────── */
+function applyLanguage(lang){
+  currentLang=translations[lang]?lang:"pl";
+  const t=translations[currentLang];
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k=el.getAttribute("data-i18n");
+    if(t[k]!==undefined)el.textContent=t[k];
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>{
+    const k=el.getAttribute("data-i18n-html");
+    if(t[k]!==undefined)el.innerHTML=t[k];
+  });
+  document.documentElement.setAttribute("lang",currentLang);
+  document.querySelectorAll(".lang-pill").forEach(btn=>
+    btn.classList.toggle("is-active",btn.getAttribute("data-lang")===currentLang));
+  updateGenericWaLinks();
+  renderMarquee();
+  renderFilters("a");renderFilters("b");
+  renderGrid("a");renderGrid("b");
+}
+document.querySelectorAll("[data-lang]").forEach(btn=>
+  btn.addEventListener("click",()=>applyLanguage(btn.getAttribute("data-lang"))));
+
+/* ── MARQUEE ─────────────────────────────────────────── */
+function renderMarquee(){
+  const t=translations[currentLang];
+  const words=[t.subcat_wood,t.subcat_pencil,t.subcat_bw,t.subcat_color,t.cat_a_title,t.cat_b_title];
+  const track=document.getElementById("marquee-track");
+  if(!track)return;
+  track.innerHTML=words.concat(words).map(w=>
+    `<span class="flex items-center gap-10">${w}<span style="color:var(--c-cyan);">◆</span></span>`
+  ).join("");
+}
+
+/* ── FILTERS ─────────────────────────────────────────── */
+const activeFilter={a:"all",b:"all"};
+function renderFilters(catKey){
+  const t=translations[currentLang];
+  const container=document.getElementById("filters-"+catKey);
+  if(!container)return;
+  const labels={all:t.filter_all,wood:t.subcat_wood,pencil:t.subcat_pencil,bw:t.subcat_bw,color:t.subcat_color};
+  container.innerHTML=["all",...SUBCATS].map(k=>`
+    <button type="button" data-filter="${k}" class="filter-pill${activeFilter[catKey]===k?" is-active":""}">${labels[k]}</button>
+  `).join("");
+  container.querySelectorAll("[data-filter]").forEach(btn=>
+    btn.addEventListener("click",()=>{
+      activeFilter[catKey]=btn.getAttribute("data-filter");
+      renderFilters(catKey);renderGrid(catKey);
+    }));
+}
+
+/* ── GRID ────────────────────────────────────────────── */
+function renderGrid(catKey){
+  const t=translations[currentLang];
+  const grid=document.getElementById("grid-"+catKey);
+  const emptyMsg=document.getElementById("empty-"+catKey);
+  if(!grid)return;
+  const items=galleryData[catKey];
+  const filter=activeFilter[catKey];
+  const tl={wood:t.subcat_wood,pencil:t.subcat_pencil,bw:t.subcat_bw,color:t.subcat_color};
+  const catLabel=catKey==="a"?t.cat_a_title:t.cat_b_title;
+  let visible=0;
+  grid.innerHTML=items.map((item,i)=>{
+    const show=filter==="all"||filter===item.subcat;
+    if(show)visible++;
+    const tech=tl[item.subcat];
+    const title=t.piece_label+" "+String(i+1).padStart(2,"0");
+    const alt=title+" — "+tech+" — "+catLabel;
+    return `
+      <figure class="masonry-item${show?"":" is-hidden"}" data-cat="${catKey}" data-index="${i}">
+        <div class="gallery-card" tabindex="0" role="button" aria-label="${alt}">
+          <img src="${item.src}" alt="${alt}" loading="lazy" decoding="async">
+          <div class="gallery-overlay">
+            <button type="button" class="gallery-overlay-btn quote-btn btn-cyber-filled w-full text-center py-2.5 text-[10px]">${t.card_cta}</button>
+          </div>
+        </div>
+        <figcaption class="gallery-caption">
+          <span class="cap-title" style="color:#6A6A8A;">${title}</span>
+          <span class="cap-tech" style="color:var(--c-cyan);font-size:9px;">${tech}</span>
+        </figcaption>
+      </figure>`;
+  }).join("");
+
+  grid.querySelectorAll(".masonry-item").forEach(fig=>{
+    const card=fig.querySelector(".gallery-card");
+    const open=()=>openLightbox(catKey,parseInt(fig.dataset.index,10));
+    card.addEventListener("click",open);
+    card.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});
+  });
+  grid.querySelectorAll(".quote-btn").forEach((btn,i)=>{
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      const tech=tl[items[i].subcat];
+      const title=t.piece_label+" "+String(i+1).padStart(2,"0");
+      window.open(waLink(buildPieceMessage(title,tech)),"_blank","noopener");
+    });
+  });
+  if(emptyMsg)emptyMsg.classList.toggle("hidden",visible!==0);
+}
+
+/* ── LIGHTBOX ─────────────────────────────────────────── */
+const lightbox=document.getElementById("lightbox");
+const lbImg=document.getElementById("lightbox-img");
+const lbTitle=document.getElementById("lightbox-title");
+const lbTech=document.getElementById("lightbox-technique");
+const lbCta=document.getElementById("lightbox-cta");
+let lbState={cat:"a",index:0};
+
+function openLightbox(catKey,index){
+  lbState={cat:catKey,index};
+  fillLightbox();
+  lightbox.classList.add("is-open");
+  document.body.classList.add("no-scroll");
+}
+function closeLightbox(){
+  lightbox.classList.remove("is-open");
+  document.body.classList.remove("no-scroll");
+}
+function fillLightbox(){
+  const t=translations[currentLang];
+  const item=galleryData[lbState.cat][lbState.index];
+  const tl={wood:t.subcat_wood,pencil:t.subcat_pencil,bw:t.subcat_bw,color:t.subcat_color};
+  const tech=tl[item.subcat];
+  const title=t.piece_label+" "+String(lbState.index+1).padStart(2,"0");
+  const badge=document.querySelector(".lb-badge");
+  if(badge)badge.textContent=lbState.cat==="a"?t.cat_a_eyebrow:t.cat_b_eyebrow;
+  lbImg.src=item.src; lbImg.alt=title+" — "+tech;
+  lbTitle.textContent=title; lbTech.textContent=tech;
+  lbCta.setAttribute("href",waLink(buildPieceMessage(title,tech)));
+}
+function stepLightbox(d){
+  const len=galleryData[lbState.cat].length;
+  lbState.index=(lbState.index+d+len)%len;
+  fillLightbox();
+}
+document.getElementById("lb-close").addEventListener("click",closeLightbox);
+document.getElementById("lb-prev").addEventListener("click",()=>stepLightbox(-1));
+document.getElementById("lb-next").addEventListener("click",()=>stepLightbox(1));
+lightbox.addEventListener("click",e=>{if(e.target===lightbox)closeLightbox();});
+document.addEventListener("keydown",e=>{
+  if(!lightbox.classList.contains("is-open"))return;
+  if(e.key==="Escape")closeLightbox();
+  if(e.key==="ArrowLeft")stepLightbox(-1);
+  if(e.key==="ArrowRight")stepLightbox(1);
+});
+
+/* ── HEADER SCROLL ───────────────────────────────────── */
+const header=document.getElementById("site-header");
+window.addEventListener("scroll",()=>{
+  header.classList.toggle("scrolled",window.scrollY>30);
+},{passive:true});
+
+/* ── MOBILE NAV ──────────────────────────────────────── */
+const mobileNav=document.getElementById("mobile-nav");
+const menuToggle=document.getElementById("menu-toggle");
+const menuClose=document.getElementById("menu-close");
+function openNav(){mobileNav.classList.add("is-open");document.body.classList.add("no-scroll");menuToggle.setAttribute("aria-expanded","true");}
+function closeNav(){mobileNav.classList.remove("is-open");if(!lightbox.classList.contains("is-open"))document.body.classList.remove("no-scroll");menuToggle.setAttribute("aria-expanded","false");}
+menuToggle.addEventListener("click",openNav);
+menuClose.addEventListener("click",closeNav);
+mobileNav.querySelectorAll("a").forEach(a=>a.addEventListener("click",closeNav));
+
+/* ── HERO MOUSE PARALLAX ─────────────────────────────── */
+const heroSection=document.getElementById("home");
+const heroSpotlight=heroSection.querySelector(".hero-spotlight");
+const heroFrame=heroSection.querySelector(".hero-frame-wrap");
+if(window.matchMedia("(pointer:fine)").matches){
+  heroSection.addEventListener("mousemove",e=>{
+    const r=heroSection.getBoundingClientRect();
+    const mx=((e.clientX-r.left)/r.width)*100;
+    const my=((e.clientY-r.top)/r.height)*100;
+    heroSection.style.setProperty("--mx",mx+"%");
+    heroSection.style.setProperty("--my",my+"%");
+    if(heroFrame){
+      const cx=r.left+r.width/2, cy=r.top+r.height/2;
+      const ry=((e.clientX-cx)/r.width)*6;
+      const rx=-((e.clientY-cy)/r.height)*6;
+      heroFrame.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    }
+  },{passive:true});
+  heroSection.addEventListener("mouseleave",()=>{if(heroFrame)heroFrame.style.transform="";});
+}
+
+/* ── CYBERPUNK GRID MOUSE PARALLAX ───────────────────── */
+const cpGrid=document.getElementById("cp-grid");
+if(window.matchMedia("(pointer:fine)").matches){
+  document.addEventListener("mousemove",e=>{
+    const dx=(e.clientX/window.innerWidth-.5)*.8;
+    const dy=(e.clientY/window.innerHeight-.5)*.5;
+    cpGrid.style.transform=`translate(${dx}%, ${dy}%)`;
+  },{passive:true});
+}
+
+/* ── REVEAL OBSERVER ─────────────────────────────────── */
+const revealObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("is-visible");revealObs.unobserve(e.target);}});
+},{threshold:.12,rootMargin:"0px 0px -50px 0px"});
+function observeReveals(){
+  document.querySelectorAll(".reveal:not(.is-visible)").forEach(el=>revealObs.observe(el));
+}
+
+/* ── ACTIVE NAV OBSERVER ─────────────────────────────── */
+const navLinks=document.querySelectorAll('.nav-link[href^="#"]');
+new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting)
+      navLinks.forEach(l=>l.classList.toggle("is-active",l.getAttribute("href")==="#"+e.target.id));
+  });
+},{threshold:.5}).observe && document.querySelectorAll("main section[id]").forEach(s=>{
+  new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting)
+        navLinks.forEach(l=>l.classList.toggle("is-active",l.getAttribute("href")==="#"+e.target.id));
+    });
+  },{threshold:.45}).observe(s);
+});
+
+/* ── FOOTER YEAR ─────────────────────────────────────── */
+document.getElementById("footer-year").textContent=new Date().getFullYear();
+
+/* ── SPLASH ──────────────────────────────────────────── */
+const splash=document.getElementById("splash");
+const splashMono=document.getElementById("splash-mono");
+const splashPct=document.getElementById("splash-pct");
+
+/* Animate percentage counter */
+let pct=0;
+const pctInterval=setInterval(()=>{
+  pct=Math.min(100,pct+Math.floor(Math.random()*12)+3);
+  if(splashPct)splashPct.textContent=pct+"%";
+  if(pct>=100)clearInterval(pctInterval);
+},140);
+
+/* Brief glitch on monogram */
+setTimeout(()=>{if(splashMono)splashMono.classList.add("glitch-active");},600);
+setTimeout(()=>{if(splashMono)splashMono.classList.remove("glitch-active");},1200);
+
+function hideSplash(){
+  splash.classList.add("splash-hide");
+  document.body.classList.remove("no-scroll");
+  observeReveals();
+}
+setTimeout(hideSplash,2800);
+
+/* ── INIT ────────────────────────────────────────────── */
+applyLanguage("pl");
+
+})();
+</script>
+</body>
+</html>
