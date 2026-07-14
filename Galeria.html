@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Galeria snów — ArtNonimu's</title>
+<meta name="description" content="Kolekcja Abstraigo na sprzedaż oraz galeria sprzedanych portretów zwierząt i ludzi — ArtNonimu's, Polska.">
+<link rel="canonical" href="https://artnonimus.art/galeria.html">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page-gallery">
+
+  <!-- ============================================================
+       FONDO — reemplaza data-src por la ruta real de tu video "Vdo2"
+       Ejemplo: assets/video/vdo2.mp4
+       ============================================================ -->
+  <video class="bg-video" autoplay muted loop playsinline poster="">
+    <source src="assets/Vdo2.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
+
+  <a class="mini-logo float-c" href="index.html" aria-label="Strona główna">
+    <img src="https://i.ibb.co/Hf8mJNr2/IMG-20260711-WA0001.jpg" alt="ArtNonimu's">
+  </a>
+
+  <div class="lang-switch" role="group" aria-label="Język / Language / Idioma">
+    <button type="button" data-lang="pl" class="lang-pill is-active float-c">PL</button>
+    <button type="button" data-lang="en" class="lang-pill float-c">EN</button>
+    <button type="button" data-lang="es" class="lang-pill float-c">ES</button>
+  </div>
+
+  <!-- Botones flotantes laterales — físicamente separados y desfasados -->
+  <div class="tabs-float">
+    <button type="button" class="tab-btn float-a is-active" data-tab="venta" data-i18n="tab_venta">En venta</button>
+    <button type="button" class="tab-btn float-b" data-tab="vendidos" data-i18n="tab_vendidos">Vendidos</button>
+  </div>
+
+  <div class="gallery-shell">
+
+    <div class="gallery-hero">
+      <p class="eyebrow" data-i18n="gallery_eyebrow">PRACOWNIA · POLSKA</p>
+      <h1 data-i18n="gallery_h1">Galeria snów</h1>
+      <p data-i18n="gallery_sub">Zwierzęta i ludzie zamienieni w unikatowe dzieła.</p>
+    </div>
+
+    <div class="about-block glass-panel">
+      <p data-i18n="about_p1">Każdy portret zaczyna się od zwykłego zdjęcia.</p>
+      <p data-i18n="about_p2">Bez druku, bez kopii — tylko oryginał.</p>
+    </div>
+
+    <div class="process-grid">
+      <div class="process-card glass-panel">
+        <span class="step-tag glow-pink" data-i18n="step1_tag">01</span>
+        <h3 data-i18n="step1_title">Wyślij zdjęcie</h3>
+        <p data-i18n="step1_text">Prześlij ulubione zdjęcie przez WhatsApp.</p>
+      </div>
+      <div class="process-card glass-panel">
+        <span class="step-tag glow-cyan" data-i18n="step2_tag">02</span>
+        <h3 data-i18n="step2_title">Wybierz technikę</h3>
+        <p data-i18n="step2_text">Razem dobierzemy najlepszą formę.</p>
+      </div>
+      <div class="process-card glass-panel">
+        <span class="step-tag glow-lilac" data-i18n="step3_tag">03</span>
+        <h3 data-i18n="step3_title">Odbierz dzieło</h3>
+        <p data-i18n="step3_text">Tworzę portret ręcznie i bezpiecznie wysyłam.</p>
+      </div>
+    </div>
+
+    <!-- PANEL: EN VENTA — Colección Abstraigo -->
+    <section id="panel-venta" class="panel is-active">
+      <div class="gallery-hero" style="margin-bottom:2rem;">
+        <p class="eyebrow" data-i18n="cat_c_eyebrow">NA SPRZEDAŻ</p>
+        <h2 style="font-family:'Unbounded',sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);" data-i18n="cat_c_title">Kolekcja Abstraigo</h2>
+        <p data-i18n="cat_c_sub">Abstrakcja w akwareli i technice mieszanej.</p>
+      </div>
+      <div id="abstraigo-works"></div>
+    </section>
+
+    <!-- PANEL: VENDIDOS — Zwierzęta + Ludzie -->
+    <section id="panel-vendidos" class="panel">
+
+      <div class="sold-section">
+        <p class="eyebrow" data-i18n="cat_a_eyebrow">SPRZEDANE</p>
+        <h2 data-i18n="cat_a_title">Portrety Zwierząt</h2>
+        <p class="sub" data-i18n="cat_a_sub">Psy, koty i inni czworonożni bohaterowie.</p>
+        <div id="filters-a" class="filter-row"></div>
+        <div class="carousel-viewport"><div id="carousel-track-a" class="carousel-track"></div></div>
+        <div class="gallery-nav-btn">
+          <button type="button" class="gallery-arrow" data-carousel-prev="a" aria-label="Poprzednia">‹</button>
+          <span id="carousel-counter-a" class="carousel-counter"></span>
+          <button type="button" class="gallery-arrow" data-carousel-next="a" aria-label="Następna">›</button>
+        </div>
+        <p id="empty-a" class="empty-note hidden" data-i18n="gallery_empty"></p>
+      </div>
+
+      <div class="sold-section">
+        <p class="eyebrow" data-i18n="cat_b_eyebrow">SPRZEDANE</p>
+        <h2 data-i18n="cat_b_title">Portrety Ludzi</h2>
+        <p class="sub" data-i18n="cat_b_sub">Portrety bliskich osób.</p>
+        <div id="filters-b" class="filter-row"></div>
+        <div class="carousel-viewport"><div id="carousel-track-b" class="carousel-track"></div></div>
+        <div class="gallery-nav-btn">
+          <button type="button" class="gallery-arrow" data-carousel-prev="b" aria-label="Poprzednia">‹</button>
+          <span id="carousel-counter-b" class="carousel-counter"></span>
+          <button type="button" class="gallery-arrow" data-carousel-next="b" aria-label="Następna">›</button>
+        </div>
+        <p id="empty-b" class="empty-note hidden" data-i18n="gallery_empty"></p>
+      </div>
+
+    </section>
+
+  </div>
+
+  <footer class="site-footer">
+    <a class="footer-credit" href="https://septimapacha.com" target="_blank" rel="noopener" data-i18n="footer_credit">stworzone przez septimapacha.com</a>
+  </footer>
+
+  <!-- Lightbox -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Podgląd pracy">
+    <button id="lightbox-close" class="lb-close" type="button" aria-label="Zamknij">×</button>
+    <button id="lightbox-prev" class="lb-prev" type="button" aria-label="Poprzednia">‹</button>
+    <button id="lightbox-next" class="lb-next" type="button" aria-label="Następna">›</button>
+    <div class="lb-stage glass-panel">
+      <img id="lightbox-img" src="" alt="">
+      <div class="lb-meta">
+        <div>
+          <span id="lightbox-name" class="name"></span>
+          <span id="lightbox-technique" class="tech"></span>
+        </div>
+        <a id="lightbox-cta" class="btn-dream" href="#" target="_blank" rel="noopener" data-i18n="lightbox_cta">Zamów tę pracę</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
