@@ -190,7 +190,8 @@ if(document.body.classList.contains("page-index")){
     if(!radialMenu) return;
     const items = radialMenu.querySelectorAll(".radial-item");
     const n = items.length;
-    const radius = window.innerWidth < 640 ? 118 : 168;
+    // radius scales with viewport but never pushes signs off-screen on narrow phones
+    const radius = Math.max(88, Math.min(window.innerWidth * 0.26, 140));
     const arcStart = -160, arcEnd = -20;
     items.forEach((el,i)=>{
       const angle = n===1 ? -90 : arcStart + (arcEnd-arcStart)*(i/(n-1));
