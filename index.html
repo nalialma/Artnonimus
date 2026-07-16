@@ -189,6 +189,26 @@ a{ color:inherit; text-decoration:none; }
 }
 .logo-btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:6px; border-radius:50%; }
 
+/* "Tócame" circular LED sign — spins slowly around the logo, doubles as an
+   extra-large tap target that also opens the menu (handled via delegation). */
+.tap-badge{
+  position:absolute; inset:-34px;
+  cursor:pointer;
+  clip-path:circle(50%);
+  z-index:4;
+  animation: spinBadge 16s linear infinite;
+}
+.tap-badge-svg{ width:100%; height:100%; overflow:visible; display:block; }
+.tap-badge-text{
+  font-family:'Monoton',cursive;
+  font-size:14px;
+  letter-spacing:3px;
+  fill:var(--pink);
+  filter: drop-shadow(0 0 4px var(--pink-soft)) drop-shadow(0 0 9px var(--cyan-soft));
+}
+@keyframes spinBadge{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce){ .tap-badge{ animation:none; } }
+
 .radial-menu{
   position:absolute; inset:0;
   pointer-events:none;
@@ -349,6 +369,17 @@ a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-of
     <div class="logo-orbit">
       <div id="radial-menu" class="radial-menu" aria-hidden="true"></div>
 
+      <div class="tap-badge" aria-hidden="true">
+        <svg class="tap-badge-svg" viewBox="0 0 200 200">
+          <defs>
+            <path id="tapCirclePath" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"/>
+          </defs>
+          <text class="tap-badge-text">
+            <textPath href="#tapCirclePath" startOffset="0%">TÓCAME • TÓCAME • </textPath>
+          </text>
+        </svg>
+      </div>
+
       <button id="logo-btn" class="logo-btn" type="button"
               aria-haspopup="true" aria-expanded="false" aria-controls="radial-menu"
               aria-label="Abrir menú">
@@ -423,22 +454,4 @@ const translations = {
     menu_gallery:"Gallery", menu_info:"Virtual Store",
     footer_credit:"made by septimapacha.com",
     info_title:"A studio inside a dream",
-    info_text:"Every portrait starts as an ordinary photo and becomes a handmade piece — painted on wood, drawn in pencil, or reimagined as caricature. No prints, no copies — just an original made for you.",
-    info_cta:"Message on WhatsApp",
-    stat_techniques:"Techniques", stat_ship:"Delivery", stat_original:"Original",
-    wa_generic:"Hi! I'd like to order a portrait. Could you tell me more?"
-  },
-  es:{
-    menu_gallery:"Galería", menu_info:"Tienda Virtual",
-    footer_credit:"creado por septimapacha.com",
-    info_title:"Un estudio dentro de un sueño",
-    info_text:"Cada retrato empieza como una foto cualquiera y se convierte en una pieza hecha a mano — pintada sobre madera, dibujada a lápiz o reinterpretada como caricatura. Sin impresiones ni copias: solo un original hecho para ti.",
-    info_cta:"Escribir por WhatsApp",
-    stat_techniques:"Técnicas", stat_ship:"Envío", stat_original:"Original",
-    wa_generic:"¡Hola! Quiero encargar un retrato. ¿Podrías darme más información?"
-  },
-  it:{
-    menu_gallery:"Galleria", menu_info:"Negozio Virtuale",
-    footer_credit:"creato da septimapacha.com",
-    info_title:"Uno studio dentro un sogno",
-    info_text:"Ogni ritratto inizia come una foto qualsiasi e diventa un pezzo fatto a mano — dipinto su legno, disegnato a m
+    info_text:"Every portrait starts as an ordinary photo and becomes a handmade piece — painted on wood, drawn in pencil, or reimagi
