@@ -455,4 +455,167 @@ const translations = {
     menu_gallery:"Gallery", menu_info:"Virtual Store",
     footer_credit:"made by septimapacha.com",
     info_title:"A studio inside a dream",
-    info_text:"Every portrait starts as a
+    info_text:"Every portrait starts as an ordinary photo and becomes a handmade piece — painted on wood, drawn in pencil, or reimagined as caricature. No prints, no copies — just an original made for you.",
+    info_cta:"Message on WhatsApp",
+    stat_techniques:"Techniques", stat_ship:"Delivery", stat_original:"Original",
+    wa_generic:"Hi! I'd like to order a portrait. Could you tell me more?",
+    tap_badge_text:"TOUCH ME • TOUCH ME • "
+  },
+  es:{
+    menu_gallery:"Galería", menu_info:"Tienda Virtual",
+    footer_credit:"creado por septimapacha.com",
+    info_title:"Un estudio dentro de un sueño",
+    info_text:"Cada retrato empieza como una foto cualquiera y se convierte en una pieza hecha a mano — pintada sobre madera, dibujada a lápiz o reinterpretada como caricatura. Sin impresiones ni copias: solo un original hecho para ti.",
+    info_cta:"Escribir por WhatsApp",
+    stat_techniques:"Técnicas", stat_ship:"Envío", stat_original:"Original",
+    wa_generic:"¡Hola! Quiero encargar un retrato. ¿Podrías darme más información?",
+    tap_badge_text:"TÓCAME • TÓCAME • "
+  },
+  it:{
+    menu_gallery:"Galleria", menu_info:"Negozio Virtuale",
+    footer_credit:"creato da septimapacha.com",
+    info_title:"Uno studio dentro un sogno",
+    info_text:"Ogni ritratto inizia come una foto qualsiasi e diventa un pezzo fatto a mano — dipinto su legno, disegnato a matita o reinventato come caricatura. Niente stampe, niente copie — solo un originale creato per te.",
+    info_cta:"Scrivi su WhatsApp",
+    stat_techniques:"Tecniche", stat_ship:"Spedizione", stat_original:"Originale",
+    wa_generic:"Ciao! Vorrei ordinare un ritratto. Potresti darmi maggiori informazioni?",
+    tap_badge_text:"TOCCAMI • TOCCAMI • "
+  },
+  pt:{
+    menu_gallery:"Galeria", menu_info:"Loja Virtual",
+    footer_credit:"criado por septimapacha.com",
+    info_title:"Um estúdio dentro de um sonho",
+    info_text:"Cada retrato começa como uma foto comum e se transforma numa peça feita à mão — pintada em madeira, desenhada a lápis ou reinventada como caricatura. Sem impressões, sem cópias — apenas um original feito para você.",
+    info_cta:"Escrever no WhatsApp",
+    stat_techniques:"Técnicas", stat_ship:"Envio", stat_original:"Original",
+    wa_generic:"Olá! Gostaria de encomendar um retrato. Poderia me dar mais informações?",
+    tap_badge_text:"TOQUE AQUI • TOQUE AQUI • "
+  }
+};
+
+let currentLang = "pl";
+function t(key){ return (translations[currentLang] && translations[currentLang][key]) !== undefined ? translations[currentLang][key] : (translations.pl[key]||""); }
+
+function updateWaLinks(){
+  const msg = t("wa_generic");
+  document.querySelectorAll(".js-wa-generic").forEach(el=>el.setAttribute("href",waLink(msg)));
+}
+
+function applyLanguage(lang){
+  currentLang = translations[lang] ? lang : "pl";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k=el.getAttribute("data-i18n");
+    const v=t(k);
+    if(v) el.textContent=v;
+  });
+  document.documentElement.setAttribute("lang",currentLang);
+  document.querySelectorAll(".lang-pill").forEach(b=>b.classList.toggle("is-active",b.getAttribute("data-lang")===currentLang));
+  updateWaLinks();
+  layoutRadial();
+  buildRadialItems();
+}
+
+/* ============================================================
+   INDEX PAGE — radial menu + info modal
+   ============================================================ */
+const menuItems = [
+  { key:"gallery", labelKey:"menu_gallery", href:"galeria.html", tone:"tone-cyan" },
+  { key:"info",    labelKey:"menu_info",    action:"info",       tone:"tone-pink" }
+];
+
+const radialMenu = document.getElementById("radial-menu");
+const logoBtn = document.getElementById("logo-btn");
+const infoModal = document.getElementById("info-modal");
+
+function buildRadialItems(){
+  if(!radialMenu) return;
+  radialMenu.innerHTML = menuItems.map(item=>{
+    const label = t(item.labelKey);
+    if(item.action==="info"){
+      return `<div class="radial-item"><button type="button" class="radial-led ${item.tone} float-c" data-action="info">${label}</button></div>`;
+    }
+    return `<div class="radial-item"><a class="radial-led ${item.tone} float-a" href="${item.href}">${label}</a></div>`;
+  }).join("");
+  layoutRadial();
+}
+
+function layoutRadial(){
+  if(!radialMenu) return;
+  const items = radialMenu.querySelectorAll(".radial-item");
+  const n = items.length;
+  const radius = Math.max(88, Math.min(window.innerWidth * 0.26, 140));
+  const arcStart = -160, arcEnd = -20;
+  items.forEach((el,i)=>{
+    const angle = n===1 ? -90 : arcStart + (arcEnd-arcStart)*(i/(n-1));
+    const rad = angle*Math.PI/180;
+    const x = radius*Math.cos(rad);
+    const y = radius*Math.sin(rad);
+    el.style.setProperty("--tx", x.toFixed(1)+"px");
+    el.style.setProperty("--ty", y.toFixed(1)+"px");
+  });
+}
+
+function openMenu(){
+  radialMenu.classList.add("is-open");
+  logoBtn.classList.add("is-open");
+  logoBtn.setAttribute("aria-expanded","true");
+}
+function closeMenu(){
+  radialMenu.classList.remove("is-open");
+  logoBtn.classList.remove("is-open");
+  logoBtn.setAttribute("aria-expanded","false");
+}
+function toggleMenu(){
+  if(radialMenu.classList.contains("is-open")) closeMenu(); else openMenu();
+}
+function openInfo(){
+  infoModal.classList.add("is-open");
+  infoModal.setAttribute("aria-hidden","false");
+  closeMenu();
+}
+function closeInfo(){
+  infoModal.classList.remove("is-open");
+  infoModal.setAttribute("aria-hidden","true");
+}
+
+/* ------------------------------------------------------------
+   SINGLE delegated click handler for the whole page.
+   This is the robust pattern: one listener on document, every
+   interactive bit is matched via closest(). No dependence on
+   stopPropagation() timing or listener attachment order — if the
+   element exists in the DOM when clicked, this always catches it.
+   ------------------------------------------------------------ */
+document.addEventListener("click", (e)=>{
+  const langBtn = e.target.closest("[data-lang]");
+  if(langBtn){ applyLanguage(langBtn.getAttribute("data-lang")); return; }
+
+  const logoHit = e.target.closest("#logo-btn") || e.target.closest(".tap-badge");
+  if(logoHit){ toggleMenu(); return; }
+
+  const infoAction = e.target.closest('[data-action="info"]');
+  if(infoAction){ openInfo(); return; }
+
+  const closeBtn = e.target.closest("#info-close");
+  if(closeBtn){ closeInfo(); return; }
+
+  if(e.target === infoModal){ closeInfo(); return; }
+
+  if(radialMenu && radialMenu.classList.contains("is-open") &&
+     !e.target.closest("#radial-menu")){
+    closeMenu();
+  }
+});
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){ closeMenu(); closeInfo(); }
+});
+
+window.addEventListener("resize",()=>{ layoutRadial(); });
+
+buildRadialItems();
+updateWaLinks();
+
+})();
+</script>
+</body>
+</html>
