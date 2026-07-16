@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -45,13 +44,18 @@ img{ max-width:100%; display:block; }
 button{ font-family:inherit; }
 a{ color:inherit; text-decoration:none; }
 
-/* BACKGROUND VIDEO */
+/* BACKGROUND VIDEO — mobile gets Vdo1a, desktop gets Vdo4 */
 .bg-video{
   position:fixed; inset:0; z-index:0;
   width:100%; height:100%;
   object-fit:cover;
   background:var(--void);
   filter: saturate(1.05) brightness(.78) contrast(1.02);
+}
+.bg-video-desktop{ display:none; }
+@media (min-width:769px){
+  .bg-video-mobile{ display:none; }
+  .bg-video-desktop{ display:block; }
 }
 .video-overlay{
   position:fixed; inset:0; z-index:1; pointer-events:none;
@@ -110,9 +114,10 @@ a{ color:inherit; text-decoration:none; }
 /* LANGUAGE SWITCH */
 .lang-switch{
   position:fixed; top:18px; right:18px; z-index:50;
-  display:flex; gap:6px;
+  display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px;
   padding:6px;
-  border-radius:999px;
+  max-width:180px;
+  border-radius:20px;
 }
 .lang-pill{
   width:34px; height:34px; border-radius:50%;
@@ -141,14 +146,11 @@ a{ color:inherit; text-decoration:none; }
   z-index:2;
 }
 
-/* Logo made smaller (was min(34vw,128px)) and shifted 30% lower on the same
-   horizontal axis via translateY, so it stays perfectly centered but sits
-   further down the page. */
+/* Logo: small, and perfectly centered again (no vertical offset) */
 .logo-orbit{
   position:relative;
   width:min(24vw,92px); height:min(24vw,92px);
   display:flex; align-items:center; justify-content:center;
-  transform: translateY(30%);
 }
 
 .logo-btn{
@@ -324,8 +326,13 @@ a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-of
 </head>
 <body class="page-index">
 
-  <video class="bg-video" autoplay muted loop playsinline poster="">
-    <source src="Vdo1.mp4" type="video/mp4">
+  <!-- Mobile background video -->
+  <video class="bg-video bg-video-mobile" autoplay muted loop playsinline poster="">
+    <source src="Vdo1a.mp4" type="video/mp4">
+  </video>
+  <!-- Desktop background video -->
+  <video class="bg-video bg-video-desktop" autoplay muted loop playsinline poster="">
+    <source src="Vdo4.mp4" type="video/mp4">
   </video>
   <div class="video-overlay"></div>
 
@@ -333,6 +340,8 @@ a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-of
     <button type="button" data-lang="pl" class="lang-pill is-active float-c">PL</button>
     <button type="button" data-lang="en" class="lang-pill float-c">EN</button>
     <button type="button" data-lang="es" class="lang-pill float-c">ES</button>
+    <button type="button" data-lang="it" class="lang-pill float-c">IT</button>
+    <button type="button" data-lang="pt" class="lang-pill float-c">PT</button>
   </div>
 
   <main class="stage">
@@ -345,7 +354,7 @@ a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-of
               aria-label="Abrir menú">
         <span class="logo-ring r1"></span>
         <span class="logo-ring r2"></span>
-        <img class="logo-img" src="https://i.ibb.co/Hf8mJNr2/IMG-20260711-WA0001.jpg" alt="ArtNonimu's">
+        <img class="logo-img" src="https://i.ibb.co/mPQjbWs/1784228306856.png" alt="ArtNonimu's">
       </button>
     </div>
 
@@ -398,11 +407,11 @@ const WHATSAPP_NUMBER = "48692971895";
 function waLink(msg){ return "https://wa.me/"+WHATSAPP_NUMBER+"?text="+encodeURIComponent(msg); }
 
 /* ============================================================
-   i18n — PL / EN / ES
+   i18n — PL / EN / ES / IT / PT
    ============================================================ */
 const translations = {
   pl:{
-    menu_gallery:"Galeria", menu_info:"Informacja",
+    menu_gallery:"Galeria", menu_info:"Sklep Wirtualny",
     footer_credit:"stworzone przez septimapacha.com",
     info_title:"Pracownia w świecie snu",
     info_text:"Każdy portret zaczyna się od zwykłego zdjęcia i zamienia się w rękodzieło malowane na drewnie, rysowane ołówkiem lub przedstawione jako karykatura. Bez druku, bez kopii — tylko oryginał, tworzony specjalnie dla Ciebie.",
@@ -411,7 +420,7 @@ const translations = {
     wa_generic:"Cześć! Chcę zamówić portret. Proszę o więcej informacji."
   },
   en:{
-    menu_gallery:"Gallery", menu_info:"Info",
+    menu_gallery:"Gallery", menu_info:"Virtual Store",
     footer_credit:"made by septimapacha.com",
     info_title:"A studio inside a dream",
     info_text:"Every portrait starts as an ordinary photo and becomes a handmade piece — painted on wood, drawn in pencil, or reimagined as caricature. No prints, no copies — just an original made for you.",
@@ -420,131 +429,16 @@ const translations = {
     wa_generic:"Hi! I'd like to order a portrait. Could you tell me more?"
   },
   es:{
-    menu_gallery:"Galería", menu_info:"Información",
+    menu_gallery:"Galería", menu_info:"Tienda Virtual",
     footer_credit:"creado por septimapacha.com",
     info_title:"Un estudio dentro de un sueño",
     info_text:"Cada retrato empieza como una foto cualquiera y se convierte en una pieza hecha a mano — pintada sobre madera, dibujada a lápiz o reinterpretada como caricatura. Sin impresiones ni copias: solo un original hecho para ti.",
     info_cta:"Escribir por WhatsApp",
     stat_techniques:"Técnicas", stat_ship:"Envío", stat_original:"Original",
     wa_generic:"¡Hola! Quiero encargar un retrato. ¿Podrías darme más información?"
-  }
-};
-
-let currentLang = "pl";
-function t(key){ return (translations[currentLang] && translations[currentLang][key]) !== undefined ? translations[currentLang][key] : (translations.pl[key]||""); }
-
-function updateWaLinks(){
-  const msg = t("wa_generic");
-  document.querySelectorAll(".js-wa-generic").forEach(el=>el.setAttribute("href",waLink(msg)));
-}
-
-function applyLanguage(lang){
-  currentLang = translations[lang] ? lang : "pl";
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const k=el.getAttribute("data-i18n");
-    const v=t(k);
-    if(v) el.textContent=v;
-  });
-  document.documentElement.setAttribute("lang",currentLang);
-  document.querySelectorAll(".lang-pill").forEach(b=>b.classList.toggle("is-active",b.getAttribute("data-lang")===currentLang));
-  updateWaLinks();
-  if(typeof layoutRadial==="function") layoutRadial();
-  if(typeof buildRadialItems==="function") buildRadialItems();
-}
-document.addEventListener("click",e=>{
-  const langBtn=e.target.closest("[data-lang]");
-  if(langBtn) applyLanguage(langBtn.getAttribute("data-lang"));
-});
-
-/* ============================================================
-   INDEX PAGE — radial menu + info modal
-   ============================================================ */
-const menuItems = [
-  { key:"gallery", labelKey:"menu_gallery", href:"galeria.html", tone:"tone-cyan" },
-  { key:"info",    labelKey:"menu_info",    action:"info",       tone:"tone-pink" }
-];
-
-const radialMenu = document.getElementById("radial-menu");
-const logoBtn = document.getElementById("logo-btn");
-const infoModal = document.getElementById("info-modal");
-const infoClose = document.getElementById("info-close");
-
-function buildRadialItems(){
-  if(!radialMenu) return;
-  radialMenu.innerHTML = menuItems.map(item=>{
-    const label = t(item.labelKey);
-    if(item.action==="info"){
-      return `<div class="radial-item"><button type="button" class="radial-led ${item.tone} float-c" data-action="info">${label}</button></div>`;
-    }
-    return `<div class="radial-item"><a class="radial-led ${item.tone} float-a" href="${item.href}">${label}</a></div>`;
-  }).join("");
-  layoutRadial();
-  radialMenu.querySelectorAll('[data-action="info"]').forEach(b=>b.addEventListener("click",openInfo));
-}
-
-function layoutRadial(){
-  if(!radialMenu) return;
-  const items = radialMenu.querySelectorAll(".radial-item");
-  const n = items.length;
-  const radius = Math.max(88, Math.min(window.innerWidth * 0.26, 140));
-  const arcStart = -160, arcEnd = -20;
-  items.forEach((el,i)=>{
-    const angle = n===1 ? -90 : arcStart + (arcEnd-arcStart)*(i/(n-1));
-    const rad = angle*Math.PI/180;
-    const x = radius*Math.cos(rad);
-    const y = radius*Math.sin(rad);
-    el.style.setProperty("--tx", x.toFixed(1)+"px");
-    el.style.setProperty("--ty", y.toFixed(1)+"px");
-  });
-}
-
-function openMenu(){
-  radialMenu.classList.add("is-open");
-  logoBtn.classList.add("is-open");
-  logoBtn.setAttribute("aria-expanded","true");
-}
-function closeMenu(){
-  radialMenu.classList.remove("is-open");
-  logoBtn.classList.remove("is-open");
-  logoBtn.setAttribute("aria-expanded","false");
-}
-function toggleMenu(e){
-  e.stopPropagation();
-  if(radialMenu.classList.contains("is-open")) closeMenu(); else openMenu();
-}
-
-if(logoBtn){
-  logoBtn.addEventListener("click",toggleMenu);
-  document.addEventListener("click",e=>{
-    if(!radialMenu.classList.contains("is-open")) return;
-    if(logoBtn.contains(e.target)) return;
-    if(radialMenu.contains(e.target)) return;
-    closeMenu();
-  });
-  document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeMenu(); });
-}
-
-function openInfo(){
-  infoModal.classList.add("is-open");
-  infoModal.setAttribute("aria-hidden","false");
-  closeMenu();
-}
-function closeInfo(){
-  infoModal.classList.remove("is-open");
-  infoModal.setAttribute("aria-hidden","true");
-}
-if(infoClose) infoClose.addEventListener("click",closeInfo);
-if(infoModal){
-  infoModal.addEventListener("click",e=>{ if(e.target===infoModal) closeInfo(); });
-  document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeInfo(); });
-}
-
-window.addEventListener("resize",()=>{ layoutRadial(); });
-
-buildRadialItems();
-updateWaLinks();
-
-})();
-</script>
-</body>
-</html>
+  },
+  it:{
+    menu_gallery:"Galleria", menu_info:"Negozio Virtuale",
+    footer_credit:"creato da septimapacha.com",
+    info_title:"Uno studio dentro un sogno",
+    info_text:"Ogni ritratto inizia come una foto qualsiasi e diventa un pezzo fatto a mano — dipinto su legno, disegnato a m
