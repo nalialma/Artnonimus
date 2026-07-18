@@ -41,8 +41,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 /* ---------------- TOP BAR ---------------- */
 .top-bar{ position:fixed; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; gap:10px; }
-.mini-logo{ width:44px; height:44px; border-radius:50%; flex:0 0 auto; }
-.mini-logo img{ width:100%; height:100%; object-fit:cover; border-radius:50%; mix-blend-mode:screen; filter:contrast(1.2) brightness(1.1) saturate(1.15); }
+.mini-logo{ width:44px; height:44px; border-radius:50%; flex:0 0 auto; cursor:pointer; border:1px solid var(--glass-brd); transition: border-color .3s, box-shadow .3s, transform .3s; }
+.mini-logo:hover, .mini-logo:focus-visible{ border-color:var(--pink-soft); box-shadow:0 0 16px rgba(255,184,230,.35); transform:translateY(-2px); }
+.mini-logo img{ width:100%; height:100%; object-fit:cover; border-radius:50%; mix-blend-mode:screen; filter:contrast(1.2) brightness(1.1) saturate(1.15); pointer-events:none; }
 .top-actions{ display:flex; align-items:center; gap:8px; }
 
 .lang-switch{ display:flex; flex-wrap:wrap; gap:5px; }
@@ -82,6 +83,28 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .product-card:hover .product-img-wrap img{ transform:scale(1.05); }
 .sold-badge{ position:absolute; top:10px; left:10px; padding:.3rem .7rem; border-radius:999px; background:rgba(11,7,20,.6); color:var(--pink); font-family:'Space Mono',monospace; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; }
 .delete-badge{ position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,120,120,.5); background:rgba(20,8,10,.7); color:#ffb3b3; font-size:1rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.edit-badge{ position:absolute; top:10px; right:46px; width:30px; height:30px; border-radius:50%; border:1px solid var(--cyan-soft); background:rgba(8,16,20,.7); color:var(--cyan); font-size:.85rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.img-count-badge{ position:absolute; bottom:8px; left:8px; padding:.25rem .55rem; border-radius:999px; background:rgba(11,7,20,.6); color:var(--pearl); font-family:'Space Mono',monospace; font-size:.6rem; }
+.product-img-wrap{ cursor:pointer; }
+
+/* ---------------- LIGHTBOX (visor de imágenes superpuesto) ---------------- */
+.lightbox-overlay{ position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center; padding:1.2rem; background:rgba(11,7,20,.85); backdrop-filter:blur(10px); opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
+.lightbox-overlay.is-open{ opacity:1; visibility:visible; }
+.lightbox-stage{ position:relative; max-width:640px; width:100%; }
+.lightbox-stage img{ width:100%; max-height:72vh; object-fit:contain; border-radius:18px; background:rgba(0,0,0,.4); }
+.lightbox-close, .lightbox-prev, .lightbox-next{ position:absolute; width:42px; height:42px; border-radius:50%; border:1px solid var(--glass-brd); background:rgba(20,14,32,.7); color:var(--pearl); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; }
+.lightbox-close{ top:-14px; right:-14px; }
+.lightbox-prev{ left:8px; top:50%; transform:translateY(-50%); }
+.lightbox-next{ right:8px; top:50%; transform:translateY(-50%); }
+.lightbox-counter{ text-align:center; margin-top:.7rem; font-family:'Space Mono',monospace; font-size:.65rem; letter-spacing:.1em; color:rgba(246,238,252,.6); }
+
+/* ---------------- ADMIN: gestión de imágenes existentes en el editor ---------------- */
+.current-images{ display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:.6rem; }
+.current-images .thumb{ position:relative; width:56px; height:56px; border-radius:10px; overflow:hidden; }
+.current-images .thumb img{ width:100%; height:100%; object-fit:cover; }
+.current-images .thumb button{ position:absolute; top:1px; right:1px; width:18px; height:18px; border-radius:50%; border:none; background:rgba(20,8,10,.85); color:#ffb3b3; font-size:.65rem; line-height:1; cursor:pointer; }
+.field-hint{ font-family:'Space Mono',monospace; font-size:.58rem; color:rgba(246,238,252,.45); margin-top:.3rem; }
+.modal-danger{ width:100%; padding:.7rem; border-radius:999px; border:1px solid rgba(255,140,140,.5); background:transparent; color:#ffb3b3; font-family:'Unbounded',sans-serif; font-weight:600; font-size:.72rem; letter-spacing:.03em; text-transform:uppercase; cursor:pointer; margin-top:.6rem; }
 .product-body{ padding:.9rem 1rem 1.1rem; display:flex; flex-direction:column; gap:.4rem; flex:1; }
 .product-body h3{ font-family:'Unbounded',sans-serif; font-weight:600; font-size:.98rem; }
 .product-meta{ font-family:'Space Mono',monospace; font-size:.62rem; letter-spacing:.06em; text-transform:uppercase; color:rgba(246,238,252,.5); }
@@ -144,7 +167,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 <div class="video-overlay"></div>
 
 <div class="top-bar">
-  <a class="mini-logo" href="index.html" aria-label="Volver al inicio">
+  <a class="mini-logo" href="index.html" aria-label="Volver al inicio" title="Volver a la página principal">
     <img src="https://i.ibb.co/mPQjbWs/1784228306856.png" alt="ArtNonimu's">
   </a>
   <div class="top-actions">
@@ -232,9 +255,54 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="f-technique"></div>
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="f-dims"></div>
     </div>
-    <div class="field"><label data-i18n="f_file">Imagen</label><input type="file" id="f-file" accept="image/*"></div>
+    <div class="field"><label data-i18n="f_file">Imágenes</label><input type="file" id="f-file" accept="image/*" multiple>
+      <div class="field-hint" data-i18n="f_file_hint">Podés seleccionar varias imágenes a la vez.</div>
+    </div>
     <button type="button" id="admin-upload-submit" class="modal-submit" data-i18n="admin_upload_submit">Publicar obra</button>
     <div id="admin-upload-msg" class="modal-msg"></div>
+  </div>
+</div>
+
+<!-- ADMIN: EDITAR OBRA -->
+<div id="admin-edit-overlay" class="modal-overlay">
+  <div class="modal-panel glass-panel">
+    <button type="button" class="modal-close" data-close-modal="admin-edit-overlay">×</button>
+    <h2 class="glow-cyan" data-i18n="admin_edit_title">Editar obra</h2>
+    <div class="field">
+      <label data-i18n="f_images_current">Imágenes actuales</label>
+      <div id="edit-current-images" class="current-images"></div>
+      <div class="field-hint" data-i18n="f_images_hint">Tocá la × para quitar una imagen.</div>
+    </div>
+    <div class="field"><label data-i18n="f_title">Título</label><input type="text" id="ef-title"></div>
+    <div class="field"><label data-i18n="f_desc">Descripción</label><textarea id="ef-desc"></textarea></div>
+    <div class="admin-row-2">
+      <div class="field"><label data-i18n="f_category">Categoría</label>
+        <select id="ef-category">
+          <option value="fisica" data-i18n="tab_fisica">Arte Física</option>
+          <option value="virtual" data-i18n="tab_virtual">Arte Virtual</option>
+        </select>
+      </div>
+      <div class="field"><label data-i18n="f_price">Precio (EUR)</label><input type="number" id="ef-price" step="0.01" min="0"></div>
+    </div>
+    <div class="admin-row-2">
+      <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="ef-technique"></div>
+      <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="ef-dims"></div>
+    </div>
+    <div class="field"><label data-i18n="f_add_images">Agregar más imágenes</label><input type="file" id="ef-file" accept="image/*" multiple></div>
+    <button type="button" id="admin-edit-submit" class="modal-submit" data-i18n="save_changes">Guardar cambios</button>
+    <button type="button" id="admin-edit-delete" class="modal-danger" data-i18n="delete_product_btn">Eliminar esta obra</button>
+    <div id="admin-edit-msg" class="modal-msg"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX: visor de imágenes superpuesto -->
+<div id="lightbox-overlay" class="lightbox-overlay">
+  <div class="lightbox-stage">
+    <button type="button" id="lightbox-close" class="lightbox-close" aria-label="Cerrar">×</button>
+    <button type="button" id="lightbox-prev" class="lightbox-prev" aria-label="Anterior">‹</button>
+    <img id="lightbox-img" src="" alt="">
+    <button type="button" id="lightbox-next" class="lightbox-next" aria-label="Siguiente">›</button>
+    <div id="lightbox-counter" class="lightbox-counter"></div>
   </div>
 </div>
 
@@ -270,9 +338,13 @@ const translations = {
     admin_wrong_password:"Błędne hasło", admin_login_ok:"Zalogowano",
     admin_upload_title:"Dodaj nową pracę", admin_upload_submit:"Opublikuj pracę",
     f_title:"Tytuł", f_desc:"Opis", f_category:"Kategoria", f_price:"Cena (EUR)",
-    f_technique:"Technika", f_dims:"Wymiary", f_file:"Zdjęcie",
+    f_technique:"Technika", f_dims:"Wymiary", f_file:"Zdjęcie", f_file_hint:"Możesz wybrać kilka zdjęć naraz.",
     upload_ok:"Praca opublikowana", upload_error:"Błąd przy publikacji",
-    confirm_delete:"Usunąć tę pracę?", checkout_error:"Błąd płatności, spróbuj ponownie."
+    confirm_delete:"Usunąć tę pracę?", checkout_error:"Błąd płatności, spróbuj ponownie.",
+    admin_edit_title:"Edytuj pracę", edit_label:"Edytuj", save_changes:"Zapisz zmiany",
+    delete_product_btn:"Usuń tę pracę", f_images_current:"Aktualne zdjęcia",
+    f_images_hint:"Dotknij ×, aby usunąć zdjęcie.", f_add_images:"Dodaj więcej zdjęć",
+    edit_ok:"Zmiany zapisane", edit_error:"Błąd przy zapisywaniu"
   },
   en:{
     shop_eyebrow:"SHOP · POLAND", shop_h1:"Virtual Store",
@@ -286,9 +358,13 @@ const translations = {
     admin_wrong_password:"Wrong password", admin_login_ok:"Logged in",
     admin_upload_title:"Upload new piece", admin_upload_submit:"Publish piece",
     f_title:"Title", f_desc:"Description", f_category:"Category", f_price:"Price (EUR)",
-    f_technique:"Technique", f_dims:"Dimensions", f_file:"Image",
+    f_technique:"Technique", f_dims:"Dimensions", f_file:"Images", f_file_hint:"You can select several images at once.",
     upload_ok:"Piece published", upload_error:"Error publishing",
-    confirm_delete:"Delete this piece?", checkout_error:"Payment error, please try again."
+    confirm_delete:"Delete this piece?", checkout_error:"Payment error, please try again.",
+    admin_edit_title:"Edit piece", edit_label:"Edit", save_changes:"Save changes",
+    delete_product_btn:"Delete this piece", f_images_current:"Current images",
+    f_images_hint:"Tap × to remove an image.", f_add_images:"Add more images",
+    edit_ok:"Changes saved", edit_error:"Error saving changes"
   },
   es:{
     shop_eyebrow:"TIENDA · POLONIA", shop_h1:"Tienda Virtual",
@@ -302,9 +378,13 @@ const translations = {
     admin_wrong_password:"Contraseña incorrecta", admin_login_ok:"Sesión iniciada",
     admin_upload_title:"Subir nueva obra", admin_upload_submit:"Publicar obra",
     f_title:"Título", f_desc:"Descripción", f_category:"Categoría", f_price:"Precio (EUR)",
-    f_technique:"Técnica", f_dims:"Dimensiones", f_file:"Imagen",
+    f_technique:"Técnica", f_dims:"Dimensiones", f_file:"Imágenes", f_file_hint:"Podés seleccionar varias imágenes a la vez.",
     upload_ok:"Obra publicada", upload_error:"Error al publicar",
-    confirm_delete:"¿Eliminar esta obra?", checkout_error:"Error en el pago, intentá de nuevo."
+    confirm_delete:"¿Eliminar esta obra?", checkout_error:"Error en el pago, intentá de nuevo.",
+    admin_edit_title:"Editar obra", edit_label:"Editar", save_changes:"Guardar cambios",
+    delete_product_btn:"Eliminar esta obra", f_images_current:"Imágenes actuales",
+    f_images_hint:"Tocá la × para quitar una imagen.", f_add_images:"Agregar más imágenes",
+    edit_ok:"Cambios guardados", edit_error:"Error al guardar los cambios"
   },
   it:{
     shop_eyebrow:"NEGOZIO · POLONIA", shop_h1:"Negozio Virtuale",
@@ -318,9 +398,13 @@ const translations = {
     admin_wrong_password:"Password errata", admin_login_ok:"Accesso effettuato",
     admin_upload_title:"Carica nuova opera", admin_upload_submit:"Pubblica opera",
     f_title:"Titolo", f_desc:"Descrizione", f_category:"Categoria", f_price:"Prezzo (EUR)",
-    f_technique:"Tecnica", f_dims:"Dimensioni", f_file:"Immagine",
+    f_technique:"Tecnica", f_dims:"Dimensioni", f_file:"Immagini", f_file_hint:"Puoi selezionare più immagini insieme.",
     upload_ok:"Opera pubblicata", upload_error:"Errore nella pubblicazione",
-    confirm_delete:"Eliminare questa opera?", checkout_error:"Errore nel pagamento, riprova."
+    confirm_delete:"Eliminare questa opera?", checkout_error:"Errore nel pagamento, riprova.",
+    admin_edit_title:"Modifica opera", edit_label:"Modifica", save_changes:"Salva modifiche",
+    delete_product_btn:"Elimina questa opera", f_images_current:"Immagini attuali",
+    f_images_hint:"Tocca × per rimuovere un'immagine.", f_add_images:"Aggiungi altre immagini",
+    edit_ok:"Modifiche salvate", edit_error:"Errore nel salvataggio"
   },
   pt:{
     shop_eyebrow:"LOJA · POLÔNIA", shop_h1:"Loja Virtual",
@@ -334,9 +418,13 @@ const translations = {
     admin_wrong_password:"Senha incorreta", admin_login_ok:"Login realizado",
     admin_upload_title:"Enviar nova obra", admin_upload_submit:"Publicar obra",
     f_title:"Título", f_desc:"Descrição", f_category:"Categoria", f_price:"Preço (EUR)",
-    f_technique:"Técnica", f_dims:"Dimensões", f_file:"Imagem",
+    f_technique:"Técnica", f_dims:"Dimensões", f_file:"Imagens", f_file_hint:"Você pode selecionar várias imagens de uma vez.",
     upload_ok:"Obra publicada", upload_error:"Erro ao publicar",
-    confirm_delete:"Excluir esta obra?", checkout_error:"Erro no pagamento, tente novamente."
+    confirm_delete:"Excluir esta obra?", checkout_error:"Erro no pagamento, tente novamente.",
+    admin_edit_title:"Editar obra", edit_label:"Editar", save_changes:"Salvar alterações",
+    delete_product_btn:"Excluir esta obra", f_images_current:"Imagens atuais",
+    f_images_hint:"Toque no × para remover uma imagem.", f_add_images:"Adicionar mais imagens",
+    edit_ok:"Alterações salvas", edit_error:"Erro ao salvar as alterações"
   }
 };
 let currentLang = "pl";
@@ -374,16 +462,24 @@ async function loadProducts(){
   renderProducts();
 }
 
+function getImages(p){
+  return (Array.isArray(p.images) && p.images.length > 0) ? p.images : (p.image_url ? [p.image_url] : []);
+}
+
 function renderProducts(){
   const grid = document.getElementById("product-grid");
   const list = allProducts.filter(p=>p.category===activeCategory);
   if(list.length===0){ grid.innerHTML = `<div class="empty-note">${t("empty")}</div>`; return; }
 
-  grid.innerHTML = list.map(p=>`
+  grid.innerHTML = list.map(p=>{
+    const imgs = getImages(p);
+    return `
     <div class="product-card glass-panel" data-id="${p.id}">
-      <div class="product-img-wrap">
-        <img src="${p.image_url}" alt="${escapeHtml(p.title)}" loading="lazy">
+      <div class="product-img-wrap" data-lightbox-id="${p.id}">
+        <img src="${imgs[0] || ""}" alt="${escapeHtml(p.title)}" loading="lazy">
         ${p.is_sold ? `<span class="sold-badge">${t("sold_out")}</span>` : ""}
+        ${imgs.length > 1 ? `<span class="img-count-badge">1/${imgs.length}</span>` : ""}
+        ${adminToken ? `<button type="button" class="edit-badge" data-edit-id="${p.id}" aria-label="Editar">✎</button>` : ""}
         ${adminToken ? `<button type="button" class="delete-badge" data-delete-id="${p.id}" aria-label="Eliminar">×</button>` : ""}
       </div>
       <div class="product-body">
@@ -393,7 +489,8 @@ function renderProducts(){
         <button type="button" class="add-cart-btn" data-add-id="${p.id}" ${p.is_sold ? "disabled" : ""}>${t("add_to_cart")}</button>
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function formatPrice(price, currency){
@@ -457,7 +554,7 @@ function addToCart(id){
   if(!p || p.is_sold) return;
   const existing = cart.find(i=>i.id===id);
   if(existing) existing.quantity += 1;
-  else cart.push({ id:p.id, title:p.title, price:p.price, currency:p.currency, image:p.image_url, quantity:1 });
+  else cart.push({ id:p.id, title:p.title, price:p.price, currency:p.currency, image:getImages(p)[0] || "", quantity:1 });
   saveCart();
   openCart();
 }
@@ -483,6 +580,10 @@ document.getElementById("product-grid").addEventListener("click", (e)=>{
   if(addBtn){ addToCart(addBtn.getAttribute("data-add-id")); return; }
   const delBtn = e.target.closest("[data-delete-id]");
   if(delBtn){ deleteProduct(delBtn.getAttribute("data-delete-id")); return; }
+  const editBtn = e.target.closest("[data-edit-id]");
+  if(editBtn){ openEditModal(editBtn.getAttribute("data-edit-id")); return; }
+  const imgWrap = e.target.closest("[data-lightbox-id]");
+  if(imgWrap){ openLightbox(imgWrap.getAttribute("data-lightbox-id")); return; }
 });
 
 document.getElementById("cart-items").addEventListener("click", (e)=>{
@@ -492,6 +593,46 @@ document.getElementById("cart-items").addEventListener("click", (e)=>{
   const qtyBtn = e.target.closest("[data-qty]");
   if(qtyBtn){ changeQty(id, Number(qtyBtn.getAttribute("data-qty"))); return; }
   if(e.target.closest("[data-remove]")){ removeFromCart(id); }
+});
+
+/* ============================================================
+   LIGHTBOX — visor de imágenes superpuesto (overlay)
+   ============================================================ */
+let lightboxImages = [];
+let lightboxIndex = 0;
+const lightboxOverlay = document.getElementById("lightbox-overlay");
+const lightboxImg = document.getElementById("lightbox-img");
+const lightboxCounter = document.getElementById("lightbox-counter");
+
+function openLightbox(productId){
+  const p = allProducts.find(x=>x.id===productId);
+  if(!p) return;
+  lightboxImages = getImages(p);
+  if(lightboxImages.length===0) return;
+  lightboxIndex = 0;
+  renderLightbox();
+  lightboxOverlay.classList.add("is-open");
+}
+function renderLightbox(){
+  lightboxImg.src = lightboxImages[lightboxIndex] || "";
+  lightboxCounter.textContent = lightboxImages.length > 1 ? `${lightboxIndex+1} / ${lightboxImages.length}` : "";
+  document.getElementById("lightbox-prev").style.display = lightboxImages.length > 1 ? "flex" : "none";
+  document.getElementById("lightbox-next").style.display = lightboxImages.length > 1 ? "flex" : "none";
+}
+function closeLightbox(){ lightboxOverlay.classList.remove("is-open"); }
+function lightboxStep(delta){
+  lightboxIndex = (lightboxIndex + delta + lightboxImages.length) % lightboxImages.length;
+  renderLightbox();
+}
+document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+document.getElementById("lightbox-prev").addEventListener("click", ()=>lightboxStep(-1));
+document.getElementById("lightbox-next").addEventListener("click", ()=>lightboxStep(1));
+lightboxOverlay.addEventListener("click", (e)=>{ if(e.target===lightboxOverlay) closeLightbox(); });
+document.addEventListener("keydown", (e)=>{
+  if(!lightboxOverlay.classList.contains("is-open")) return;
+  if(e.key==="Escape") closeLightbox();
+  if(e.key==="ArrowLeft") lightboxStep(-1);
+  if(e.key==="ArrowRight") lightboxStep(1);
 });
 
 /* ============================================================
@@ -559,6 +700,27 @@ document.getElementById("admin-login-submit").addEventListener("click", async ()
   }
 });
 
+async function uploadOneFile(file){
+  const urlRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ token: adminToken, action:"get-upload-url", fileName:file.name })
+  });
+  const urlData = await urlRes.json();
+  if(!urlData.signedUrl) throw new Error("no-upload-url");
+  const { error: upErr } = await supabase.storage
+    .from("product-images")
+    .uploadToSignedUrl(urlData.path, urlData.token, file);
+  if(upErr) throw upErr;
+  return urlData.publicUrl;
+}
+async function uploadFiles(fileList){
+  const files = Array.from(fileList || []);
+  const urls = [];
+  for(const file of files){ urls.push(await uploadOneFile(file)); }
+  return urls;
+}
+
 document.getElementById("admin-upload-submit").addEventListener("click", async ()=>{
   const msg = document.getElementById("admin-upload-msg");
   msg.textContent = ""; msg.className = "modal-msg";
@@ -568,36 +730,22 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   const price = parseFloat(document.getElementById("f-price").value);
   const technique = document.getElementById("f-technique").value.trim();
   const dimensions = document.getElementById("f-dims").value.trim();
-  const file = document.getElementById("f-file").files[0];
+  const files = document.getElementById("f-file").files;
 
-  if(!title || !file || isNaN(price)){
+  if(!title || files.length===0 || isNaN(price)){
     msg.textContent = t("upload_error"); msg.classList.add("is-error");
     return;
   }
 
   try{
-    // 1) pedir URL firmada para subir la imagen
-    const urlRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
-      body: JSON.stringify({ token: adminToken, action:"get-upload-url", fileName:file.name })
-    });
-    const urlData = await urlRes.json();
-    if(!urlData.signedUrl) throw new Error("no-upload-url");
+    const images = await uploadFiles(files);
 
-    // 2) subir el archivo directo a Supabase Storage
-    const { error: upErr } = await supabase.storage
-      .from("product-images")
-      .uploadToSignedUrl(urlData.path, urlData.token, file);
-    if(upErr) throw upErr;
-
-    // 3) insertar el producto en la tabla
     const insertRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
       method:"POST",
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, image_url: urlData.publicUrl }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, images }
       })
     });
     const insertData = await insertRes.json();
@@ -630,6 +778,100 @@ async function deleteProduct(id){
     if(data.ok){ await loadProducts(); }
   } catch(e){ /* silencioso */ }
 }
+
+/* ============================================================
+   ADMIN — EDITAR OBRA (modificar campos, agregar/quitar imágenes, borrar)
+   ============================================================ */
+let editingProductId = null;
+let editingImages = [];
+
+function renderEditImages(){
+  const box = document.getElementById("edit-current-images");
+  box.innerHTML = editingImages.map((url,i)=>`
+    <div class="thumb" data-idx="${i}">
+      <img src="${url}" alt="">
+      <button type="button" data-remove-edit-img="${i}" aria-label="Quitar">×</button>
+    </div>
+  `).join("");
+}
+
+function openEditModal(id){
+  const p = allProducts.find(x=>x.id===id);
+  if(!p) return;
+  editingProductId = id;
+  editingImages = getImages(p).slice();
+  document.getElementById("ef-title").value = p.title || "";
+  document.getElementById("ef-desc").value = p.description || "";
+  document.getElementById("ef-category").value = p.category || "fisica";
+  document.getElementById("ef-price").value = p.price != null ? p.price : "";
+  document.getElementById("ef-technique").value = p.technique || "";
+  document.getElementById("ef-dims").value = p.dimensions || "";
+  document.getElementById("ef-file").value = "";
+  document.getElementById("admin-edit-msg").textContent = "";
+  document.getElementById("admin-edit-msg").className = "modal-msg";
+  renderEditImages();
+  openModal("admin-edit-overlay");
+}
+
+document.getElementById("edit-current-images").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-remove-edit-img]");
+  if(!btn) return;
+  const idx = Number(btn.getAttribute("data-remove-edit-img"));
+  editingImages.splice(idx, 1);
+  renderEditImages();
+});
+
+document.getElementById("admin-edit-submit").addEventListener("click", async ()=>{
+  const msg = document.getElementById("admin-edit-msg");
+  msg.textContent = ""; msg.className = "modal-msg";
+  if(!editingProductId) return;
+
+  const title = document.getElementById("ef-title").value.trim();
+  const description = document.getElementById("ef-desc").value.trim();
+  const category = document.getElementById("ef-category").value;
+  const price = parseFloat(document.getElementById("ef-price").value);
+  const technique = document.getElementById("ef-technique").value.trim();
+  const dimensions = document.getElementById("ef-dims").value.trim();
+  const newFiles = document.getElementById("ef-file").files;
+
+  if(!title || isNaN(price)){
+    msg.textContent = t("edit_error"); msg.classList.add("is-error");
+    return;
+  }
+
+  try{
+    const newUrls = await uploadFiles(newFiles);
+    const images = [...editingImages, ...newUrls];
+    if(images.length===0){
+      msg.textContent = t("edit_error"); msg.classList.add("is-error");
+      return;
+    }
+
+    const res = await fetch(`${FUNCTIONS_URL}/admin-product`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({
+        token: adminToken, action:"update", id: editingProductId,
+        product:{ title, description, category, price, technique, dimensions, images }
+      })
+    });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "update-failed");
+
+    msg.textContent = t("edit_ok"); msg.classList.add("is-ok");
+    await loadProducts();
+    setTimeout(()=>closeModal("admin-edit-overlay"), 700);
+  } catch(e){
+    msg.textContent = t("edit_error"); msg.classList.add("is-error");
+  }
+});
+
+document.getElementById("admin-edit-delete").addEventListener("click", async ()=>{
+  if(!editingProductId) return;
+  if(!confirm(t("confirm_delete"))) return;
+  await deleteProduct(editingProductId);
+  closeModal("admin-edit-overlay");
+});
 
 /* ============================================================
    IDIOMA
