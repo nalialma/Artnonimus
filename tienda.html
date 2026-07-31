@@ -22,6 +22,10 @@ img{ max-width:100%; display:block; }
 button, input, select{ font-family:inherit; }
 a{ color:inherit; text-decoration:none; }
 
+/* Protección básica de imágenes: freno visual, no una barrera real (cualquiera
+   puede igual hacer una captura de pantalla). Se desactiva en modo admin. */
+body:not(.is-admin-mode) img{ -webkit-user-select:none; user-select:none; -webkit-user-drag:none; user-drag:none; -webkit-touch-callout:none; }
+
 .bg-video{ position:fixed; inset:0; z-index:0; width:100%; height:100%; object-fit:cover; background:var(--void); filter: saturate(1.05) brightness(.78) contrast(1.02); }
 .video-overlay{ position:fixed; inset:0; z-index:1; pointer-events:none;
   background: radial-gradient(ellipse 70% 55% at 50% 30%, rgba(11,7,20,.05) 0%, rgba(11,7,20,.6) 68%, rgba(11,7,20,.9) 100%),
@@ -112,6 +116,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .add-cart-btn{ margin-top:.5rem; display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:.65rem 1rem; border-radius:999px; background:linear-gradient(135deg,var(--pink),var(--lilac)); color:#1a1024; font-family:'Unbounded',sans-serif; font-weight:600; font-size:.7rem; letter-spacing:.03em; text-transform:uppercase; border:none; cursor:pointer; transition: box-shadow .3s, transform .3s; }
 .add-cart-btn:hover{ box-shadow:0 0 22px rgba(255,184,230,.5); transform:translateY(-2px); }
 .add-cart-btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; transform:none; }
+.product-actions{ display:flex; gap:.5rem; margin-top:.5rem; }
+.product-actions .add-cart-btn{ margin-top:0; flex:1; }
+.whatsapp-btn{ margin-top:.5rem; display:inline-flex; align-items:center; justify-content:center; gap:.35rem; padding:.65rem .85rem; border-radius:999px; background:rgba(37,211,102,.16); border:1px solid rgba(37,211,102,.55); color:#5cf5a0; font-family:'Unbounded',sans-serif; font-weight:600; font-size:.68rem; letter-spacing:.02em; text-transform:uppercase; cursor:pointer; transition: box-shadow .3s, transform .3s; flex:0 0 auto; }
+.whatsapp-btn:hover{ box-shadow:0 0 18px rgba(37,211,102,.4); transform:translateY(-2px); }
+.whatsapp-btn svg{ width:14px; height:14px; flex:0 0 auto; }
 .empty-note{ text-align:center; font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(246,238,252,.4); padding:3rem 0; grid-column:1/-1; }
 
 /* ---------------- CART DRAWER ---------------- */
@@ -131,7 +140,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .qty-btn{ width:22px; height:22px; border-radius:50%; border:1px solid var(--glass-brd); background:var(--glass-2); color:var(--pearl); cursor:pointer; line-height:1; }
 .cart-item-remove{ background:none; border:none; color:rgba(255,140,140,.8); font-size:.9rem; cursor:pointer; padding:.2rem; }
 .cart-foot{ padding:1.1rem 1.3rem 1.4rem; border-top:1px solid var(--glass-brd); }
-.cart-total-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.9rem; font-family:'Unbounded',sans-serif; }
+.cart-shipping{ margin-bottom:.9rem; }
+.cart-shipping label{ display:block; font-family:'Space Mono',monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; color:rgba(246,238,252,.55); margin-bottom:.35rem; }
+.cart-shipping select{ width:100%; padding:.6rem .7rem; border-radius:12px; border:1px solid var(--glass-brd); background:rgba(255,255,255,.06); color:var(--pearl); font-size:.8rem; }
+.cart-subtotal-row, .cart-shipping-row{ display:flex; justify-content:space-between; font-family:'Space Mono',monospace; font-size:.72rem; color:rgba(246,238,252,.65); margin-bottom:.4rem; }
+.cart-total-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.9rem; margin-top:.5rem; padding-top:.6rem; border-top:1px solid var(--glass-brd); font-family:'Unbounded',sans-serif; }
 .cart-total-row .val{ font-weight:800; font-size:1.2rem; color:var(--pink); }
 .checkout-btn{ width:100%; padding:.9rem; border-radius:999px; border:none; background:linear-gradient(135deg,var(--pink),var(--lilac)); color:#1a1024; font-family:'Unbounded',sans-serif; font-weight:700; font-size:.85rem; letter-spacing:.03em; text-transform:uppercase; cursor:pointer; transition:.3s; }
 .checkout-btn:hover{ box-shadow:0 0 26px rgba(255,184,230,.5); }
@@ -214,6 +227,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   </div>
   <div id="cart-items" class="cart-items"></div>
   <div class="cart-foot">
+    <div id="cart-shipping-field" class="cart-shipping" style="display:none;">
+      <label data-i18n="shipping_zone_label">Zona de envío</label>
+      <select id="shipping-zone">
+        <option value="pl" data-i18n="zone_pl">Polonia</option>
+        <option value="eu" data-i18n="zone_eu">Resto de Europa</option>
+        <option value="latam" data-i18n="zone_latam">Latinoamérica</option>
+        <option value="world" data-i18n="zone_world">Resto del mundo</option>
+      </select>
+    </div>
+    <div id="cart-subtotal-row" class="cart-subtotal-row" style="display:none;">
+      <span data-i18n="cart_subtotal">Subtotal</span>
+      <span id="cart-subtotal">€0.00</span>
+    </div>
+    <div id="cart-shipping-row" class="cart-shipping-row" style="display:none;">
+      <span data-i18n="cart_shipping">Envío</span>
+      <span id="cart-shipping-cost">€0.00</span>
+    </div>
     <div class="cart-total-row">
       <span data-i18n="cart_total">Total</span>
       <span class="val" id="cart-total">€0.00</span>
@@ -244,7 +274,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div class="field"><label data-i18n="f_desc">Descripción</label><textarea id="f-desc"></textarea></div>
     <div class="admin-row-2">
       <div class="field"><label data-i18n="f_category">Categoría</label>
-        <select id="f-category">
+        <select id="f-category" onchange="document.getElementById('f-shipping-fields').style.display = this.value==='fisica' ? 'grid' : 'none';">
           <option value="fisica" data-i18n="tab_fisica">Arte Física</option>
           <option value="virtual" data-i18n="tab_virtual">Arte Virtual</option>
         </select>
@@ -254,6 +284,18 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div class="admin-row-2">
       <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="f-technique"></div>
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="f-dims"></div>
+    </div>
+    <div id="f-shipping-fields" class="admin-row-2">
+      <div class="field"><label data-i18n="f_weight">Peso (kg)</label><input type="number" id="f-weight" step="0.1" min="0" value="0">
+        <div class="field-hint" data-i18n="f_shipping_hint">Solo para obra física: se usa para calcular el costo de envío.</div>
+      </div>
+      <div class="field"><label data-i18n="f_shipping_size">Tamaño de paquete</label>
+        <select id="f-shipping-size">
+          <option value="S" data-i18n="size_s">Pequeño</option>
+          <option value="M" data-i18n="size_m">Mediano</option>
+          <option value="L" data-i18n="size_l">Grande</option>
+        </select>
+      </div>
     </div>
     <div class="field"><label data-i18n="f_file">Imágenes</label><input type="file" id="f-file" accept="image/*" multiple>
       <div class="field-hint" data-i18n="f_file_hint">Seleccioná mínimo 3 imágenes.</div>
@@ -277,7 +319,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div class="field"><label data-i18n="f_desc">Descripción</label><textarea id="ef-desc"></textarea></div>
     <div class="admin-row-2">
       <div class="field"><label data-i18n="f_category">Categoría</label>
-        <select id="ef-category">
+        <select id="ef-category" onchange="document.getElementById('ef-shipping-fields').style.display = this.value==='fisica' ? 'grid' : 'none';">
           <option value="fisica" data-i18n="tab_fisica">Arte Física</option>
           <option value="virtual" data-i18n="tab_virtual">Arte Virtual</option>
         </select>
@@ -287,6 +329,18 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div class="admin-row-2">
       <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="ef-technique"></div>
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="ef-dims"></div>
+    </div>
+    <div id="ef-shipping-fields" class="admin-row-2">
+      <div class="field"><label data-i18n="f_weight">Peso (kg)</label><input type="number" id="ef-weight" step="0.1" min="0" value="0">
+        <div class="field-hint" data-i18n="f_shipping_hint">Solo para obra física: se usa para calcular el costo de envío.</div>
+      </div>
+      <div class="field"><label data-i18n="f_shipping_size">Tamaño de paquete</label>
+        <select id="ef-shipping-size">
+          <option value="S" data-i18n="size_s">Pequeño</option>
+          <option value="M" data-i18n="size_m">Mediano</option>
+          <option value="L" data-i18n="size_l">Grande</option>
+        </select>
+      </div>
     </div>
     <div class="field"><label data-i18n="f_add_images">Agregar más imágenes</label><input type="file" id="ef-file" accept="image/*" multiple></div>
     <button type="button" id="admin-edit-submit" class="modal-submit" data-i18n="save_changes">Guardar cambios</button>
@@ -345,7 +399,13 @@ const translations = {
     delete_product_btn:"Usuń tę pracę", f_images_current:"Aktualne zdjęcia",
     f_images_hint:"Dotknij ×, aby usunąć zdjęcie. Wymagane minimum 3 zdjęcia.", f_add_images:"Dodaj więcej zdjęć",
     edit_ok:"Zmiany zapisane", edit_error:"Błąd przy zapisywaniu",
-    min_images_error:"Każda praca wymaga co najmniej 3 zdjęć."
+    min_images_error:"Każda praca wymaga co najmniej 3 zdjęć.",
+    whatsapp_btn:"WhatsApp", f_weight:"Waga (kg)", f_shipping_size:"Rozmiar paczki",
+    f_shipping_hint:"Tylko dla sztuki fizycznej: używane do obliczenia kosztu wysyłki.",
+    size_s:"Mały", size_m:"Średni", size_l:"Duży",
+    shipping_zone_label:"Strefa wysyłki", zone_pl:"Polska", zone_eu:"Reszta Europy",
+    zone_latam:"Ameryka Łacińska", zone_world:"Reszta świata",
+    cart_subtotal:"Suma częściowa", cart_shipping:"Wysyłka"
   },
   en:{
     shop_eyebrow:"SHOP · POLAND", shop_h1:"Virtual Store",
@@ -366,7 +426,13 @@ const translations = {
     delete_product_btn:"Delete this piece", f_images_current:"Current images",
     f_images_hint:"Tap × to remove an image. At least 3 images are required.", f_add_images:"Add more images",
     edit_ok:"Changes saved", edit_error:"Error saving changes",
-    min_images_error:"Each piece needs at least 3 images."
+    min_images_error:"Each piece needs at least 3 images.",
+    whatsapp_btn:"WhatsApp", f_weight:"Weight (kg)", f_shipping_size:"Package size",
+    f_shipping_hint:"Physical art only: used to calculate the shipping cost.",
+    size_s:"Small", size_m:"Medium", size_l:"Large",
+    shipping_zone_label:"Shipping zone", zone_pl:"Poland", zone_eu:"Rest of Europe",
+    zone_latam:"Latin America", zone_world:"Rest of the world",
+    cart_subtotal:"Subtotal", cart_shipping:"Shipping"
   },
   es:{
     shop_eyebrow:"TIENDA · POLONIA", shop_h1:"Tienda Virtual",
@@ -387,7 +453,13 @@ const translations = {
     delete_product_btn:"Eliminar esta obra", f_images_current:"Imágenes actuales",
     f_images_hint:"Tocá la × para quitar una imagen. Se requieren mínimo 3 imágenes.", f_add_images:"Agregar más imágenes",
     edit_ok:"Cambios guardados", edit_error:"Error al guardar los cambios",
-    min_images_error:"Cada obra necesita al menos 3 imágenes."
+    min_images_error:"Cada obra necesita al menos 3 imágenes.",
+    whatsapp_btn:"WhatsApp", f_weight:"Peso (kg)", f_shipping_size:"Tamaño de paquete",
+    f_shipping_hint:"Solo para obra física: se usa para calcular el costo de envío.",
+    size_s:"Pequeño", size_m:"Mediano", size_l:"Grande",
+    shipping_zone_label:"Zona de envío", zone_pl:"Polonia", zone_eu:"Resto de Europa",
+    zone_latam:"Latinoamérica", zone_world:"Resto del mundo",
+    cart_subtotal:"Subtotal", cart_shipping:"Envío"
   },
   it:{
     shop_eyebrow:"NEGOZIO · POLONIA", shop_h1:"Negozio Virtuale",
@@ -408,7 +480,13 @@ const translations = {
     delete_product_btn:"Elimina questa opera", f_images_current:"Immagini attuali",
     f_images_hint:"Tocca × per rimuovere un'immagine. Sono richieste almeno 3 immagini.", f_add_images:"Aggiungi altre immagini",
     edit_ok:"Modifiche salvate", edit_error:"Errore nel salvataggio",
-    min_images_error:"Ogni opera richiede almeno 3 immagini."
+    min_images_error:"Ogni opera richiede almeno 3 immagini.",
+    whatsapp_btn:"WhatsApp", f_weight:"Peso (kg)", f_shipping_size:"Dimensione pacco",
+    f_shipping_hint:"Solo per arte fisica: usato per calcolare il costo di spedizione.",
+    size_s:"Piccolo", size_m:"Medio", size_l:"Grande",
+    shipping_zone_label:"Zona di spedizione", zone_pl:"Polonia", zone_eu:"Resto d'Europa",
+    zone_latam:"America Latina", zone_world:"Resto del mondo",
+    cart_subtotal:"Subtotale", cart_shipping:"Spedizione"
   },
   pt:{
     shop_eyebrow:"LOJA · POLÔNIA", shop_h1:"Loja Virtual",
@@ -429,7 +507,13 @@ const translations = {
     delete_product_btn:"Excluir esta obra", f_images_current:"Imagens atuais",
     f_images_hint:"Toque no × para remover uma imagem. São necessárias no mínimo 3 imagens.", f_add_images:"Adicionar mais imagens",
     edit_ok:"Alterações salvas", edit_error:"Erro ao salvar as alterações",
-    min_images_error:"Cada obra precisa de no mínimo 3 imagens."
+    min_images_error:"Cada obra precisa de no mínimo 3 imagens.",
+    whatsapp_btn:"WhatsApp", f_weight:"Peso (kg)", f_shipping_size:"Tamanho do pacote",
+    f_shipping_hint:"Somente para arte física: usado para calcular o custo de envio.",
+    size_s:"Pequeno", size_m:"Médio", size_l:"Grande",
+    shipping_zone_label:"Zona de envio", zone_pl:"Polônia", zone_eu:"Resto da Europa",
+    zone_latam:"América Latina", zone_world:"Resto do mundo",
+    cart_subtotal:"Subtotal", cart_shipping:"Envio"
   }
 };
 let currentLang = "pl";
@@ -455,6 +539,31 @@ function saveCart(){ localStorage.setItem("an_cart", JSON.stringify(cart)); upda
 
 /* Cada obra debe tener al menos esta cantidad de imágenes (subida y edición). */
 const MIN_IMAGES = 3;
+
+/* WhatsApp para coordinar compras directamente. */
+const WHATSAPP_NUMBER = "48514290151";
+function whatsappLink(product){
+  const msg = `Hola! Quiero coordinar la compra de la obra "${product.title}" directamente.`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
+/* ============================================================
+   ENVÍOS — tarifas por zona (deben coincidir con las de la Edge
+   Function create-checkout-session, que es la que cobra de verdad).
+   costo = base + peso_kg * perKg + recargo por tamaño de paquete
+   ============================================================ */
+const SHIPPING_RATES = {
+  pl:    { base: 5,  perKg: 2,  sizeSurcharge: { S: 0, M: 3,  L: 8  } },
+  eu:    { base: 12, perKg: 4,  sizeSurcharge: { S: 0, M: 5,  L: 15 } },
+  latam: { base: 25, perKg: 8,  sizeSurcharge: { S: 0, M: 10, L: 30 } },
+  world: { base: 30, perKg: 10, sizeSurcharge: { S: 0, M: 12, L: 35 } },
+};
+function shippingForItem(zone, weightKg, size){
+  const rate = SHIPPING_RATES[zone] || SHIPPING_RATES.world;
+  const s = ["S","M","L"].includes(size) ? size : "S";
+  const w = Number.isFinite(weightKg) && weightKg > 0 ? weightKg : 0;
+  return rate.base + w * rate.perKg + rate.sizeSurcharge[s];
+}
 
 /* ============================================================
    PRODUCTOS
@@ -494,7 +603,13 @@ function renderProducts(){
         <h3>${escapeHtml(p.title)}</h3>
         ${p.technique ? `<div class="product-meta">${escapeHtml(p.technique)}${p.dimensions ? " · "+escapeHtml(p.dimensions) : ""}</div>` : ""}
         <div class="product-price">${formatPrice(p.price, p.currency)}</div>
-        <button type="button" class="add-cart-btn" data-add-id="${p.id}" ${p.is_sold ? "disabled" : ""}>${t("add_to_cart")}</button>
+        <div class="product-actions">
+          <button type="button" class="add-cart-btn" data-add-id="${p.id}" ${p.is_sold ? "disabled" : ""}>${t("add_to_cart")}</button>
+          <a class="whatsapp-btn" href="${whatsappLink(p)}" target="_blank" rel="noopener" aria-label="Coordinar por WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.33 4.95L2 22l5.28-1.39c1.44.79 3.06 1.2 4.72 1.2h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.05c-.24.68-1.4 1.32-1.93 1.4-.49.08-1.11.11-1.79-.11-.41-.13-.94-.31-1.62-.6-2.85-1.23-4.71-4.1-4.85-4.29-.14-.19-1.16-1.54-1.16-2.94 0-1.4.73-2.09.99-2.37.26-.28.57-.35.76-.35h.55c.18 0 .41-.03.64.49.24.55.81 1.9.88 2.03.07.14.11.3.02.48-.09.19-.14.3-.27.46-.14.16-.29.36-.41.48-.14.14-.28.29-.12.57.16.28.72 1.19 1.55 1.93 1.06.95 1.96 1.24 2.24 1.38.28.14.44.12.61-.07.16-.19.7-.82.89-1.1.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg>
+            <span data-i18n="whatsapp_btn">WhatsApp</span>
+          </a>
+        </div>
       </div>
     </div>
   `;
@@ -521,11 +636,19 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
 /* ============================================================
    CARRITO
    ============================================================ */
+function currentShippingZone(){
+  const sel = document.getElementById("shipping-zone");
+  return (sel && SHIPPING_RATES[sel.value]) ? sel.value : "pl";
+}
+
 function updateCartUI(){
   const itemsBox = document.getElementById("cart-items");
   const countEl = document.getElementById("cart-count");
   const totalEl = document.getElementById("cart-total");
   const checkoutBtn = document.getElementById("checkout-btn");
+  const shippingField = document.getElementById("cart-shipping-field");
+  const subtotalRow = document.getElementById("cart-subtotal-row");
+  const shippingRow = document.getElementById("cart-shipping-row");
 
   const totalQty = cart.reduce((s,i)=>s+i.quantity,0);
   countEl.textContent = totalQty;
@@ -552,9 +675,26 @@ function updateCartUI(){
     checkoutBtn.disabled = false;
   }
 
-  const total = cart.reduce((s,i)=>s+i.price*i.quantity,0);
+  const subtotal = cart.reduce((s,i)=>s+i.price*i.quantity,0);
   const currency = cart[0]?.currency || "EUR";
-  totalEl.textContent = formatPrice(total, currency);
+  const physicalItems = cart.filter(i=>i.category==="fisica");
+
+  let shipping = 0;
+  if(physicalItems.length > 0){
+    shippingField.style.display = "block";
+    const zone = currentShippingZone();
+    shipping = physicalItems.reduce((s,i)=> s + shippingForItem(zone, i.weight_kg, i.shipping_size) * i.quantity, 0);
+    subtotalRow.style.display = "flex";
+    shippingRow.style.display = "flex";
+    document.getElementById("cart-subtotal").textContent = formatPrice(subtotal, currency);
+    document.getElementById("cart-shipping-cost").textContent = formatPrice(shipping, currency);
+  } else {
+    shippingField.style.display = "none";
+    subtotalRow.style.display = "none";
+    shippingRow.style.display = "none";
+  }
+
+  totalEl.textContent = formatPrice(subtotal + shipping, currency);
 }
 
 function addToCart(id){
@@ -562,7 +702,11 @@ function addToCart(id){
   if(!p || p.is_sold) return;
   const existing = cart.find(i=>i.id===id);
   if(existing) existing.quantity += 1;
-  else cart.push({ id:p.id, title:p.title, price:p.price, currency:p.currency, image:getImages(p)[0] || "", quantity:1 });
+  else cart.push({
+    id:p.id, title:p.title, price:p.price, currency:p.currency,
+    image:getImages(p)[0] || "", quantity:1,
+    category:p.category, weight_kg:p.weight_kg || 0, shipping_size:p.shipping_size || "S",
+  });
   saveCart();
   openCart();
 }
@@ -574,6 +718,8 @@ function changeQty(id, delta){
   saveCart();
 }
 function removeFromCart(id){ cart = cart.filter(i=>i.id!==id); saveCart(); }
+
+document.getElementById("shipping-zone").addEventListener("change", updateCartUI);
 
 const cartOverlay = document.getElementById("cart-overlay");
 const cartDrawer = document.getElementById("cart-drawer");
@@ -655,6 +801,7 @@ document.getElementById("checkout-btn").addEventListener("click", async ()=>{
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         items: cart,
+        shippingZone: currentShippingZone(),
         successUrl: window.location.origin + window.location.pathname + "?pago=exito",
         cancelUrl: window.location.origin + window.location.pathname + "?pago=cancelado",
       })
@@ -677,6 +824,13 @@ document.querySelectorAll("[data-close-modal]").forEach(b=>{
   b.addEventListener("click", ()=>closeModal(b.getAttribute("data-close-modal")));
 });
 
+/* Refleja el estado de admin en el botón y en <body> (esto último habilita
+   guardar/descargar imágenes: ver regla CSS "body:not(.is-admin-mode) img"). */
+function setAdminUiState(isAdmin){
+  document.getElementById("admin-trigger").classList.toggle("is-admin", isAdmin);
+  document.body.classList.toggle("is-admin-mode", isAdmin);
+}
+
 document.getElementById("admin-trigger").addEventListener("click", ()=>{
   if(adminToken){ openModal("admin-upload-overlay"); }
   else{ openModal("admin-login-overlay"); }
@@ -697,7 +851,7 @@ document.getElementById("admin-login-submit").addEventListener("click", async ()
       adminToken = data.token;
       sessionStorage.setItem("an_admin_token", adminToken);
       msg.textContent = t("admin_login_ok"); msg.classList.add("is-ok");
-      document.getElementById("admin-trigger").classList.add("is-admin");
+      setAdminUiState(true);
       document.getElementById("admin-password-input").value = "";
       setTimeout(()=>{ closeModal("admin-login-overlay"); openModal("admin-upload-overlay"); renderProducts(); }, 500);
     } else {
@@ -714,10 +868,21 @@ function handleAuthError(status, data){
   if(status === 401){
     adminToken = null;
     sessionStorage.removeItem("an_admin_token");
-    document.getElementById("admin-trigger").classList.remove("is-admin");
+    setAdminUiState(false);
     throw new Error(data?.error || "Sesión de administrador vencida. Iniciá sesión de nuevo.");
   }
 }
+
+/* ============================================================
+   PROTECCIÓN BÁSICA DE IMÁGENES (freno visual, no infalible):
+   deshabilita clic derecho y arrastre sobre <img>, salvo en modo admin.
+   ============================================================ */
+document.addEventListener("contextmenu", (e)=>{
+  if(!adminToken && e.target.tagName === "IMG") e.preventDefault();
+});
+document.addEventListener("dragstart", (e)=>{
+  if(!adminToken && e.target.tagName === "IMG") e.preventDefault();
+});
 
 async function uploadOneFile(file){
   const urlRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
@@ -752,6 +917,8 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   const price = parseFloat(document.getElementById("f-price").value);
   const technique = document.getElementById("f-technique").value.trim();
   const dimensions = document.getElementById("f-dims").value.trim();
+  const weight_kg = parseFloat(document.getElementById("f-weight").value) || 0;
+  const shipping_size = document.getElementById("f-shipping-size").value;
   const files = document.getElementById("f-file").files;
 
   if(!title || isNaN(price)){
@@ -775,7 +942,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, images }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, weight_kg, shipping_size, images }
       })
     });
     const insertData = await insertRes.json();
@@ -788,6 +955,8 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     document.getElementById("f-price").value = "";
     document.getElementById("f-technique").value = "";
     document.getElementById("f-dims").value = "";
+    document.getElementById("f-weight").value = "0";
+    document.getElementById("f-shipping-size").value = "S";
     document.getElementById("f-file").value = "";
     await loadProducts();
     setTimeout(()=>closeModal("admin-upload-overlay"), 800);
@@ -838,9 +1007,12 @@ function openEditModal(id){
   document.getElementById("ef-title").value = p.title || "";
   document.getElementById("ef-desc").value = p.description || "";
   document.getElementById("ef-category").value = p.category || "fisica";
+  document.getElementById("ef-shipping-fields").style.display = (p.category === "fisica") ? "grid" : "none";
   document.getElementById("ef-price").value = p.price != null ? p.price : "";
   document.getElementById("ef-technique").value = p.technique || "";
   document.getElementById("ef-dims").value = p.dimensions || "";
+  document.getElementById("ef-weight").value = p.weight_kg != null ? p.weight_kg : 0;
+  document.getElementById("ef-shipping-size").value = p.shipping_size || "S";
   document.getElementById("ef-file").value = "";
   document.getElementById("admin-edit-msg").textContent = "";
   document.getElementById("admin-edit-msg").className = "modal-msg";
@@ -869,6 +1041,8 @@ document.getElementById("admin-edit-submit").addEventListener("click", async (ev
   const price = parseFloat(document.getElementById("ef-price").value);
   const technique = document.getElementById("ef-technique").value.trim();
   const dimensions = document.getElementById("ef-dims").value.trim();
+  const weight_kg = parseFloat(document.getElementById("ef-weight").value) || 0;
+  const shipping_size = document.getElementById("ef-shipping-size").value;
   const newFiles = document.getElementById("ef-file").files;
 
   if(!title || isNaN(price)){
@@ -893,7 +1067,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async (ev
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"update", id: editingProductId,
-        product:{ title, description, category, price, technique, dimensions, images }
+        product:{ title, description, category, price, technique, dimensions, weight_kg, shipping_size, images }
       })
     });
     const data = await res.json();
@@ -929,7 +1103,7 @@ document.querySelectorAll("[data-lang]").forEach(btn=>{
 /* ============================================================
    INICIO
    ============================================================ */
-if(adminToken) document.getElementById("admin-trigger").classList.add("is-admin");
+if(adminToken) setAdminUiState(true);
 updateCartUI();
 loadProducts();
 </script>
