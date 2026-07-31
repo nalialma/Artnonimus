@@ -741,7 +741,9 @@ async function uploadFiles(fileList){
   return urls;
 }
 
-document.getElementById("admin-upload-submit").addEventListener("click", async ()=>{
+document.getElementById("admin-upload-submit").addEventListener("click", async (ev)=>{
+  const btn = ev.currentTarget;
+  if(btn.disabled) return; // evita disparar subidas duplicadas si tocan el botón varias veces
   const msg = document.getElementById("admin-upload-msg");
   msg.textContent = ""; msg.className = "modal-msg";
   const title = document.getElementById("f-title").value.trim();
@@ -761,8 +763,12 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     return;
   }
 
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Subiendo imágenes…";
   try{
     const images = await uploadFiles(files);
+    btn.textContent = "Guardando…";
 
     const insertRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
       method:"POST",
@@ -788,6 +794,9 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   } catch(e){
     msg.textContent = (e && e.message) ? e.message : t("upload_error");
     msg.classList.add("is-error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
   }
 });
 
@@ -847,7 +856,9 @@ document.getElementById("edit-current-images").addEventListener("click", (e)=>{
   renderEditImages();
 });
 
-document.getElementById("admin-edit-submit").addEventListener("click", async ()=>{
+document.getElementById("admin-edit-submit").addEventListener("click", async (ev)=>{
+  const btn = ev.currentTarget;
+  if(btn.disabled) return; // evita disparar guardados/subidas duplicadas si tocan el botón varias veces
   const msg = document.getElementById("admin-edit-msg");
   msg.textContent = ""; msg.className = "modal-msg";
   if(!editingProductId) return;
@@ -865,6 +876,9 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
     return;
   }
 
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = newFiles.length > 0 ? "Subiendo imágenes…" : "Guardando…";
   try{
     const newUrls = await uploadFiles(newFiles);
     const images = [...editingImages, ...newUrls];
@@ -872,6 +886,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
       msg.textContent = t("min_images_error"); msg.classList.add("is-error");
       return;
     }
+    btn.textContent = "Guardando…";
 
     const res = await fetch(`${FUNCTIONS_URL}/admin-product`, {
       method:"POST",
@@ -891,6 +906,9 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
   } catch(e){
     msg.textContent = (e && e.message) ? e.message : t("edit_error");
     msg.classList.add("is-error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
   }
 });
 
