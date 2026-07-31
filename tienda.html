@@ -256,7 +256,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="f-dims"></div>
     </div>
     <div class="field"><label data-i18n="f_file">Imágenes</label><input type="file" id="f-file" accept="image/*" multiple>
-      <div class="field-hint" data-i18n="f_file_hint">Podés seleccionar varias imágenes a la vez.</div>
+      <div class="field-hint" data-i18n="f_file_hint">Seleccioná mínimo 3 imágenes.</div>
     </div>
     <button type="button" id="admin-upload-submit" class="modal-submit" data-i18n="admin_upload_submit">Publicar obra</button>
     <div id="admin-upload-msg" class="modal-msg"></div>
@@ -271,7 +271,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div class="field">
       <label data-i18n="f_images_current">Imágenes actuales</label>
       <div id="edit-current-images" class="current-images"></div>
-      <div class="field-hint" data-i18n="f_images_hint">Tocá la × para quitar una imagen.</div>
+      <div class="field-hint" data-i18n="f_images_hint">Tocá la × para quitar una imagen. Se requieren mínimo 3 imágenes.</div>
     </div>
     <div class="field"><label data-i18n="f_title">Título</label><input type="text" id="ef-title"></div>
     <div class="field"><label data-i18n="f_desc">Descripción</label><textarea id="ef-desc"></textarea></div>
@@ -338,13 +338,14 @@ const translations = {
     admin_wrong_password:"Błędne hasło", admin_login_ok:"Zalogowano",
     admin_upload_title:"Dodaj nową pracę", admin_upload_submit:"Opublikuj pracę",
     f_title:"Tytuł", f_desc:"Opis", f_category:"Kategoria", f_price:"Cena (EUR)",
-    f_technique:"Technika", f_dims:"Wymiary", f_file:"Zdjęcie", f_file_hint:"Możesz wybrać kilka zdjęć naraz.",
+    f_technique:"Technika", f_dims:"Wymiary", f_file:"Zdjęcia", f_file_hint:"Wybierz co najmniej 3 zdjęcia.",
     upload_ok:"Praca opublikowana", upload_error:"Błąd przy publikacji",
     confirm_delete:"Usunąć tę pracę?", checkout_error:"Błąd płatności, spróbuj ponownie.",
     admin_edit_title:"Edytuj pracę", edit_label:"Edytuj", save_changes:"Zapisz zmiany",
     delete_product_btn:"Usuń tę pracę", f_images_current:"Aktualne zdjęcia",
-    f_images_hint:"Dotknij ×, aby usunąć zdjęcie.", f_add_images:"Dodaj więcej zdjęć",
-    edit_ok:"Zmiany zapisane", edit_error:"Błąd przy zapisywaniu"
+    f_images_hint:"Dotknij ×, aby usunąć zdjęcie. Wymagane minimum 3 zdjęcia.", f_add_images:"Dodaj więcej zdjęć",
+    edit_ok:"Zmiany zapisane", edit_error:"Błąd przy zapisywaniu",
+    min_images_error:"Każda praca wymaga co najmniej 3 zdjęć."
   },
   en:{
     shop_eyebrow:"SHOP · POLAND", shop_h1:"Virtual Store",
@@ -358,13 +359,14 @@ const translations = {
     admin_wrong_password:"Wrong password", admin_login_ok:"Logged in",
     admin_upload_title:"Upload new piece", admin_upload_submit:"Publish piece",
     f_title:"Title", f_desc:"Description", f_category:"Category", f_price:"Price (EUR)",
-    f_technique:"Technique", f_dims:"Dimensions", f_file:"Images", f_file_hint:"You can select several images at once.",
+    f_technique:"Technique", f_dims:"Dimensions", f_file:"Images", f_file_hint:"Select at least 3 images.",
     upload_ok:"Piece published", upload_error:"Error publishing",
     confirm_delete:"Delete this piece?", checkout_error:"Payment error, please try again.",
     admin_edit_title:"Edit piece", edit_label:"Edit", save_changes:"Save changes",
     delete_product_btn:"Delete this piece", f_images_current:"Current images",
-    f_images_hint:"Tap × to remove an image.", f_add_images:"Add more images",
-    edit_ok:"Changes saved", edit_error:"Error saving changes"
+    f_images_hint:"Tap × to remove an image. At least 3 images are required.", f_add_images:"Add more images",
+    edit_ok:"Changes saved", edit_error:"Error saving changes",
+    min_images_error:"Each piece needs at least 3 images."
   },
   es:{
     shop_eyebrow:"TIENDA · POLONIA", shop_h1:"Tienda Virtual",
@@ -378,13 +380,14 @@ const translations = {
     admin_wrong_password:"Contraseña incorrecta", admin_login_ok:"Sesión iniciada",
     admin_upload_title:"Subir nueva obra", admin_upload_submit:"Publicar obra",
     f_title:"Título", f_desc:"Descripción", f_category:"Categoría", f_price:"Precio (EUR)",
-    f_technique:"Técnica", f_dims:"Dimensiones", f_file:"Imágenes", f_file_hint:"Podés seleccionar varias imágenes a la vez.",
+    f_technique:"Técnica", f_dims:"Dimensiones", f_file:"Imágenes", f_file_hint:"Seleccioná mínimo 3 imágenes.",
     upload_ok:"Obra publicada", upload_error:"Error al publicar",
     confirm_delete:"¿Eliminar esta obra?", checkout_error:"Error en el pago, intentá de nuevo.",
     admin_edit_title:"Editar obra", edit_label:"Editar", save_changes:"Guardar cambios",
     delete_product_btn:"Eliminar esta obra", f_images_current:"Imágenes actuales",
-    f_images_hint:"Tocá la × para quitar una imagen.", f_add_images:"Agregar más imágenes",
-    edit_ok:"Cambios guardados", edit_error:"Error al guardar los cambios"
+    f_images_hint:"Tocá la × para quitar una imagen. Se requieren mínimo 3 imágenes.", f_add_images:"Agregar más imágenes",
+    edit_ok:"Cambios guardados", edit_error:"Error al guardar los cambios",
+    min_images_error:"Cada obra necesita al menos 3 imágenes."
   },
   it:{
     shop_eyebrow:"NEGOZIO · POLONIA", shop_h1:"Negozio Virtuale",
@@ -398,13 +401,14 @@ const translations = {
     admin_wrong_password:"Password errata", admin_login_ok:"Accesso effettuato",
     admin_upload_title:"Carica nuova opera", admin_upload_submit:"Pubblica opera",
     f_title:"Titolo", f_desc:"Descrizione", f_category:"Categoria", f_price:"Prezzo (EUR)",
-    f_technique:"Tecnica", f_dims:"Dimensioni", f_file:"Immagini", f_file_hint:"Puoi selezionare più immagini insieme.",
+    f_technique:"Tecnica", f_dims:"Dimensioni", f_file:"Immagini", f_file_hint:"Seleziona almeno 3 immagini.",
     upload_ok:"Opera pubblicata", upload_error:"Errore nella pubblicazione",
     confirm_delete:"Eliminare questa opera?", checkout_error:"Errore nel pagamento, riprova.",
     admin_edit_title:"Modifica opera", edit_label:"Modifica", save_changes:"Salva modifiche",
     delete_product_btn:"Elimina questa opera", f_images_current:"Immagini attuali",
-    f_images_hint:"Tocca × per rimuovere un'immagine.", f_add_images:"Aggiungi altre immagini",
-    edit_ok:"Modifiche salvate", edit_error:"Errore nel salvataggio"
+    f_images_hint:"Tocca × per rimuovere un'immagine. Sono richieste almeno 3 immagini.", f_add_images:"Aggiungi altre immagini",
+    edit_ok:"Modifiche salvate", edit_error:"Errore nel salvataggio",
+    min_images_error:"Ogni opera richiede almeno 3 immagini."
   },
   pt:{
     shop_eyebrow:"LOJA · POLÔNIA", shop_h1:"Loja Virtual",
@@ -418,13 +422,14 @@ const translations = {
     admin_wrong_password:"Senha incorreta", admin_login_ok:"Login realizado",
     admin_upload_title:"Enviar nova obra", admin_upload_submit:"Publicar obra",
     f_title:"Título", f_desc:"Descrição", f_category:"Categoria", f_price:"Preço (EUR)",
-    f_technique:"Técnica", f_dims:"Dimensões", f_file:"Imagens", f_file_hint:"Você pode selecionar várias imagens de uma vez.",
+    f_technique:"Técnica", f_dims:"Dimensões", f_file:"Imagens", f_file_hint:"Selecione no mínimo 3 imagens.",
     upload_ok:"Obra publicada", upload_error:"Erro ao publicar",
     confirm_delete:"Excluir esta obra?", checkout_error:"Erro no pagamento, tente novamente.",
     admin_edit_title:"Editar obra", edit_label:"Editar", save_changes:"Salvar alterações",
     delete_product_btn:"Excluir esta obra", f_images_current:"Imagens atuais",
-    f_images_hint:"Toque no × para remover uma imagem.", f_add_images:"Adicionar mais imagens",
-    edit_ok:"Alterações salvas", edit_error:"Erro ao salvar as alterações"
+    f_images_hint:"Toque no × para remover uma imagem. São necessárias no mínimo 3 imagens.", f_add_images:"Adicionar mais imagens",
+    edit_ok:"Alterações salvas", edit_error:"Erro ao salvar as alterações",
+    min_images_error:"Cada obra precisa de no mínimo 3 imagens."
   }
 };
 let currentLang = "pl";
@@ -447,6 +452,9 @@ let cart = JSON.parse(localStorage.getItem("an_cart") || "[]");
 let adminToken = sessionStorage.getItem("an_admin_token") || null;
 
 function saveCart(){ localStorage.setItem("an_cart", JSON.stringify(cart)); updateCartUI(); }
+
+/* Cada obra debe tener al menos esta cantidad de imágenes (subida y edición). */
+const MIN_IMAGES = 3;
 
 /* ============================================================
    PRODUCTOS
@@ -744,8 +752,12 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   const dimensions = document.getElementById("f-dims").value.trim();
   const files = document.getElementById("f-file").files;
 
-  if(!title || files.length===0 || isNaN(price)){
+  if(!title || isNaN(price)){
     msg.textContent = t("upload_error"); msg.classList.add("is-error");
+    return;
+  }
+  if(files.length < MIN_IMAGES){
+    msg.textContent = t("min_images_error"); msg.classList.add("is-error");
     return;
   }
 
@@ -856,8 +868,8 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
   try{
     const newUrls = await uploadFiles(newFiles);
     const images = [...editingImages, ...newUrls];
-    if(images.length===0){
-      msg.textContent = "La obra necesita al menos una imagen"; msg.classList.add("is-error");
+    if(images.length < MIN_IMAGES){
+      msg.textContent = t("min_images_error"); msg.classList.add("is-error");
       return;
     }
 
