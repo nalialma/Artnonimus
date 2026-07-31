@@ -700,6 +700,17 @@ document.getElementById("admin-login-submit").addEventListener("click", async ()
   }
 });
 
+/* Si el backend devuelve 401 (token inválido o vencido a las 4hs), cerramos
+   la sesión de admin en el cliente y avisamos, en vez de mostrar un error genérico. */
+function handleAuthError(status, data){
+  if(status === 401){
+    adminToken = null;
+    sessionStorage.removeItem("an_admin_token");
+    document.getElementById("admin-trigger").classList.remove("is-admin");
+    throw new Error(data?.error || "Sesión de administrador vencida. Iniciá sesión de nuevo.");
+  }
+}
+
 async function uploadOneFile(file){
   const urlRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
     method:"POST",
@@ -707,7 +718,8 @@ async function uploadOneFile(file){
     body: JSON.stringify({ token: adminToken, action:"get-upload-url", fileName:file.name })
   });
   const urlData = await urlRes.json();
-  if(!urlData.signedUrl) throw new Error("no-upload-url");
+  handleAuthError(urlRes.status, urlData);
+  if(!urlData.signedUrl) throw new Error(urlData.error || "No se pudo generar la URL de subida");
   const { error: upErr } = await supabase.storage
     .from("product-images")
     .uploadToSignedUrl(urlData.path, urlData.token, file);
@@ -749,7 +761,8 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
       })
     });
     const insertData = await insertRes.json();
-    if(!insertData.ok) throw new Error(insertData.error || "insert-failed");
+    handleAuthError(insertRes.status, insertData);
+    if(!insertData.ok) throw new Error(insertData.error || t("upload_error"));
 
     msg.textContent = t("upload_ok"); msg.classList.add("is-ok");
     document.getElementById("f-title").value = "";
@@ -761,7 +774,8 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     await loadProducts();
     setTimeout(()=>closeModal("admin-upload-overlay"), 800);
   } catch(e){
-    msg.textContent = t("upload_error"); msg.classList.add("is-error");
+    msg.textContent = (e && e.message) ? e.message : t("upload_error");
+    msg.classList.add("is-error");
   }
 });
 
@@ -843,7 +857,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
     const newUrls = await uploadFiles(newFiles);
     const images = [...editingImages, ...newUrls];
     if(images.length===0){
-      msg.textContent = t("edit_error"); msg.classList.add("is-error");
+      msg.textContent = "La obra necesita al menos una imagen"; msg.classList.add("is-error");
       return;
     }
 
@@ -856,13 +870,15 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
       })
     });
     const data = await res.json();
-    if(!data.ok) throw new Error(data.error || "update-failed");
+    handleAuthError(res.status, data);
+    if(!data.ok) throw new Error(data.error || t("edit_error"));
 
     msg.textContent = t("edit_ok"); msg.classList.add("is-ok");
     await loadProducts();
     setTimeout(()=>closeModal("admin-edit-overlay"), 700);
   } catch(e){
-    msg.textContent = t("edit_error"); msg.classList.add("is-error");
+    msg.textContent = (e && e.message) ? e.message : t("edit_error");
+    msg.classList.add("is-error");
   }
 });
 
