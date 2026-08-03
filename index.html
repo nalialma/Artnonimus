@@ -3,9 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ArtNonimu's — Portrety w świecie snu | Polska</title>
-<meta name="description" content="Ręcznie malowane portrety zwierząt i ludzi na zamówienie. Pracownia dreamcore — malarstwo na drewnie, rysunek ołówkiem, karykatury. Polska.">
+<title>ArtNonimu's — Przestrzeń Sztuki | Portrety w świecie snu | Polska</title>
+<meta name="description" content="ArtNonimu's — przestrzeń sztuki dreamcore. Ręcznie malowane portrety zwierząt i ludzi na zamówienie, arte físico y arte digital. Pracownia w Polsce z wysyłką do całej Europy i Ameryki Łacińskiej.">
+<meta name="keywords" content="espacio de arte, art space, przestrzeń sztuki, arte físico, arte digital, retratos personalizados, portrety na zamówienie, custom pet portraits, dreamcore art, Polska, Polonia, Poland, Europa, Europe, Latinoamérica, Latin America">
+<meta name="author" content="ArtNonimu's">
+<meta name="robots" content="index, follow">
+<meta name="geo.region" content="PL">
+<meta name="geo.placename" content="Poland">
 <link rel="canonical" href="https://artnonimus.art/">
+
+<!-- hreflang alternates: same single-page app, language selected via ?lang= -->
+<link rel="alternate" hreflang="pl" href="https://artnonimus.art/?lang=pl">
+<link rel="alternate" hreflang="en" href="https://artnonimus.art/?lang=en">
+<link rel="alternate" hreflang="es" href="https://artnonimus.art/?lang=es">
+<link rel="alternate" hreflang="it" href="https://artnonimus.art/?lang=it">
+<link rel="alternate" hreflang="pt" href="https://artnonimus.art/?lang=pt">
+<link rel="alternate" hreflang="x-default" href="https://artnonimus.art/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ArtNonimu's">
+<meta property="og:title" content="ArtNonimu's — Przestrzeń Sztuki | Espacio de Arte">
+<meta property="og:description" content="Retratos personalizados de arte físico y arte digital, pintados a mano en Polonia, con envíos a toda Europa y Latinoamérica.">
+<meta property="og:image" content="https://i.ibb.co/mPQjbWs/1784228306856.png">
+<meta property="og:url" content="https://artnonimus.art/">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="pt_PT">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ArtNonimu's — Espacio de Arte">
+<meta name="twitter:description" content="Arte físico y arte digital hecho a mano en Polonia, con envíos a Europa y Latinoamérica.">
+<meta name="twitter:image" content="https://i.ibb.co/mPQjbWs/1784228306856.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ArtGallery",
+  "name": "ArtNonimu's",
+  "alternateName": "Espacio de Arte / Przestrzeń Sztuki",
+  "url": "https://artnonimus.art/",
+  "image": "https://i.ibb.co/mPQjbWs/1784228306856.png",
+  "description": "Espacio de arte dreamcore: retratos personalizados de arte físico (pintura sobre madera, lápiz, caricatura) y arte digital, hechos a mano en Polonia.",
+  "address": { "@type": "PostalAddress", "addressCountry": "PL" },
+  "areaServed": [
+    { "@type": "Place", "name": "Poland" },
+    { "@type": "Place", "name": "Europe" },
+    { "@type": "Place", "name": "Latin America" }
+  ],
+  "sameAs": [
+    "https://www.facebook.com/share/1HShtjirCN/",
+    "https://www.instagram.com/artnonimu_s"
+  ]
+}
+</script>
 <style>
 /* ============================================================
    ArtNonimu's — DREAMCORE / WEIRDCORE / LIMINAL
@@ -151,6 +203,14 @@ a{ color:inherit; text-decoration:none; }
   position:relative;
   width:min(24vw,92px); height:min(24vw,92px);
   display:flex; align-items:center; justify-content:center;
+}
+
+.tagline{
+  font-family:'Unbounded',sans-serif; font-weight:600;
+  font-size:.72rem; letter-spacing:.22em; text-transform:uppercase;
+  color:rgba(246,238,252,.7);
+  text-align:center;
+  text-shadow:0 0 12px rgba(217,194,255,.35);
 }
 
 .logo-btn{
@@ -389,6 +449,8 @@ a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-of
       </button>
     </div>
 
+    <p class="tagline glow-lilac float-c" data-i18n="tagline">Przestrzeń Sztuki</p>
+
     <div class="social-row" aria-label="Media społecznościowe">
       <a class="social-btn float-a" href="https://www.facebook.com/share/1HShtjirCN/" target="_blank" rel="noopener" aria-label="Facebook">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06C2 17.08 5.66 21.23 10.44 22v-7.03H7.9v-2.91h2.54V9.84c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.91h-2.33V22C18.34 21.23 22 17.08 22 12.06Z"/></svg>
@@ -442,54 +504,69 @@ function waLink(msg){ return "https://wa.me/"+WHATSAPP_NUMBER+"?text="+encodeURI
    ============================================================ */
 const translations = {
   pl:{
-    menu_gallery:"Galeria", menu_info:"Sklep Wirtualny",
+    tagline:"Przestrzeń Sztuki",
+    menu_physical:"Sztuka Fizyczna", menu_digital:"Sztuka Cyfrowa",
     footer_credit:"stworzone przez septimapacha.com",
     info_title:"Pracownia w świecie snu",
     info_text:"Każdy portret zaczyna się od zwykłego zdjęcia i zamienia się w rękodzieło malowane na drewnie, rysowane ołówkiem lub przedstawione jako karykatura. Bez druku, bez kopii — tylko oryginał, tworzony specjalnie dla Ciebie.",
     info_cta:"Napisz na WhatsApp",
     stat_techniques:"Techniki", stat_ship:"Dostawa", stat_original:"Oryginał",
     wa_generic:"Cześć! Chcę zamówić portret. Proszę o więcej informacji.",
-    tap_badge_text:"DOTKNIJ MNIE • DOTKNIJ MNIE • "
+    tap_badge_text:"DOTKNIJ MNIE • DOTKNIJ MNIE • ",
+    page_title:"ArtNonimu's — Przestrzeń Sztuki | Portrety w świecie snu | Polska",
+    meta_description:"ArtNonimu's — przestrzeń sztuki dreamcore. Ręcznie malowane portrety zwierząt i ludzi na zamówienie, sztuka fizyczna i cyfrowa. Pracownia w Polsce z wysyłką do całej Europy i Ameryki Łacińskiej."
   },
   en:{
-    menu_gallery:"Gallery", menu_info:"Virtual Store",
+    tagline:"Art Space",
+    menu_physical:"Physical Art", menu_digital:"Digital Art",
     footer_credit:"made by septimapacha.com",
     info_title:"A studio inside a dream",
     info_text:"Every portrait starts as an ordinary photo and becomes a handmade piece — painted on wood, drawn in pencil, or reimagined as caricature. No prints, no copies — just an original made for you.",
     info_cta:"Message on WhatsApp",
     stat_techniques:"Techniques", stat_ship:"Delivery", stat_original:"Original",
     wa_generic:"Hi! I'd like to order a portrait. Could you tell me more?",
-    tap_badge_text:"TOUCH ME • TOUCH ME • "
+    tap_badge_text:"TOUCH ME • TOUCH ME • ",
+    page_title:"ArtNonimu's — Art Space | Dreamlike Portraits | Poland",
+    meta_description:"ArtNonimu's — a dreamcore art space. Hand-painted custom portraits of pets and people, physical and digital art. Based in Poland, shipping across Europe and Latin America."
   },
   es:{
-    menu_gallery:"Galería", menu_info:"Tienda Virtual",
+    tagline:"Espacio de Arte",
+    menu_physical:"Arte Física", menu_digital:"Arte Digital",
     footer_credit:"creado por septimapacha.com",
     info_title:"Un estudio dentro de un sueño",
     info_text:"Cada retrato empieza como una foto cualquiera y se convierte en una pieza hecha a mano — pintada sobre madera, dibujada a lápiz o reinterpretada como caricatura. Sin impresiones ni copias: solo un original hecho para ti.",
     info_cta:"Escribir por WhatsApp",
     stat_techniques:"Técnicas", stat_ship:"Envío", stat_original:"Original",
     wa_generic:"¡Hola! Quiero encargar un retrato. ¿Podrías darme más información?",
-    tap_badge_text:"TÓCAME • TÓCAME • "
+    tap_badge_text:"TÓCAME • TÓCAME • ",
+    page_title:"ArtNonimu's — Espacio de Arte | Retratos de Ensueño | Polonia",
+    meta_description:"ArtNonimu's — un espacio de arte dreamcore. Retratos personalizados de mascotas y personas hechos a mano, arte física y arte digital. Con sede en Polonia y envíos a toda Europa y Latinoamérica."
   },
   it:{
-    menu_gallery:"Galleria", menu_info:"Negozio Virtuale",
+    tagline:"Spazio d'Arte",
+    menu_physical:"Arte Fisica", menu_digital:"Arte Digitale",
     footer_credit:"creato da septimapacha.com",
     info_title:"Uno studio dentro un sogno",
     info_text:"Ogni ritratto inizia come una foto qualsiasi e diventa un pezzo fatto a mano — dipinto su legno, disegnato a matita o reinventato come caricatura. Niente stampe, niente copie — solo un originale creato per te.",
     info_cta:"Scrivi su WhatsApp",
     stat_techniques:"Tecniche", stat_ship:"Spedizione", stat_original:"Originale",
     wa_generic:"Ciao! Vorrei ordinare un ritratto. Potresti darmi maggiori informazioni?",
-    tap_badge_text:"TOCCAMI • TOCCAMI • "
+    tap_badge_text:"TOCCAMI • TOCCAMI • ",
+    page_title:"ArtNonimu's — Spazio d'Arte | Ritratti Onirici | Polonia",
+    meta_description:"ArtNonimu's — uno spazio d'arte dreamcore. Ritratti personalizzati di animali e persone dipinti a mano, arte fisica e arte digitale. Con sede in Polonia, spedizioni in tutta Europa e America Latina."
   },
   pt:{
-    menu_gallery:"Galeria", menu_info:"Loja Virtual",
+    tagline:"Espaço de Arte",
+    menu_physical:"Arte Física", menu_digital:"Arte Digital",
     footer_credit:"criado por septimapacha.com",
     info_title:"Um estúdio dentro de um sonho",
     info_text:"Cada retrato começa como uma foto comum e se transforma numa peça feita à mão — pintada em madeira, desenhada a lápis ou reinventada como caricatura. Sem impressões, sem cópias — apenas um original feito para você.",
     info_cta:"Escrever no WhatsApp",
     stat_techniques:"Técnicas", stat_ship:"Envio", stat_original:"Original",
     wa_generic:"Olá! Gostaria de encomendar um retrato. Poderia me dar mais informações?",
-    tap_badge_text:"TOQUE AQUI • TOQUE AQUI • "
+    tap_badge_text:"TOQUE AQUI • TOQUE AQUI • ",
+    page_title:"ArtNonimu's — Espaço de Arte | Retratos Oníricos | Polônia",
+    meta_description:"ArtNonimu's — um espaço de arte dreamcore. Retratos personalizados de pets e pessoas pintados à mão, arte física e arte digital. Sediado na Polônia, com envios para toda a Europa e América Latina."
   }
 };
 
@@ -499,6 +576,23 @@ function t(key){ return (translations[currentLang] && translations[currentLang][
 function updateWaLinks(){
   const msg = t("wa_generic");
   document.querySelectorAll(".js-wa-generic").forEach(el=>el.setAttribute("href",waLink(msg)));
+}
+
+function updateSeoMeta(){
+  const title = t("page_title");
+  const desc = t("meta_description");
+  if(title) document.title = title;
+  if(desc){
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if(metaDesc) metaDesc.setAttribute("content",desc);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if(ogDesc) ogDesc.setAttribute("content",desc);
+  }
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if(ogTitle && title) ogTitle.setAttribute("content",title);
+  const ogLocaleMap = { pl:"pl_PL", en:"en_US", es:"es_ES", it:"it_IT", pt:"pt_PT" };
+  const ogLocale = document.querySelector('meta[property="og:locale"]');
+  if(ogLocale && ogLocaleMap[currentLang]) ogLocale.setAttribute("content",ogLocaleMap[currentLang]);
 }
 
 function applyLanguage(lang){
@@ -511,6 +605,7 @@ function applyLanguage(lang){
   document.documentElement.setAttribute("lang",currentLang);
   document.querySelectorAll(".lang-pill").forEach(b=>b.classList.toggle("is-active",b.getAttribute("data-lang")===currentLang));
   updateWaLinks();
+  updateSeoMeta();
   layoutRadial();
   buildRadialItems();
 }
@@ -518,9 +613,11 @@ function applyLanguage(lang){
 /* ============================================================
    INDEX PAGE — radial menu + info modal
    ============================================================ */
+/* Both links point to galeria.html for now — update the hrefs once the
+   dedicated "arte física" / "arte digital" pages exist. */
 const menuItems = [
-  { key:"gallery", labelKey:"menu_gallery", href:"galeria.html", tone:"tone-cyan" },
-  { key:"store",   labelKey:"menu_info",    href:"tienda.html",  tone:"tone-pink" }
+  { key:"physical", labelKey:"menu_physical", href:"galeria.html", tone:"tone-cyan" },
+  { key:"digital",  labelKey:"menu_digital",  href:"galeria.html", tone:"tone-pink" }
 ];
 
 const radialMenu = document.getElementById("radial-menu");
@@ -612,8 +709,15 @@ document.addEventListener("keydown",e=>{
 
 window.addEventListener("resize",()=>{ layoutRadial(); });
 
-buildRadialItems();
-updateWaLinks();
+/* Honor ?lang=xx in the URL (used by the hreflang alternates in <head>)
+   so each language has a real, linkable entry point. */
+const urlLang = new URLSearchParams(window.location.search).get("lang");
+if(urlLang && translations[urlLang] && urlLang!=="pl"){
+  applyLanguage(urlLang);
+} else {
+  buildRadialItems();
+  updateWaLinks();
+}
 
 })();
 </script>
