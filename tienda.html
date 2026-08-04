@@ -82,6 +82,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .currency-btn:not(.is-active):hover{ border-color:var(--cyan-soft); color:var(--pearl); }
 .fx-note{ text-align:center; font-family:'Space Mono',monospace; font-size:.56rem; letter-spacing:.04em; color:rgba(246,238,252,.4); margin-bottom:1.6rem; }
 
+/* ---------------- COLECCIONES / ESTILOS (filtro + gestión admin) ---------------- */
+.collections-row{ display:flex; justify-content:center; gap:.5rem; margin:0 0 1.1rem; flex-wrap:wrap; }
+.collection-btn{ padding:.5rem 1.1rem; border-radius:999px; border:1px solid var(--glass-brd); background:var(--glass); color:rgba(246,238,252,.65); font-family:'Unbounded',sans-serif; font-weight:600; font-size:.68rem; letter-spacing:.02em; cursor:pointer; transition:.3s; }
+.collection-btn.is-active{ color:#1a1024; background:var(--lilac); border-color:var(--lilac); box-shadow:0 0 16px rgba(217,194,255,.4); }
+.collection-btn:not(.is-active):hover{ border-color:var(--pink-soft); color:var(--pearl); }
+
+.collections-list{ display:flex; flex-direction:column; gap:.6rem; margin-bottom:1rem; max-height:220px; overflow-y:auto; }
+.collection-row{ display:flex; align-items:center; gap:.5rem; padding:.55rem .7rem; border-radius:14px; background:var(--glass-2); border:1px solid var(--glass-brd); }
+.collection-row span{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.85rem; }
+.collection-row button{ width:28px; height:28px; border-radius:50%; border:1px solid var(--glass-brd); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.8rem; line-height:1; flex:0 0 auto; }
+.collection-row .coll-rename{ color:var(--cyan); border-color:var(--cyan-soft); }
+.collection-row .coll-delete{ color:#ffb3b3; border-color:rgba(255,120,120,.5); }
+.collections-empty{ text-align:center; font-size:.78rem; color:rgba(246,238,252,.45); padding:.8rem 0; }
+.add-collection-row{ display:flex; gap:.5rem; }
+.add-collection-row input{ flex:1; }
+.add-collection-row button{ flex:0 0 auto; padding:0 1.1rem; border-radius:12px; border:none; background:linear-gradient(135deg,var(--pink),var(--lilac)); color:#1a1024; font-family:'Unbounded',sans-serif; font-weight:700; font-size:.72rem; cursor:pointer; }
+
 /* ---------------- ANTI-DESCARGA DE IMÁGENES ----------------
    Disuade el guardado rápido (click derecho, arrastrar, long-press
    en móvil). No es 100% infalible -- cualquiera con DevTools o una
@@ -204,6 +221,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <button type="button" id="admin-trigger" class="icon-btn admin-trigger" aria-label="Admin" title="Admin">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 13a7.4 7.4 0 0 0 0-2l1.9-1.5-2-3.4-2.2.9a7.6 7.6 0 0 0-1.7-1L15 4h-4l-.4 2a7.6 7.6 0 0 0-1.7 1l-2.2-.9-2 3.4L6.6 11a7.4 7.4 0 0 0 0 2l-1.9 1.5 2 3.4 2.2-.9c.5.4 1.1.75 1.7 1l.4 2h4l.4-2c.6-.25 1.2-.6 1.7-1l2.2.9 2-3.4L19.4 13Z"/></svg>
     </button>
+    <button type="button" id="collections-trigger" class="icon-btn admin-trigger" style="display:none" aria-label="Colecciones" title="Gestionar colecciones" data-i18n-title="manage_collections_btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+    </button>
     <button type="button" id="cart-trigger" class="icon-btn" aria-label="Carrito">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9.5" cy="20.5" r="1.4"/><circle cx="17.5" cy="20.5" r="1.4"/></svg>
       <span class="cart-count" id="cart-count">0</span>
@@ -227,6 +247,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <button type="button" class="status-btn is-active" data-status="available" data-i18n="status_available">En venta</button>
     <button type="button" class="status-btn" data-status="sold" data-i18n="status_sold">Vendidos</button>
   </div>
+
+  <div id="collections-row" class="collections-row" role="group" aria-label="Colección"></div>
 
   <div class="currency-row" role="group" aria-label="Moneda">
     <button type="button" class="currency-btn" data-currency="PLN">PLN</button>
@@ -291,6 +313,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="f-technique"></div>
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="f-dims"></div>
     </div>
+    <div class="field"><label data-i18n="f_collection">Colección / Estilo</label>
+      <select id="f-collection"><option value="" data-i18n="no_collection">Sin colección</option></select>
+    </div>
     <div class="field"><label data-i18n="f_file">Imágenes</label><input type="file" id="f-file" accept="image/*" multiple>
       <div class="field-hint" data-i18n="f_file_hint">Podés seleccionar varias imágenes a la vez.</div>
     </div>
@@ -324,10 +349,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="ef-technique"></div>
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="ef-dims"></div>
     </div>
+    <div class="field"><label data-i18n="f_collection">Colección / Estilo</label>
+      <select id="ef-collection"><option value="" data-i18n="no_collection">Sin colección</option></select>
+    </div>
     <div class="field"><label data-i18n="f_add_images">Agregar más imágenes</label><input type="file" id="ef-file" accept="image/*" multiple></div>
     <button type="button" id="admin-edit-submit" class="modal-submit" data-i18n="save_changes">Guardar cambios</button>
     <button type="button" id="admin-edit-delete" class="modal-danger" data-i18n="delete_product_btn">Eliminar esta obra</button>
     <div id="admin-edit-msg" class="modal-msg"></div>
+  </div>
+</div>
+
+<!-- ADMIN: GESTIONAR COLECCIONES / ESTILOS -->
+<div id="admin-collections-overlay" class="modal-overlay">
+  <div class="modal-panel glass-panel">
+    <button type="button" class="modal-close" data-close-modal="admin-collections-overlay">×</button>
+    <h2 class="glow-lilac" data-i18n="manage_collections_title">Gestionar colecciones</h2>
+    <div id="collections-manage-list" class="collections-list">
+      <div class="collections-empty" data-i18n="collections_empty">Todavía no creaste ninguna colección.</div>
+    </div>
+    <div class="add-collection-row">
+      <input type="text" id="new-collection-name" data-i18n-placeholder="collection_new_placeholder" placeholder="Nombre de la nueva colección">
+      <button type="button" id="add-collection-btn" data-i18n="collection_add_btn">Agregar</button>
+    </div>
+    <div id="admin-collections-msg" class="modal-msg"></div>
   </div>
 </div>
 
@@ -383,7 +427,15 @@ const translations = {
     delete_product_btn:"Usuń tę pracę", f_images_current:"Aktualne zdjęcia",
     f_images_hint:"Dotknij ×, aby usunąć zdjęcie.", f_add_images:"Dodaj więcej zdjęć",
     edit_ok:"Zmiany zapisane", edit_error:"Błąd przy zapisywaniu",
-    fx_note:"Kursy walut aktualizują się automatycznie.", fx_updated:"Aktualizacja:", fx_fallback:"kursy orientacyjne (offline)"
+    fx_note:"Kursy walut aktualizują się automatycznie.", fx_updated:"Aktualizacja:", fx_fallback:"kursy orientacyjne (offline)",
+    f_collection:"Kolekcja / Styl", no_collection:"Bez kolekcji", all_collections:"Wszystkie",
+    manage_collections_btn:"Zarządzaj kolekcjami", manage_collections_title:"Zarządzaj kolekcjami",
+    collections_empty:"Nie masz jeszcze żadnej kolekcji.", collection_new_placeholder:"Nazwa nowej kolekcji",
+    collection_add_btn:"Dodaj", collection_rename_btn:"Zmień nazwę", collection_confirm_delete:"Usunąć tę kolekcję? Prace w niej pozostaną, ale bez kolekcji.",
+    collection_created:"Kolekcja utworzona", collection_create_error:"Błąd przy tworzeniu kolekcji",
+    collection_renamed:"Nazwa zmieniona", collection_rename_error:"Błąd przy zmianie nazwy",
+    collection_deleted:"Kolekcja usunięta", collection_delete_error:"Błąd przy usuwaniu",
+    collection_rename_prompt:"Nowa nazwa dla tej kolekcji:"
   },
   en:{
     shop_eyebrow:"SHOP · POLAND", shop_h1:"Virtual Store",
@@ -406,7 +458,15 @@ const translations = {
     delete_product_btn:"Delete this piece", f_images_current:"Current images",
     f_images_hint:"Tap × to remove an image.", f_add_images:"Add more images",
     edit_ok:"Changes saved", edit_error:"Error saving changes",
-    fx_note:"Exchange rates update automatically.", fx_updated:"Updated:", fx_fallback:"approximate rates (offline)"
+    fx_note:"Exchange rates update automatically.", fx_updated:"Updated:", fx_fallback:"approximate rates (offline)",
+    f_collection:"Collection / Style", no_collection:"No collection", all_collections:"All",
+    manage_collections_btn:"Manage collections", manage_collections_title:"Manage collections",
+    collections_empty:"You haven't created any collection yet.", collection_new_placeholder:"New collection name",
+    collection_add_btn:"Add", collection_rename_btn:"Rename", collection_confirm_delete:"Delete this collection? Pieces in it will remain, just without a collection.",
+    collection_created:"Collection created", collection_create_error:"Error creating collection",
+    collection_renamed:"Name updated", collection_rename_error:"Error renaming collection",
+    collection_deleted:"Collection deleted", collection_delete_error:"Error deleting collection",
+    collection_rename_prompt:"New name for this collection:"
   },
   es:{
     shop_eyebrow:"TIENDA · POLONIA", shop_h1:"Tienda Virtual",
@@ -429,7 +489,15 @@ const translations = {
     delete_product_btn:"Eliminar esta obra", f_images_current:"Imágenes actuales",
     f_images_hint:"Tocá la × para quitar una imagen.", f_add_images:"Agregar más imágenes",
     edit_ok:"Cambios guardados", edit_error:"Error al guardar los cambios",
-    fx_note:"Los tipos de cambio se actualizan automáticamente.", fx_updated:"Actualizado:", fx_fallback:"tasas orientativas (sin conexión)"
+    fx_note:"Los tipos de cambio se actualizan automáticamente.", fx_updated:"Actualizado:", fx_fallback:"tasas orientativas (sin conexión)",
+    f_collection:"Colección / Estilo", no_collection:"Sin colección", all_collections:"Todas",
+    manage_collections_btn:"Gestionar colecciones", manage_collections_title:"Gestionar colecciones",
+    collections_empty:"Todavía no creaste ninguna colección.", collection_new_placeholder:"Nombre de la nueva colección",
+    collection_add_btn:"Agregar", collection_rename_btn:"Renombrar", collection_confirm_delete:"¿Eliminar esta colección? Las obras que la tenían quedan sin colección.",
+    collection_created:"Colección creada", collection_create_error:"Error al crear la colección",
+    collection_renamed:"Nombre actualizado", collection_rename_error:"Error al renombrar",
+    collection_deleted:"Colección eliminada", collection_delete_error:"Error al eliminar",
+    collection_rename_prompt:"Nuevo nombre para esta colección:"
   },
   it:{
     shop_eyebrow:"NEGOZIO · POLONIA", shop_h1:"Negozio Virtuale",
@@ -452,7 +520,15 @@ const translations = {
     delete_product_btn:"Elimina questa opera", f_images_current:"Immagini attuali",
     f_images_hint:"Tocca × per rimuovere un'immagine.", f_add_images:"Aggiungi altre immagini",
     edit_ok:"Modifiche salvate", edit_error:"Errore nel salvataggio",
-    fx_note:"I tassi di cambio si aggiornano automaticamente.", fx_updated:"Aggiornato:", fx_fallback:"tassi indicativi (offline)"
+    fx_note:"I tassi di cambio si aggiornano automaticamente.", fx_updated:"Aggiornato:", fx_fallback:"tassi indicativi (offline)",
+    f_collection:"Collezione / Stile", no_collection:"Senza collezione", all_collections:"Tutte",
+    manage_collections_btn:"Gestisci collezioni", manage_collections_title:"Gestisci collezioni",
+    collections_empty:"Non hai ancora creato nessuna collezione.", collection_new_placeholder:"Nome della nuova collezione",
+    collection_add_btn:"Aggiungi", collection_rename_btn:"Rinomina", collection_confirm_delete:"Eliminare questa collezione? Le opere resteranno, ma senza collezione.",
+    collection_created:"Collezione creata", collection_create_error:"Errore nella creazione",
+    collection_renamed:"Nome aggiornato", collection_rename_error:"Errore nella rinomina",
+    collection_deleted:"Collezione eliminata", collection_delete_error:"Errore nell'eliminazione",
+    collection_rename_prompt:"Nuovo nome per questa collezione:"
   },
   pt:{
     shop_eyebrow:"LOJA · POLÔNIA", shop_h1:"Loja Virtual",
@@ -475,7 +551,15 @@ const translations = {
     delete_product_btn:"Excluir esta obra", f_images_current:"Imagens atuais",
     f_images_hint:"Toque no × para remover uma imagem.", f_add_images:"Adicionar mais imagens",
     edit_ok:"Alterações salvas", edit_error:"Erro ao salvar as alterações",
-    fx_note:"As taxas de câmbio são atualizadas automaticamente.", fx_updated:"Atualizado:", fx_fallback:"taxas aproximadas (offline)"
+    fx_note:"As taxas de câmbio são atualizadas automaticamente.", fx_updated:"Atualizado:", fx_fallback:"taxas aproximadas (offline)",
+    f_collection:"Coleção / Estilo", no_collection:"Sem coleção", all_collections:"Todas",
+    manage_collections_btn:"Gerenciar coleções", manage_collections_title:"Gerenciar coleções",
+    collections_empty:"Você ainda não criou nenhuma coleção.", collection_new_placeholder:"Nome da nova coleção",
+    collection_add_btn:"Adicionar", collection_rename_btn:"Renomear", collection_confirm_delete:"Excluir esta coleção? As obras nela permanecerão, apenas sem coleção.",
+    collection_created:"Coleção criada", collection_create_error:"Erro ao criar a coleção",
+    collection_renamed:"Nome atualizado", collection_rename_error:"Erro ao renomear",
+    collection_deleted:"Coleção excluída", collection_delete_error:"Erro ao excluir",
+    collection_rename_prompt:"Novo nome para esta coleção:"
   }
 };
 let currentLang = "pl";
@@ -484,6 +568,7 @@ function applyLanguage(lang){
   currentLang = translations[lang] ? lang : "pl";
   document.querySelectorAll("[data-i18n]").forEach(el=>{ const v=t(el.getAttribute("data-i18n")); if(v) el.textContent=v; });
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{ const v=t(el.getAttribute("data-i18n-placeholder")); if(v) el.setAttribute("placeholder",v); });
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{ const v=t(el.getAttribute("data-i18n-title")); if(v){ el.setAttribute("title",v); el.setAttribute("aria-label",v); } });
   document.querySelectorAll(".lang-pill").forEach(b=>b.classList.toggle("is-active", b.getAttribute("data-lang")===currentLang));
   document.documentElement.setAttribute("lang", currentLang);
   // Si la persona todavía no eligió moneda manualmente, seguimos el idioma
@@ -492,6 +577,7 @@ function applyLanguage(lang){
     setDisplayCurrency(currentLang === "pl" ? "PLN" : "EUR", false);
   }
   renderFxNote();
+  renderCollectionButtons();
   renderProducts();
 }
 
@@ -501,6 +587,8 @@ function applyLanguage(lang){
 let allProducts = [];
 let activeCategory = "fisica";
 let activeStatus = "available"; // "available" (en venta) | "sold" (vendidos)
+let collections = []; // colecciones/estilos cargados desde Supabase
+let activeCollection = "all"; // "all" o el id de una colección
 let cart = JSON.parse(localStorage.getItem("an_cart") || "[]");
 let adminToken = sessionStorage.getItem("an_admin_token") || null;
 
@@ -605,10 +693,56 @@ function getImages(p){
   return (Array.isArray(p.images) && p.images.length > 0) ? p.images : (p.image_url ? [p.image_url] : []);
 }
 
+/* ============================================================
+   COLECCIONES / ESTILOS
+   Lectura pública directa (RLS permite SELECT a cualquiera, igual que
+   "products"). Crear/renombrar/borrar pasa por el Edge Function
+   admin-collections, protegido con el mismo token de administrador.
+   ============================================================ */
+async function loadCollections(){
+  const { data, error } = await supabase.from("collections").select("*").order("sort_order").order("name");
+  if(!error){ collections = data || []; }
+  renderCollectionButtons();
+  populateCollectionSelects();
+}
+
+function renderCollectionButtons(){
+  const row = document.getElementById("collections-row");
+  if(!row) return;
+  const allBtn = `<button type="button" class="collection-btn${activeCollection==="all"?" is-active":""}" data-collection="all">${t("all_collections")}</button>`;
+  const rest = collections.map(c=>`<button type="button" class="collection-btn${activeCollection===c.id?" is-active":""}" data-collection="${c.id}">${escapeHtml(c.name)}</button>`).join("");
+  row.innerHTML = allBtn + rest;
+  // Si ya no existe la colección activa (la borraron), volvemos a "Todas".
+  if(activeCollection !== "all" && !collections.find(c=>c.id===activeCollection)){
+    activeCollection = "all";
+    renderCollectionButtons();
+  }
+}
+
+function populateCollectionSelects(){
+  ["f-collection","ef-collection"].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    const current = sel.value;
+    sel.innerHTML = `<option value="">${t("no_collection")}</option>` +
+      collections.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+    if(current) sel.value = current;
+  });
+}
+
+document.getElementById("collections-row").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-collection]");
+  if(!btn) return;
+  activeCollection = btn.getAttribute("data-collection");
+  renderCollectionButtons();
+  renderProducts();
+});
+
 function renderProducts(){
   const grid = document.getElementById("product-grid");
   const list = allProducts.filter(p=>{
     if(p.category !== activeCategory) return false;
+    if(activeCollection !== "all" && p.collection_id !== activeCollection) return false;
     const isSold = !!p.is_sold;
     return activeStatus === "sold" ? isSold : !isSold;
   });
@@ -827,12 +961,24 @@ document.querySelectorAll("[data-close-modal]").forEach(b=>{
   b.addEventListener("click", ()=>closeModal(b.getAttribute("data-close-modal")));
 });
 
+function updateAdminUiState(){
+  document.getElementById("admin-trigger").classList.toggle("is-admin", !!adminToken);
+  document.getElementById("collections-trigger").style.display = adminToken ? "flex" : "none";
+}
+
 document.getElementById("admin-trigger").addEventListener("click", ()=>{
   if(adminToken){
     document.getElementById("f-category").value = activeCategory;
+    document.getElementById("f-collection").value = "";
     openModal("admin-upload-overlay");
   }
   else{ openModal("admin-login-overlay"); }
+});
+
+document.getElementById("collections-trigger").addEventListener("click", ()=>{
+  if(!adminToken) return;
+  renderCollectionsManageList();
+  openModal("admin-collections-overlay");
 });
 
 document.getElementById("admin-login-submit").addEventListener("click", async ()=>{
@@ -850,7 +996,7 @@ document.getElementById("admin-login-submit").addEventListener("click", async ()
       adminToken = data.token;
       sessionStorage.setItem("an_admin_token", adminToken);
       msg.textContent = t("admin_login_ok"); msg.classList.add("is-ok");
-      document.getElementById("admin-trigger").classList.add("is-admin");
+      updateAdminUiState();
       document.getElementById("admin-password-input").value = "";
       setTimeout(()=>{ closeModal("admin-login-overlay"); openModal("admin-upload-overlay"); renderProducts(); }, 500);
     } else {
@@ -891,6 +1037,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   const price = parseFloat(document.getElementById("f-price").value);
   const technique = document.getElementById("f-technique").value.trim();
   const dimensions = document.getElementById("f-dims").value.trim();
+  const collection_id = document.getElementById("f-collection").value || null;
   const files = document.getElementById("f-file").files;
 
   if(!title || files.length===0 || isNaN(price)){
@@ -906,7 +1053,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, images }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, images }
       })
     });
     const insertData = await insertRes.json();
@@ -918,6 +1065,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     document.getElementById("f-price").value = "";
     document.getElementById("f-technique").value = "";
     document.getElementById("f-dims").value = "";
+    document.getElementById("f-collection").value = "";
     document.getElementById("f-file").value = "";
     await loadProducts();
     setTimeout(()=>closeModal("admin-upload-overlay"), 800);
@@ -967,6 +1115,7 @@ function openEditModal(id){
   document.getElementById("ef-price").value = p.price != null ? p.price : "";
   document.getElementById("ef-technique").value = p.technique || "";
   document.getElementById("ef-dims").value = p.dimensions || "";
+  document.getElementById("ef-collection").value = p.collection_id || "";
   document.getElementById("ef-file").value = "";
   document.getElementById("admin-edit-msg").textContent = "";
   document.getElementById("admin-edit-msg").className = "modal-msg";
@@ -993,6 +1142,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
   const price = parseFloat(document.getElementById("ef-price").value);
   const technique = document.getElementById("ef-technique").value.trim();
   const dimensions = document.getElementById("ef-dims").value.trim();
+  const collection_id = document.getElementById("ef-collection").value || null;
   const newFiles = document.getElementById("ef-file").files;
 
   if(!title || isNaN(price)){
@@ -1013,7 +1163,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"update", id: editingProductId,
-        product:{ title, description, category, price, technique, dimensions, images }
+        product:{ title, description, category, price, technique, dimensions, collection_id, images }
       })
     });
     const data = await res.json();
@@ -1032,6 +1182,93 @@ document.getElementById("admin-edit-delete").addEventListener("click", async ()=
   if(!confirm(t("confirm_delete"))) return;
   await deleteProduct(editingProductId);
   closeModal("admin-edit-overlay");
+});
+
+/* ============================================================
+   ADMIN — GESTIONAR COLECCIONES / ESTILOS
+   (crear, renombrar, borrar — vía admin-collections Edge Function)
+   ============================================================ */
+async function callCollectionsApi(action, extra){
+  const res = await fetch(`${FUNCTIONS_URL}/admin-collections`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ token: adminToken, action, ...extra })
+  });
+  return res.json();
+}
+
+function renderCollectionsManageList(){
+  const box = document.getElementById("collections-manage-list");
+  if(collections.length === 0){
+    box.innerHTML = `<div class="collections-empty">${t("collections_empty")}</div>`;
+    return;
+  }
+  box.innerHTML = collections.map(c=>`
+    <div class="collection-row" data-id="${c.id}">
+      <span>${escapeHtml(c.name)}</span>
+      <button type="button" class="coll-rename" data-rename-id="${c.id}" aria-label="${t("collection_rename_btn")}" title="${t("collection_rename_btn")}">✎</button>
+      <button type="button" class="coll-delete" data-delete-id="${c.id}" aria-label="Eliminar" title="Eliminar">×</button>
+    </div>
+  `).join("");
+}
+
+document.getElementById("add-collection-btn").addEventListener("click", async ()=>{
+  const input = document.getElementById("new-collection-name");
+  const msg = document.getElementById("admin-collections-msg");
+  const name = input.value.trim();
+  msg.textContent = ""; msg.className = "modal-msg";
+  if(!name) return;
+  try{
+    const data = await callCollectionsApi("insert", { name });
+    if(!data.ok) throw new Error(data.error || "insert-failed");
+    input.value = "";
+    msg.textContent = t("collection_created"); msg.classList.add("is-ok");
+    await loadCollections();
+    renderCollectionsManageList();
+    await loadProducts();
+  } catch(e){
+    msg.textContent = t("collection_create_error"); msg.classList.add("is-error");
+  }
+});
+
+document.getElementById("collections-manage-list").addEventListener("click", async (e)=>{
+  const msg = document.getElementById("admin-collections-msg");
+  msg.textContent = ""; msg.className = "modal-msg";
+
+  const renameBtn = e.target.closest("[data-rename-id]");
+  if(renameBtn){
+    const id = renameBtn.getAttribute("data-rename-id");
+    const current = collections.find(c=>c.id===id);
+    const name = prompt(t("collection_rename_prompt"), current ? current.name : "");
+    if(!name || !name.trim()) return;
+    try{
+      const data = await callCollectionsApi("update", { id, name: name.trim() });
+      if(!data.ok) throw new Error(data.error || "update-failed");
+      msg.textContent = t("collection_renamed"); msg.classList.add("is-ok");
+      await loadCollections();
+      renderCollectionsManageList();
+      await loadProducts();
+    } catch(e2){
+      msg.textContent = t("collection_rename_error"); msg.classList.add("is-error");
+    }
+    return;
+  }
+
+  const deleteBtn = e.target.closest("[data-delete-id]");
+  if(deleteBtn){
+    const id = deleteBtn.getAttribute("data-delete-id");
+    if(!confirm(t("collection_confirm_delete"))) return;
+    try{
+      const data = await callCollectionsApi("delete", { id });
+      if(!data.ok) throw new Error(data.error || "delete-failed");
+      msg.textContent = t("collection_deleted"); msg.classList.add("is-ok");
+      await loadCollections();
+      renderCollectionsManageList();
+      await loadProducts();
+    } catch(e2){
+      msg.textContent = t("collection_delete_error"); msg.classList.add("is-error");
+    }
+  }
 });
 
 /* ============================================================
@@ -1061,11 +1298,12 @@ document.querySelectorAll("[data-lang]").forEach(btn=>{
 /* ============================================================
    INICIO
    ============================================================ */
-if(adminToken) document.getElementById("admin-trigger").classList.add("is-admin");
+updateAdminUiState();
 setDisplayCurrency(displayCurrency, false);
 renderFxNote();
 loadFxRates();
 updateCartUI();
+loadCollections();
 loadProducts();
 </script>
 </body>
