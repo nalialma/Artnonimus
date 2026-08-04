@@ -485,6 +485,7 @@ const translations = {
     f_original_lang:"Język, w którym napisany jest tekst", f_original_lang_hint:"Dzięki temu wiemy, z jakiego języka tłumaczyć dla innych klientów.",
     manage_collections_btn:"Zarządzaj kolekcjami", manage_collections_title:"Zarządzaj kolekcjami",
     collections_empty:"Nie masz jeszcze żadnej kolekcji.", collection_new_placeholder:"Nazwa nowej kolekcji",
+    add_new_collection_option:"+ Dodaj nową kolekcję…",
     collection_add_btn:"Dodaj", collection_rename_btn:"Zmień nazwę", collection_confirm_delete:"Usunąć tę kolekcję? Prace w niej pozostaną, ale bez kolekcji.",
     collection_created:"Kolekcja utworzona", collection_create_error:"Błąd przy tworzeniu kolekcji",
     collection_renamed:"Nazwa zmieniona", collection_rename_error:"Błąd przy zmianie nazwy",
@@ -520,6 +521,7 @@ const translations = {
     f_original_lang:"Language the text is written in", f_original_lang_hint:"This is how we know which language to translate from for other customers.",
     manage_collections_btn:"Manage collections", manage_collections_title:"Manage collections",
     collections_empty:"You haven't created any collection yet.", collection_new_placeholder:"New collection name",
+    add_new_collection_option:"+ Add new collection…",
     collection_add_btn:"Add", collection_rename_btn:"Rename", collection_confirm_delete:"Delete this collection? Pieces in it will remain, just without a collection.",
     collection_created:"Collection created", collection_create_error:"Error creating collection",
     collection_renamed:"Name updated", collection_rename_error:"Error renaming collection",
@@ -555,6 +557,7 @@ const translations = {
     f_original_lang:"Idioma en el que está escrito el texto", f_original_lang_hint:"Así sabemos desde qué idioma traducir para los demás clientes.",
     manage_collections_btn:"Gestionar colecciones", manage_collections_title:"Gestionar colecciones",
     collections_empty:"Todavía no creaste ninguna colección.", collection_new_placeholder:"Nombre de la nueva colección",
+    add_new_collection_option:"+ Agregar nueva colección…",
     collection_add_btn:"Agregar", collection_rename_btn:"Renombrar", collection_confirm_delete:"¿Eliminar esta colección? Las obras que la tenían quedan sin colección.",
     collection_created:"Colección creada", collection_create_error:"Error al crear la colección",
     collection_renamed:"Nombre actualizado", collection_rename_error:"Error al renombrar",
@@ -590,6 +593,7 @@ const translations = {
     f_original_lang:"Lingua in cui è scritto il testo", f_original_lang_hint:"Così sappiamo da quale lingua tradurre per gli altri clienti.",
     manage_collections_btn:"Gestisci collezioni", manage_collections_title:"Gestisci collezioni",
     collections_empty:"Non hai ancora creato nessuna collezione.", collection_new_placeholder:"Nome della nuova collezione",
+    add_new_collection_option:"+ Aggiungi nuova collezione…",
     collection_add_btn:"Aggiungi", collection_rename_btn:"Rinomina", collection_confirm_delete:"Eliminare questa collezione? Le opere resteranno, ma senza collezione.",
     collection_created:"Collezione creata", collection_create_error:"Errore nella creazione",
     collection_renamed:"Nome aggiornato", collection_rename_error:"Errore nella rinomina",
@@ -625,6 +629,7 @@ const translations = {
     f_original_lang:"Idioma em que o texto está escrito", f_original_lang_hint:"Assim sabemos de qual idioma traduzir para os demais clientes.",
     manage_collections_btn:"Gerenciar coleções", manage_collections_title:"Gerenciar coleções",
     collections_empty:"Você ainda não criou nenhuma coleção.", collection_new_placeholder:"Nome da nova coleção",
+    add_new_collection_option:"+ Adicionar nova coleção…",
     collection_add_btn:"Adicionar", collection_rename_btn:"Renomear", collection_confirm_delete:"Excluir esta coleção? As obras nela permanecerão, apenas sem coleção.",
     collection_created:"Coleção criada", collection_create_error:"Erro ao criar a coleção",
     collection_renamed:"Nome atualizado", collection_rename_error:"Erro ao renomear",
@@ -847,7 +852,8 @@ function populateCollectionSelects(){
     if(!sel) return;
     const current = sel.value;
     sel.innerHTML = `<option value="">${t("no_collection")}</option>` +
-      collections.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+      collections.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("") +
+      `<option value="__new__">${t("add_new_collection_option")}</option>`;
     if(current) sel.value = current;
   });
 }
@@ -859,6 +865,33 @@ document.getElementById("collections-row").addEventListener("click", (e)=>{
   renderCollectionButtons();
   renderProducts();
 });
+
+/* ------------------------------------------------------------
+   Crear una colección directamente desde el propio desplegable del
+   formulario (subir/editar obra), eligiendo la opción
+   "+ Agregar nueva colección…". Así no hace falta encontrar el
+   ícono de "Gestionar colecciones" arriba de la página para poder
+   crear la primera colección.
+   ------------------------------------------------------------ */
+async function handleCollectionSelectChange(selectEl){
+  if(selectEl.value !== "__new__") return;
+  const name = prompt(t("collection_new_placeholder"));
+  if(!name || !name.trim()){
+    selectEl.value = "";
+    return;
+  }
+  try{
+    const data = await callCollectionsApi("insert", { name: name.trim() });
+    if(!data.ok) throw new Error(data.error || "insert-failed");
+    await loadCollections();
+    selectEl.value = data.collection.id;
+  } catch(e){
+    alert(t("collection_create_error"));
+    selectEl.value = "";
+  }
+}
+document.getElementById("f-collection").addEventListener("change", (e)=>handleCollectionSelectChange(e.target));
+document.getElementById("ef-collection").addEventListener("change", (e)=>handleCollectionSelectChange(e.target));
 
 /* ------------------------------------------------------------
    Filtro de ESTILOS (lista fija, separada de las colecciones).
