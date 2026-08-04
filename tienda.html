@@ -88,6 +88,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .collection-btn.is-active{ color:#1a1024; background:var(--lilac); border-color:var(--lilac); box-shadow:0 0 16px rgba(217,194,255,.4); }
 .collection-btn:not(.is-active):hover{ border-color:var(--pink-soft); color:var(--pearl); }
 
+.style-btn{ padding:.5rem 1.1rem; border-radius:999px; border:1px solid var(--glass-brd); background:var(--glass); color:rgba(246,238,252,.65); font-family:'Unbounded',sans-serif; font-weight:600; font-size:.68rem; letter-spacing:.02em; cursor:pointer; transition:.3s; }
+.style-btn.is-active{ color:#1a1024; background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 16px rgba(184,242,255,.4); }
+.style-btn:not(.is-active):hover{ border-color:var(--pink-soft); color:var(--pearl); }
+
 .collections-list{ display:flex; flex-direction:column; gap:.6rem; margin-bottom:1rem; max-height:220px; overflow-y:auto; }
 .collection-row{ display:flex; align-items:center; gap:.5rem; padding:.55rem .7rem; border-radius:14px; background:var(--glass-2); border:1px solid var(--glass-brd); }
 .collection-row span{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.85rem; }
@@ -100,8 +104,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .add-collection-row button{ flex:0 0 auto; padding:0 1.1rem; border-radius:12px; border:none; background:linear-gradient(135deg,var(--pink),var(--lilac)); color:#1a1024; font-family:'Unbounded',sans-serif; font-weight:700; font-size:.72rem; cursor:pointer; }
 
 /* ---------------- ANTI-DESCARGA DE IMÁGENES ----------------
-  
-
+   Disuade el guardado rápido (click derecho, arrastrar, long-press
+   en móvil). No es 100% infalible -- cualquiera con DevTools o una
+   captura de pantalla puede igual conseguir la imagen -- pero bloquea
+   los caminos habituales de "guardar imagen". */
+.product-img-wrap img, #lightbox-img{
+  -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+  -webkit-user-drag:none; -khtml-user-drag:none; -moz-user-drag:none; -o-user-drag:none; user-drag:none;
+  -webkit-touch-callout:none;
+  pointer-events:none;
+}
 
 /* ---------------- PRODUCT GRID ---------------- */
 .product-grid{ display:grid; gap:1.1rem; grid-template-columns:1fr; }
@@ -120,7 +132,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .product-img-wrap{ cursor:pointer; }
 
 /* ---------------- LIGHTBOX (visor de imágenes superpuesto) ---------------- */
-
+/* Ahora en dos columnas: imagen de un lado, info de la obra del otro.
+   En pantallas angostas se apilan (imagen arriba, info abajo, con scroll). */
 .lightbox-overlay{ position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center; padding:1.2rem; background:rgba(11,7,20,.85); backdrop-filter:blur(10px); opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
 .lightbox-overlay.is-open{ opacity:1; visibility:visible; }
 .lightbox-stage{ position:relative; display:flex; flex-direction:column; gap:1rem; max-width:560px; width:100%; max-height:92vh; overflow-y:auto; }
@@ -259,6 +272,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <button type="button" class="status-btn" data-status="sold" data-i18n="status_sold">Vendidos</button>
   </div>
 
+  <div id="styles-row" class="collections-row" role="group" aria-label="Estilo"></div>
+
   <div id="collections-row" class="collections-row" role="group" aria-label="Colección"></div>
 
   <div class="currency-row" role="group" aria-label="Moneda">
@@ -324,8 +339,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="f-technique"></div>
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="f-dims"></div>
     </div>
-    <div class="field"><label data-i18n="f_collection">Colección / Estilo</label>
-      <select id="f-collection"><option value="" data-i18n="no_collection">Sin colección</option></select>
+    <div class="admin-row-2">
+      <div class="field"><label data-i18n="f_collection">Colección</label>
+        <select id="f-collection"><option value="" data-i18n="no_collection">Sin colección</option></select>
+      </div>
+      <div class="field"><label data-i18n="f_style">Estilo</label>
+        <select id="f-style"><option value="" data-i18n="no_style">Sin estilo</option></select>
+      </div>
     </div>
     <div class="field"><label data-i18n="f_file">Imágenes</label><input type="file" id="f-file" accept="image/*" multiple>
       <div class="field-hint" data-i18n="f_file_hint">Podés seleccionar varias imágenes a la vez.</div>
@@ -360,8 +380,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field"><label data-i18n="f_technique">Técnica</label><input type="text" id="ef-technique"></div>
       <div class="field"><label data-i18n="f_dims">Dimensiones</label><input type="text" id="ef-dims"></div>
     </div>
-    <div class="field"><label data-i18n="f_collection">Colección / Estilo</label>
-      <select id="ef-collection"><option value="" data-i18n="no_collection">Sin colección</option></select>
+    <div class="admin-row-2">
+      <div class="field"><label data-i18n="f_collection">Colección</label>
+        <select id="ef-collection"><option value="" data-i18n="no_collection">Sin colección</option></select>
+      </div>
+      <div class="field"><label data-i18n="f_style">Estilo</label>
+        <select id="ef-style"><option value="" data-i18n="no_style">Sin estilo</option></select>
+      </div>
     </div>
     <div class="field"><label data-i18n="f_original_lang">Idioma en el que está escrito el texto</label>
       <select id="ef-original-lang">
@@ -455,7 +480,8 @@ const translations = {
     f_images_hint:"Dotknij ×, aby usunąć zdjęcie.", f_add_images:"Dodaj więcej zdjęć",
     edit_ok:"Zmiany zapisane", edit_error:"Błąd przy zapisywaniu",
     fx_note:"Kursy walut aktualizują się automatycznie.", fx_updated:"Aktualizacja:", fx_fallback:"kursy orientacyjne (offline)",
-    f_collection:"Kolekcja / Styl", no_collection:"Bez kolekcji", all_collections:"Wszystkie",
+    f_collection:"Kolekcja", no_collection:"Bez kolekcji", all_collections:"Wszystkie",
+    f_style:"Styl", no_style:"Bez stylu", all_styles:"Wszystkie",
     f_original_lang:"Język, w którym napisany jest tekst", f_original_lang_hint:"Dzięki temu wiemy, z jakiego języka tłumaczyć dla innych klientów.",
     manage_collections_btn:"Zarządzaj kolekcjami", manage_collections_title:"Zarządzaj kolekcjami",
     collections_empty:"Nie masz jeszcze żadnej kolekcji.", collection_new_placeholder:"Nazwa nowej kolekcji",
@@ -489,7 +515,8 @@ const translations = {
     f_images_hint:"Tap × to remove an image.", f_add_images:"Add more images",
     edit_ok:"Changes saved", edit_error:"Error saving changes",
     fx_note:"Exchange rates update automatically.", fx_updated:"Updated:", fx_fallback:"approximate rates (offline)",
-    f_collection:"Collection / Style", no_collection:"No collection", all_collections:"All",
+    f_collection:"Collection", no_collection:"No collection", all_collections:"All",
+    f_style:"Style", no_style:"No style", all_styles:"All",
     f_original_lang:"Language the text is written in", f_original_lang_hint:"This is how we know which language to translate from for other customers.",
     manage_collections_btn:"Manage collections", manage_collections_title:"Manage collections",
     collections_empty:"You haven't created any collection yet.", collection_new_placeholder:"New collection name",
@@ -523,7 +550,8 @@ const translations = {
     f_images_hint:"Tocá la × para quitar una imagen.", f_add_images:"Agregar más imágenes",
     edit_ok:"Cambios guardados", edit_error:"Error al guardar los cambios",
     fx_note:"Los tipos de cambio se actualizan automáticamente.", fx_updated:"Actualizado:", fx_fallback:"tasas orientativas (sin conexión)",
-    f_collection:"Colección / Estilo", no_collection:"Sin colección", all_collections:"Todas",
+    f_collection:"Colección", no_collection:"Sin colección", all_collections:"Todas",
+    f_style:"Estilo", no_style:"Sin estilo", all_styles:"Todos",
     f_original_lang:"Idioma en el que está escrito el texto", f_original_lang_hint:"Así sabemos desde qué idioma traducir para los demás clientes.",
     manage_collections_btn:"Gestionar colecciones", manage_collections_title:"Gestionar colecciones",
     collections_empty:"Todavía no creaste ninguna colección.", collection_new_placeholder:"Nombre de la nueva colección",
@@ -557,7 +585,8 @@ const translations = {
     f_images_hint:"Tocca × per rimuovere un'immagine.", f_add_images:"Aggiungi altre immagini",
     edit_ok:"Modifiche salvate", edit_error:"Errore nel salvataggio",
     fx_note:"I tassi di cambio si aggiornano automaticamente.", fx_updated:"Aggiornato:", fx_fallback:"tassi indicativi (offline)",
-    f_collection:"Collezione / Stile", no_collection:"Senza collezione", all_collections:"Tutte",
+    f_collection:"Collezione", no_collection:"Senza collezione", all_collections:"Tutte",
+    f_style:"Stile", no_style:"Nessuno stile", all_styles:"Tutti",
     f_original_lang:"Lingua in cui è scritto il testo", f_original_lang_hint:"Così sappiamo da quale lingua tradurre per gli altri clienti.",
     manage_collections_btn:"Gestisci collezioni", manage_collections_title:"Gestisci collezioni",
     collections_empty:"Non hai ancora creato nessuna collezione.", collection_new_placeholder:"Nome della nuova collezione",
@@ -591,7 +620,8 @@ const translations = {
     f_images_hint:"Toque no × para remover uma imagem.", f_add_images:"Adicionar mais imagens",
     edit_ok:"Alterações salvas", edit_error:"Erro ao salvar as alterações",
     fx_note:"As taxas de câmbio são atualizadas automaticamente.", fx_updated:"Atualizado:", fx_fallback:"taxas aproximadas (offline)",
-    f_collection:"Coleção / Estilo", no_collection:"Sem coleção", all_collections:"Todas",
+    f_collection:"Coleção", no_collection:"Sem coleção", all_collections:"Todas",
+    f_style:"Estilo", no_style:"Sem estilo", all_styles:"Todos",
     f_original_lang:"Idioma em que o texto está escrito", f_original_lang_hint:"Assim sabemos de qual idioma traduzir para os demais clientes.",
     manage_collections_btn:"Gerenciar coleções", manage_collections_title:"Gerenciar coleções",
     collections_empty:"Você ainda não criou nenhuma coleção.", collection_new_placeholder:"Nome da nova coleção",
@@ -604,6 +634,52 @@ const translations = {
     wa_product_message:"Olá! Tenho interesse nesta obra: \"{title}\" ({price}). Prefiro comprar pelo WhatsApp, você poderia me ajudar?"
   }
 };
+
+/* ------------------------------------------------------------
+   ESTILOS — lista fija de categorías de estilo/estética (Dreamcore,
+   Weirdcore, etc). A diferencia de las "colecciones" (que la admin
+   escribe a mano y administra libremente), esta lista es fija y
+   siempre la misma para todas las obras; solo se traduce su etiqueta
+   según el idioma elegido por el cliente.
+   ------------------------------------------------------------ */
+const STYLE_SLUGS = [
+  "dreamcore","weirdcore","liminal_space","traumacore","kidcore",
+  "surrealismo","arte_abstracto","pop_art","minimalismo",
+  "expresionismo_abstracto","hiperrealismo_fotorrealismo",
+  "arte_urbano","arte_digital_net_art"
+];
+const styleLabels = {
+  pl:{ dreamcore:"Dreamcore", weirdcore:"Weirdcore", liminal_space:"Liminal Space (Przestrzenie liminalne)",
+    traumacore:"Traumacore", kidcore:"Kidcore", surrealismo:"Surrealizm", arte_abstracto:"Sztuka Abstrakcyjna",
+    pop_art:"Pop Art", minimalismo:"Minimalizm", expresionismo_abstracto:"Ekspresjonizm Abstrakcyjny",
+    hiperrealismo_fotorrealismo:"Hiperrealizm / Fotorealizm", arte_urbano:"Sztuka Uliczna",
+    arte_digital_net_art:"Sztuka Cyfrowa i Net Art" },
+  en:{ dreamcore:"Dreamcore", weirdcore:"Weirdcore", liminal_space:"Liminal Space",
+    traumacore:"Traumacore", kidcore:"Kidcore", surrealismo:"Surrealism", arte_abstracto:"Abstract Art",
+    pop_art:"Pop Art", minimalismo:"Minimalism", expresionismo_abstracto:"Abstract Expressionism",
+    hiperrealismo_fotorrealismo:"Hyperrealism / Photorealism", arte_urbano:"Urban Art",
+    arte_digital_net_art:"Digital Art & Net Art" },
+  es:{ dreamcore:"Dreamcore", weirdcore:"Weirdcore", liminal_space:"Liminal Space (Espacios Liminales)",
+    traumacore:"Traumacore", kidcore:"Kidcore", surrealismo:"Surrealismo", arte_abstracto:"Arte Abstracto",
+    pop_art:"Pop Art", minimalismo:"Minimalismo", expresionismo_abstracto:"Expresionismo Abstracto",
+    hiperrealismo_fotorrealismo:"Hiperrealismo / Fotorrealismo", arte_urbano:"Arte Urbano",
+    arte_digital_net_art:"Arte Digital y Net Art" },
+  it:{ dreamcore:"Dreamcore", weirdcore:"Weirdcore", liminal_space:"Liminal Space (Spazi Liminali)",
+    traumacore:"Traumacore", kidcore:"Kidcore", surrealismo:"Surrealismo", arte_abstracto:"Arte Astratta",
+    pop_art:"Pop Art", minimalismo:"Minimalismo", expresionismo_abstracto:"Espressionismo Astratto",
+    hiperrealismo_fotorrealismo:"Iperrealismo / Fotorealismo", arte_urbano:"Arte Urbana",
+    arte_digital_net_art:"Arte Digitale e Net Art" },
+  pt:{ dreamcore:"Dreamcore", weirdcore:"Weirdcore", liminal_space:"Liminal Space (Espaços Liminares)",
+    traumacore:"Traumacore", kidcore:"Kidcore", surrealismo:"Surrealismo", arte_abstracto:"Arte Abstrata",
+    pop_art:"Pop Art", minimalismo:"Minimalismo", expresionismo_abstracto:"Expressionismo Abstrato",
+    hiperrealismo_fotorrealismo:"Hiper-realismo / Fotorrealismo", arte_urbano:"Arte Urbana",
+    arte_digital_net_art:"Arte Digital e Net Art" }
+};
+function styleLabel(slug){
+  if(!slug) return "";
+  return (styleLabels[currentLang] && styleLabels[currentLang][slug]) || styleLabels.es[slug] || slug;
+}
+
 let currentLang = "pl";
 function t(k){ return (translations[currentLang]&&translations[currentLang][k]) ?? translations.pl[k] ?? ""; }
 function applyLanguage(lang){
@@ -620,6 +696,8 @@ function applyLanguage(lang){
   }
   renderFxNote();
   renderCollectionButtons();
+  renderStyleButtons();
+  populateStyleSelects();
   renderProducts();
   if(currentLightboxProduct) renderLightboxInfo(currentLightboxProduct);
 }
@@ -630,8 +708,9 @@ function applyLanguage(lang){
 let allProducts = [];
 let activeCategory = "fisica";
 let activeStatus = "available"; // "available" (en venta) | "sold" (vendidos)
-let collections = []; // colecciones/estilos cargados desde Supabase
+let collections = []; // colecciones cargadas desde Supabase (texto libre, administrable)
 let activeCollection = "all"; // "all" o el id de una colección
+let activeStyle = "all"; // "all" o uno de los slugs de STYLE_SLUGS
 let cart = JSON.parse(localStorage.getItem("an_cart") || "[]");
 let adminToken = sessionStorage.getItem("an_admin_token") || null;
 
@@ -781,11 +860,42 @@ document.getElementById("collections-row").addEventListener("click", (e)=>{
   renderProducts();
 });
 
+/* ------------------------------------------------------------
+   Filtro de ESTILOS (lista fija, separada de las colecciones).
+   ------------------------------------------------------------ */
+function renderStyleButtons(){
+  const row = document.getElementById("styles-row");
+  if(!row) return;
+  const allBtn = `<button type="button" class="style-btn${activeStyle==="all"?" is-active":""}" data-style="all">${t("all_styles")}</button>`;
+  const rest = STYLE_SLUGS.map(slug=>`<button type="button" class="style-btn${activeStyle===slug?" is-active":""}" data-style="${slug}">${escapeHtml(styleLabel(slug))}</button>`).join("");
+  row.innerHTML = allBtn + rest;
+}
+
+function populateStyleSelects(){
+  ["f-style","ef-style"].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    const current = sel.value;
+    sel.innerHTML = `<option value="">${t("no_style")}</option>` +
+      STYLE_SLUGS.map(slug=>`<option value="${slug}">${escapeHtml(styleLabel(slug))}</option>`).join("");
+    if(current) sel.value = current;
+  });
+}
+
+document.getElementById("styles-row").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-style]");
+  if(!btn) return;
+  activeStyle = btn.getAttribute("data-style");
+  renderStyleButtons();
+  renderProducts();
+});
+
 function renderProducts(){
   const grid = document.getElementById("product-grid");
   const list = allProducts.filter(p=>{
     if(p.category !== activeCategory) return false;
     if(activeCollection !== "all" && p.collection_id !== activeCollection) return false;
+    if(activeStyle !== "all" && p.style !== activeStyle) return false;
     const isSold = !!p.is_sold;
     return activeStatus === "sold" ? isSold : !isSold;
   });
@@ -807,7 +917,7 @@ function renderProducts(){
       </div>
       <div class="product-body">
         <h3>${escapeHtml(p.title)}</h3>
-        ${p.technique ? `<div class="product-meta">${escapeHtml(p.technique)}${p.dimensions ? " · "+escapeHtml(p.dimensions) : ""}</div>` : ""}
+        ${(()=>{ const metaParts=[p.technique, p.dimensions, p.style?styleLabel(p.style):null].filter(Boolean); return metaParts.length ? `<div class="product-meta">${escapeHtml(metaParts.join(" · "))}</div>` : ""; })()}
         <div class="product-price">${formatPrice(p.price, p.currency)}</div>
         <button type="button" class="add-cart-btn" data-add-id="${p.id}" ${p.is_sold ? "disabled" : ""}>${t("add_to_cart")}</button>
       </div>
@@ -1016,7 +1126,7 @@ function renderLightboxInfo(p){
   // la traducción esté lista.
   const draw = (title, description, technique) => {
     if(currentLightboxProduct !== p) return; // la persona ya cerró/cambió de obra
-    const metaLineNow = [technique, p.dimensions].filter(Boolean).join(" · ");
+    const metaLineNow = [technique, p.dimensions, p.style?styleLabel(p.style):null].filter(Boolean).join(" · ");
     lightboxInfoBox.innerHTML = `
       ${soldBadge}
       <h3 class="lightbox-info-title">${escapeHtml(title)}</h3>
@@ -1087,6 +1197,7 @@ document.getElementById("admin-trigger").addEventListener("click", ()=>{
   if(adminToken){
     document.getElementById("f-category").value = activeCategory;
     document.getElementById("f-collection").value = "";
+    document.getElementById("f-style").value = "";
     openModal("admin-upload-overlay");
   }
   else{ openModal("admin-login-overlay"); }
@@ -1155,6 +1266,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   const technique = document.getElementById("f-technique").value.trim();
   const dimensions = document.getElementById("f-dims").value.trim();
   const collection_id = document.getElementById("f-collection").value || null;
+  const style = document.getElementById("f-style").value || null;
   const files = document.getElementById("f-file").files;
 
   if(!title || files.length===0 || isNaN(price)){
@@ -1170,7 +1282,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, images, original_lang: currentLang }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, style, images, original_lang: currentLang }
       })
     });
     const insertData = await insertRes.json();
@@ -1183,6 +1295,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     document.getElementById("f-technique").value = "";
     document.getElementById("f-dims").value = "";
     document.getElementById("f-collection").value = "";
+    document.getElementById("f-style").value = "";
     document.getElementById("f-file").value = "";
     await loadProducts();
     setTimeout(()=>closeModal("admin-upload-overlay"), 800);
@@ -1236,6 +1349,7 @@ function openEditModal(id){
   document.getElementById("ef-technique").value = p.technique || "";
   document.getElementById("ef-dims").value = p.dimensions || "";
   document.getElementById("ef-collection").value = p.collection_id || "";
+  document.getElementById("ef-style").value = p.style || "";
   document.getElementById("ef-original-lang").value = p.original_lang || "pl";
   document.getElementById("ef-file").value = "";
   document.getElementById("admin-edit-msg").textContent = "";
@@ -1264,6 +1378,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
   const technique = document.getElementById("ef-technique").value.trim();
   const dimensions = document.getElementById("ef-dims").value.trim();
   const collection_id = document.getElementById("ef-collection").value || null;
+  const style = document.getElementById("ef-style").value || null;
   const original_lang = document.getElementById("ef-original-lang").value || "pl";
   const newFiles = document.getElementById("ef-file").files;
 
@@ -1285,7 +1400,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"update", id: editingProductId,
-        product:{ title, description, category, price, technique, dimensions, collection_id, original_lang, images }
+        product:{ title, description, category, price, technique, dimensions, collection_id, style, original_lang, images }
       })
     });
     const data = await res.json();
@@ -1426,6 +1541,8 @@ setDisplayCurrency(displayCurrency, false);
 renderFxNote();
 loadFxRates();
 updateCartUI();
+renderStyleButtons();
+populateStyleSelects();
 loadCollections();
 loadProducts();
 </script>
