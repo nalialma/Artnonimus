@@ -431,6 +431,9 @@ const SUPABASE_URL = "https://fllsxgotovkljbohucum.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsbHN4Z290b3ZrbGpib2h1Y3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzMDc0MzYsImV4cCI6MjA5OTg4MzQzNn0.p2WMf76sSO25CbA63vxdi4jzfkQKGcfFIvLN29zMEfQ";
 // URL base de tus Edge Functions (normalmente: SUPABASE_URL + /functions/v1)
 const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+// Número de WhatsApp del negocio (mismo que en index.html), formato internacional sin "+"
+const WHATSAPP_NUMBER = "48692971895";
+function waLink(msg){ return "https://wa.me/"+WHATSAPP_NUMBER+"?text="+encodeURIComponent(msg); }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
