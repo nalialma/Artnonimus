@@ -128,15 +128,35 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .product-img-wrap{ cursor:pointer; }
 
 /* ---------------- LIGHTBOX (visor de imágenes superpuesto) ---------------- */
+/* Ahora en dos columnas: imagen de un lado, info de la obra del otro.
+   En pantallas angostas se apilan (imagen arriba, info abajo, con scroll). */
 .lightbox-overlay{ position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center; padding:1.2rem; background:rgba(11,7,20,.85); backdrop-filter:blur(10px); opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
 .lightbox-overlay.is-open{ opacity:1; visibility:visible; }
-.lightbox-stage{ position:relative; max-width:640px; width:100%; }
-.lightbox-stage img{ width:100%; max-height:72vh; object-fit:contain; border-radius:18px; background:rgba(0,0,0,.4); }
-.lightbox-close, .lightbox-prev, .lightbox-next{ position:absolute; width:42px; height:42px; border-radius:50%; border:1px solid var(--glass-brd); background:rgba(20,14,32,.7); color:var(--pearl); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; }
-.lightbox-close{ top:-14px; right:-14px; }
+.lightbox-stage{ position:relative; display:flex; flex-direction:column; gap:1rem; max-width:560px; width:100%; max-height:92vh; overflow-y:auto; }
+.lightbox-media{ position:relative; flex:0 0 auto; }
+.lightbox-media img{ width:100%; max-height:56vh; object-fit:contain; border-radius:18px; background:rgba(0,0,0,.4); }
+.lightbox-close{ position:absolute; top:-14px; right:-14px; width:42px; height:42px; border-radius:50%; border:1px solid var(--glass-brd); background:rgba(20,14,32,.85); color:var(--pearl); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; z-index:2; }
+.lightbox-prev, .lightbox-next{ position:absolute; width:42px; height:42px; border-radius:50%; border:1px solid var(--glass-brd); background:rgba(20,14,32,.7); color:var(--pearl); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; }
 .lightbox-prev{ left:8px; top:50%; transform:translateY(-50%); }
 .lightbox-next{ right:8px; top:50%; transform:translateY(-50%); }
 .lightbox-counter{ text-align:center; margin-top:.7rem; font-family:'Space Mono',monospace; font-size:.65rem; letter-spacing:.1em; color:rgba(246,238,252,.6); }
+
+.lightbox-info{ flex:1 1 auto; padding:1.2rem 1.3rem 1.4rem; display:flex; flex-direction:column; gap:.6rem; }
+.lightbox-info-title{ font-family:'Unbounded',sans-serif; font-weight:800; font-size:1.15rem; }
+.lightbox-info-meta{ font-family:'Space Mono',monospace; font-size:.66rem; letter-spacing:.06em; text-transform:uppercase; color:rgba(246,238,252,.55); }
+.lightbox-info-price{ font-family:'Unbounded',sans-serif; font-weight:800; font-size:1.15rem; color:var(--pink); }
+.lightbox-info-desc{ font-size:.9rem; line-height:1.55; color:rgba(246,238,252,.75); white-space:pre-line; }
+.lightbox-info-actions{ display:flex; flex-direction:column; gap:.6rem; margin-top:.3rem; }
+.lightbox-wa-btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.75rem 1rem; border-radius:999px; border:none; background:linear-gradient(135deg,#25d366,#128c4a); color:#fff; font-family:'Unbounded',sans-serif; font-weight:700; font-size:.74rem; letter-spacing:.02em; text-transform:uppercase; cursor:pointer; transition: box-shadow .3s, transform .3s; }
+.lightbox-wa-btn:hover{ box-shadow:0 0 22px rgba(37,211,102,.5); transform:translateY(-2px); }
+.lightbox-wa-btn svg{ width:16px; height:16px; flex:0 0 auto; }
+
+@media (min-width:760px){
+  .lightbox-stage{ flex-direction:row; align-items:stretch; max-width:980px; max-height:82vh; overflow:visible; }
+  .lightbox-media{ flex:1 1 55%; display:flex; flex-direction:column; justify-content:center; }
+  .lightbox-media img{ max-height:74vh; }
+  .lightbox-info{ flex:1 1 45%; overflow-y:auto; max-height:82vh; }
+}
 
 /* ---------------- ADMIN: gestión de imágenes existentes en el editor ---------------- */
 .current-images{ display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:.6rem; }
@@ -352,6 +372,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div class="field"><label data-i18n="f_collection">Colección / Estilo</label>
       <select id="ef-collection"><option value="" data-i18n="no_collection">Sin colección</option></select>
     </div>
+    <div class="field"><label data-i18n="f_original_lang">Idioma en el que está escrito el texto</label>
+      <select id="ef-original-lang">
+        <option value="pl">PL</option>
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+        <option value="it">IT</option>
+        <option value="pt">PT</option>
+      </select>
+      <div class="field-hint" data-i18n="f_original_lang_hint">Así sabemos desde qué idioma traducir para los demás clientes.</div>
+    </div>
     <div class="field"><label data-i18n="f_add_images">Agregar más imágenes</label><input type="file" id="ef-file" accept="image/*" multiple></div>
     <button type="button" id="admin-edit-submit" class="modal-submit" data-i18n="save_changes">Guardar cambios</button>
     <button type="button" id="admin-edit-delete" class="modal-danger" data-i18n="delete_product_btn">Eliminar esta obra</button>
@@ -375,14 +405,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   </div>
 </div>
 
-<!-- LIGHTBOX: visor de imágenes superpuesto -->
+<!-- LIGHTBOX: visor de imágenes + info de la obra, en dos columnas -->
 <div id="lightbox-overlay" class="lightbox-overlay">
   <div class="lightbox-stage">
     <button type="button" id="lightbox-close" class="lightbox-close" aria-label="Cerrar">×</button>
-    <button type="button" id="lightbox-prev" class="lightbox-prev" aria-label="Anterior">‹</button>
-    <img id="lightbox-img" src="" alt="">
-    <button type="button" id="lightbox-next" class="lightbox-next" aria-label="Siguiente">›</button>
-    <div id="lightbox-counter" class="lightbox-counter"></div>
+    <div class="lightbox-media">
+      <button type="button" id="lightbox-prev" class="lightbox-prev" aria-label="Anterior">‹</button>
+      <img id="lightbox-img" src="" alt="">
+      <button type="button" id="lightbox-next" class="lightbox-next" aria-label="Siguiente">›</button>
+      <div id="lightbox-counter" class="lightbox-counter"></div>
+    </div>
+    <div id="lightbox-info" class="lightbox-info glass-panel"></div>
   </div>
 </div>
 
@@ -429,13 +462,16 @@ const translations = {
     edit_ok:"Zmiany zapisane", edit_error:"Błąd przy zapisywaniu",
     fx_note:"Kursy walut aktualizują się automatycznie.", fx_updated:"Aktualizacja:", fx_fallback:"kursy orientacyjne (offline)",
     f_collection:"Kolekcja / Styl", no_collection:"Bez kolekcji", all_collections:"Wszystkie",
+    f_original_lang:"Język, w którym napisany jest tekst", f_original_lang_hint:"Dzięki temu wiemy, z jakiego języka tłumaczyć dla innych klientów.",
     manage_collections_btn:"Zarządzaj kolekcjami", manage_collections_title:"Zarządzaj kolekcjami",
     collections_empty:"Nie masz jeszcze żadnej kolekcji.", collection_new_placeholder:"Nazwa nowej kolekcji",
     collection_add_btn:"Dodaj", collection_rename_btn:"Zmień nazwę", collection_confirm_delete:"Usunąć tę kolekcję? Prace w niej pozostaną, ale bez kolekcji.",
     collection_created:"Kolekcja utworzona", collection_create_error:"Błąd przy tworzeniu kolekcji",
     collection_renamed:"Nazwa zmieniona", collection_rename_error:"Błąd przy zmianie nazwy",
     collection_deleted:"Kolekcja usunięta", collection_delete_error:"Błąd przy usuwaniu",
-    collection_rename_prompt:"Nowa nazwa dla tej kolekcji:"
+    collection_rename_prompt:"Nowa nazwa dla tej kolekcji:",
+    lightbox_wa_btn:"Wolę kupić przez WhatsApp",
+    wa_product_message:"Cześć! Interesuje mnie ta praca: \"{title}\" ({price}). Wolę kupić przez WhatsApp — czy możesz mi pomóc?"
   },
   en:{
     shop_eyebrow:"SHOP · POLAND", shop_h1:"Virtual Store",
@@ -460,13 +496,16 @@ const translations = {
     edit_ok:"Changes saved", edit_error:"Error saving changes",
     fx_note:"Exchange rates update automatically.", fx_updated:"Updated:", fx_fallback:"approximate rates (offline)",
     f_collection:"Collection / Style", no_collection:"No collection", all_collections:"All",
+    f_original_lang:"Language the text is written in", f_original_lang_hint:"This is how we know which language to translate from for other customers.",
     manage_collections_btn:"Manage collections", manage_collections_title:"Manage collections",
     collections_empty:"You haven't created any collection yet.", collection_new_placeholder:"New collection name",
     collection_add_btn:"Add", collection_rename_btn:"Rename", collection_confirm_delete:"Delete this collection? Pieces in it will remain, just without a collection.",
     collection_created:"Collection created", collection_create_error:"Error creating collection",
     collection_renamed:"Name updated", collection_rename_error:"Error renaming collection",
     collection_deleted:"Collection deleted", collection_delete_error:"Error deleting collection",
-    collection_rename_prompt:"New name for this collection:"
+    collection_rename_prompt:"New name for this collection:",
+    lightbox_wa_btn:"I'd rather buy via WhatsApp",
+    wa_product_message:"Hi! I'm interested in this piece: \"{title}\" ({price}). I'd rather buy via WhatsApp — could you help me?"
   },
   es:{
     shop_eyebrow:"TIENDA · POLONIA", shop_h1:"Tienda Virtual",
@@ -491,13 +530,16 @@ const translations = {
     edit_ok:"Cambios guardados", edit_error:"Error al guardar los cambios",
     fx_note:"Los tipos de cambio se actualizan automáticamente.", fx_updated:"Actualizado:", fx_fallback:"tasas orientativas (sin conexión)",
     f_collection:"Colección / Estilo", no_collection:"Sin colección", all_collections:"Todas",
+    f_original_lang:"Idioma en el que está escrito el texto", f_original_lang_hint:"Así sabemos desde qué idioma traducir para los demás clientes.",
     manage_collections_btn:"Gestionar colecciones", manage_collections_title:"Gestionar colecciones",
     collections_empty:"Todavía no creaste ninguna colección.", collection_new_placeholder:"Nombre de la nueva colección",
     collection_add_btn:"Agregar", collection_rename_btn:"Renombrar", collection_confirm_delete:"¿Eliminar esta colección? Las obras que la tenían quedan sin colección.",
     collection_created:"Colección creada", collection_create_error:"Error al crear la colección",
     collection_renamed:"Nombre actualizado", collection_rename_error:"Error al renombrar",
     collection_deleted:"Colección eliminada", collection_delete_error:"Error al eliminar",
-    collection_rename_prompt:"Nuevo nombre para esta colección:"
+    collection_rename_prompt:"Nuevo nombre para esta colección:",
+    lightbox_wa_btn:"Prefiero comprar por WhatsApp",
+    wa_product_message:"¡Hola! Me interesa esta obra: \"{title}\" ({price}). Prefiero comprar por WhatsApp, ¿podrías ayudarme?"
   },
   it:{
     shop_eyebrow:"NEGOZIO · POLONIA", shop_h1:"Negozio Virtuale",
@@ -522,13 +564,16 @@ const translations = {
     edit_ok:"Modifiche salvate", edit_error:"Errore nel salvataggio",
     fx_note:"I tassi di cambio si aggiornano automaticamente.", fx_updated:"Aggiornato:", fx_fallback:"tassi indicativi (offline)",
     f_collection:"Collezione / Stile", no_collection:"Senza collezione", all_collections:"Tutte",
+    f_original_lang:"Lingua in cui è scritto il testo", f_original_lang_hint:"Così sappiamo da quale lingua tradurre per gli altri clienti.",
     manage_collections_btn:"Gestisci collezioni", manage_collections_title:"Gestisci collezioni",
     collections_empty:"Non hai ancora creato nessuna collezione.", collection_new_placeholder:"Nome della nuova collezione",
     collection_add_btn:"Aggiungi", collection_rename_btn:"Rinomina", collection_confirm_delete:"Eliminare questa collezione? Le opere resteranno, ma senza collezione.",
     collection_created:"Collezione creata", collection_create_error:"Errore nella creazione",
     collection_renamed:"Nome aggiornato", collection_rename_error:"Errore nella rinomina",
     collection_deleted:"Collezione eliminata", collection_delete_error:"Errore nell'eliminazione",
-    collection_rename_prompt:"Nuovo nome per questa collezione:"
+    collection_rename_prompt:"Nuovo nome per questa collezione:",
+    lightbox_wa_btn:"Preferisco comprare su WhatsApp",
+    wa_product_message:"Ciao! Sono interessato/a a quest'opera: \"{title}\" ({price}). Preferisco comprare su WhatsApp, potresti aiutarmi?"
   },
   pt:{
     shop_eyebrow:"LOJA · POLÔNIA", shop_h1:"Loja Virtual",
@@ -553,13 +598,16 @@ const translations = {
     edit_ok:"Alterações salvas", edit_error:"Erro ao salvar as alterações",
     fx_note:"As taxas de câmbio são atualizadas automaticamente.", fx_updated:"Atualizado:", fx_fallback:"taxas aproximadas (offline)",
     f_collection:"Coleção / Estilo", no_collection:"Sem coleção", all_collections:"Todas",
+    f_original_lang:"Idioma em que o texto está escrito", f_original_lang_hint:"Assim sabemos de qual idioma traduzir para os demais clientes.",
     manage_collections_btn:"Gerenciar coleções", manage_collections_title:"Gerenciar coleções",
     collections_empty:"Você ainda não criou nenhuma coleção.", collection_new_placeholder:"Nome da nova coleção",
     collection_add_btn:"Adicionar", collection_rename_btn:"Renomear", collection_confirm_delete:"Excluir esta coleção? As obras nela permanecerão, apenas sem coleção.",
     collection_created:"Coleção criada", collection_create_error:"Erro ao criar a coleção",
     collection_renamed:"Nome atualizado", collection_rename_error:"Erro ao renomear",
     collection_deleted:"Coleção excluída", collection_delete_error:"Erro ao excluir",
-    collection_rename_prompt:"Novo nome para esta coleção:"
+    collection_rename_prompt:"Novo nome para esta coleção:",
+    lightbox_wa_btn:"Prefiro comprar pelo WhatsApp",
+    wa_product_message:"Olá! Tenho interesse nesta obra: \"{title}\" ({price}). Prefiro comprar pelo WhatsApp, você poderia me ajudar?"
   }
 };
 let currentLang = "pl";
@@ -579,6 +627,7 @@ function applyLanguage(lang){
   renderFxNote();
   renderCollectionButtons();
   renderProducts();
+  if(currentLightboxProduct) renderLightboxInfo(currentLightboxProduct);
 }
 
 /* ============================================================
@@ -888,13 +937,15 @@ document.getElementById("cart-items").addEventListener("click", (e)=>{
 });
 
 /* ============================================================
-   LIGHTBOX — visor de imágenes superpuesto (overlay)
+   LIGHTBOX — visor de imágenes + info de la obra (overlay)
    ============================================================ */
 let lightboxImages = [];
 let lightboxIndex = 0;
+let currentLightboxProduct = null;
 const lightboxOverlay = document.getElementById("lightbox-overlay");
 const lightboxImg = document.getElementById("lightbox-img");
 const lightboxCounter = document.getElementById("lightbox-counter");
+const lightboxInfoBox = document.getElementById("lightbox-info");
 
 function openLightbox(productId){
   const p = allProducts.find(x=>x.id===productId);
@@ -902,7 +953,9 @@ function openLightbox(productId){
   lightboxImages = getImages(p);
   if(lightboxImages.length===0) return;
   lightboxIndex = 0;
+  currentLightboxProduct = p;
   renderLightbox();
+  renderLightboxInfo(p);
   lightboxOverlay.classList.add("is-open");
 }
 function renderLightbox(){
@@ -911,7 +964,7 @@ function renderLightbox(){
   document.getElementById("lightbox-prev").style.display = lightboxImages.length > 1 ? "flex" : "none";
   document.getElementById("lightbox-next").style.display = lightboxImages.length > 1 ? "flex" : "none";
 }
-function closeLightbox(){ lightboxOverlay.classList.remove("is-open"); }
+function closeLightbox(){ lightboxOverlay.classList.remove("is-open"); currentLightboxProduct = null; }
 function lightboxStep(delta){
   lightboxIndex = (lightboxIndex + delta + lightboxImages.length) % lightboxImages.length;
   renderLightbox();
@@ -919,6 +972,76 @@ function lightboxStep(delta){
 document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
 document.getElementById("lightbox-prev").addEventListener("click", ()=>lightboxStep(-1));
 document.getElementById("lightbox-next").addEventListener("click", ()=>lightboxStep(1));
+document.getElementById("lightbox-info").addEventListener("click", (e)=>{
+  const addBtn = e.target.closest("[data-add-id]");
+  if(addBtn){ addToCart(addBtn.getAttribute("data-add-id")); }
+});
+
+/* ------------------------------------------------------------
+   Traducción del título/descripción/técnica al idioma que el
+   cliente tiene elegido, sea cual sea el idioma en el que el
+   administrador la haya cargado. Se cachea en memoria (esta sesión
+   del navegador) y también en Supabase (para siempre, para todos
+   los visitantes) vía el Edge Function "translate-product".
+   ------------------------------------------------------------ */
+const translationCache = {};
+
+async function fetchProductTranslation(product, lang){
+  // Ojo: no asumimos que título/descripción/técnica están en el mismo
+  // idioma entre sí (a veces no lo están) — el Edge Function detecta el
+  // idioma de cada campo por separado y solo traduce el que haga falta.
+  const cacheKey = `${product.id}::${lang}`;
+  if(translationCache[cacheKey]) return translationCache[cacheKey];
+  try{
+    const res = await fetch(`${FUNCTIONS_URL}/translate-product`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ product_id: product.id, lang })
+    });
+    const data = await res.json();
+    if(data.ok && data.translation){
+      translationCache[cacheKey] = data.translation;
+      return data.translation;
+    }
+  } catch(e){ /* si falla, mostramos el texto original más abajo */ }
+  return { title: product.title, description: product.description, technique: product.technique };
+}
+
+function waProductLink(product, title){
+  const price = formatPrice(product.price, product.currency);
+  const msg = t("wa_product_message").replace("{title}", title || product.title).replace("{price}", price);
+  return waLink(msg);
+}
+
+function renderLightboxInfo(p){
+  if(!lightboxInfoBox) return;
+  const soldBadge = p.is_sold ? `<span class="sold-badge" style="position:static; display:inline-block; margin-bottom:.2rem;">${t("sold_out")}</span>` : "";
+
+  // Mostramos ya mismo el texto tal cual está guardado (para que no quede
+  // en blanco mientras llega la traducción), y lo reemplazamos apenas
+  // la traducción esté lista.
+  const draw = (title, description, technique) => {
+    if(currentLightboxProduct !== p) return; // la persona ya cerró/cambió de obra
+    const metaLineNow = [technique, p.dimensions].filter(Boolean).join(" · ");
+    lightboxInfoBox.innerHTML = `
+      ${soldBadge}
+      <h3 class="lightbox-info-title">${escapeHtml(title)}</h3>
+      ${metaLineNow ? `<div class="lightbox-info-meta">${escapeHtml(metaLineNow)}</div>` : ""}
+      <div class="lightbox-info-price">${formatPrice(p.price, p.currency)}</div>
+      ${description ? `<p class="lightbox-info-desc">${escapeHtml(description)}</p>` : ""}
+      <div class="lightbox-info-actions">
+        <button type="button" class="add-cart-btn" data-add-id="${p.id}" ${p.is_sold ? "disabled" : ""} style="margin-top:0;">${t("add_to_cart")}</button>
+        <a class="lightbox-wa-btn" target="_blank" rel="noopener" href="${waProductLink(p, title)}">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.84.5 3.56 1.36 5.03L2 22l5.21-1.46a9.85 9.85 0 0 0 4.82 1.27h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.78 14.06c-.24.69-1.4 1.32-1.93 1.36-.5.04-1 .25-3.37-.7-2.86-1.14-4.7-4.05-4.84-4.24-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.08 1-2.37.26-.28.58-.35.77-.35.19 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.31-.3.48-.14.16-.3.36-.43.49-.14.14-.29.29-.13.57.17.28.74 1.22 1.59 1.98 1.1.98 2.02 1.28 2.3 1.43.28.14.45.12.61-.07.17-.19.71-.83.9-1.11.19-.28.38-.23.64-.14.26.1 1.66.78 1.94.93.28.14.47.21.54.33.07.12.07.68-.17 1.36Z"/></svg>
+          ${t("lightbox_wa_btn")}
+        </a>
+      </div>
+    `;
+  };
+
+  draw(p.title, p.description, p.technique);
+  fetchProductTranslation(p, currentLang).then(tr=>draw(tr.title, tr.description, tr.technique));
+}
 lightboxOverlay.addEventListener("click", (e)=>{ if(e.target===lightboxOverlay) closeLightbox(); });
 document.addEventListener("keydown", (e)=>{
   if(!lightboxOverlay.classList.contains("is-open")) return;
@@ -1053,7 +1176,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, images }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, images, original_lang: currentLang }
       })
     });
     const insertData = await insertRes.json();
@@ -1084,7 +1207,10 @@ async function deleteProduct(id){
       body: JSON.stringify({ token: adminToken, action:"delete", id })
     });
     const data = await res.json();
-    if(data.ok){ await loadProducts(); }
+    if(data.ok){
+      Object.keys(translationCache).forEach(k=>{ if(k.startsWith(id+"::")) delete translationCache[k]; });
+      await loadProducts();
+    }
   } catch(e){ /* silencioso */ }
 }
 
@@ -1116,6 +1242,7 @@ function openEditModal(id){
   document.getElementById("ef-technique").value = p.technique || "";
   document.getElementById("ef-dims").value = p.dimensions || "";
   document.getElementById("ef-collection").value = p.collection_id || "";
+  document.getElementById("ef-original-lang").value = p.original_lang || "pl";
   document.getElementById("ef-file").value = "";
   document.getElementById("admin-edit-msg").textContent = "";
   document.getElementById("admin-edit-msg").className = "modal-msg";
@@ -1143,6 +1270,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
   const technique = document.getElementById("ef-technique").value.trim();
   const dimensions = document.getElementById("ef-dims").value.trim();
   const collection_id = document.getElementById("ef-collection").value || null;
+  const original_lang = document.getElementById("ef-original-lang").value || "pl";
   const newFiles = document.getElementById("ef-file").files;
 
   if(!title || isNaN(price)){
@@ -1163,12 +1291,13 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"update", id: editingProductId,
-        product:{ title, description, category, price, technique, dimensions, collection_id, images }
+        product:{ title, description, category, price, technique, dimensions, collection_id, original_lang, images }
       })
     });
     const data = await res.json();
     if(!data.ok) throw new Error(data.error || "update-failed");
 
+    Object.keys(translationCache).forEach(k=>{ if(k.startsWith(editingProductId+"::")) delete translationCache[k]; });
     msg.textContent = t("edit_ok"); msg.classList.add("is-ok");
     await loadProducts();
     setTimeout(()=>closeModal("admin-edit-overlay"), 700);
