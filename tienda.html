@@ -185,6 +185,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .reorder-btn:hover:not(:disabled){ box-shadow:0 0 10px rgba(184,242,255,.35); }
 .reorder-btn:disabled{ opacity:.25; cursor:default; }
 .product-card.is-reordering{ opacity:.5; pointer-events:none; }
+
+/* ---------------- ADMIN: panel de pedidos ---------------- */
+.order-card{ border-radius:14px; background:var(--glass-2); border:1px solid var(--glass-brd); padding:.8rem .9rem; }
+.order-card-head{ display:flex; justify-content:space-between; align-items:baseline; gap:.5rem; margin-bottom:.4rem; }
+.order-card-head strong{ font-family:'Unbounded',sans-serif; font-size:.85rem; }
+.order-card-head span{ font-family:'Space Mono',monospace; font-size:.7rem; color:rgba(246,238,252,.6); }
+.order-address{ font-size:.78rem; color:rgba(246,238,252,.6); margin-bottom:.5rem; line-height:1.4; }
+.order-items{ display:flex; flex-direction:column; gap:.3rem; margin-bottom:.6rem; }
+.order-item-row{ display:flex; align-items:center; gap:.5rem; font-size:.78rem; }
+.order-item-row img{ width:34px; height:34px; border-radius:6px; object-fit:cover; flex:0 0 auto; }
+.order-item-row span{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.order-ship-btn{ width:100%; padding:.5rem; border-radius:999px; border:1px solid var(--cyan-soft); background:transparent; color:var(--cyan); font-family:'Unbounded',sans-serif; font-size:.7rem; text-transform:uppercase; letter-spacing:.03em; cursor:pointer; transition:.2s; }
+.order-ship-btn:hover{ box-shadow:0 0 12px rgba(184,242,255,.35); }
+.order-shipped-tag{ font-size:.72rem; color:var(--cyan); }
 .empty-note{ text-align:center; font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(246,238,252,.4); padding:3rem 0; grid-column:1/-1; }
 
 /* ---------------- CART DRAWER ---------------- */
@@ -262,6 +276,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     </button>
     <button type="button" id="reorder-trigger" class="icon-btn admin-trigger" style="display:none" aria-label="Orden" title="Ordenar obras" data-i18n-title="manage_order_btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 7l-3 3 3 3M16 17l3-3-3-3M5 10h14M5 14h14"/></svg>
+    </button>
+    <button type="button" id="orders-trigger" class="icon-btn admin-trigger" style="display:none" aria-label="Pedidos" title="Pedidos" data-i18n-title="manage_orders_btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l9-4 9 4-9 4-9-4Z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
+      <span id="orders-badge" class="cart-count" style="display:none">0</span>
     </button>
     <button type="button" id="cart-trigger" class="icon-btn" aria-label="Carrito">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9.5" cy="20.5" r="1.4"/><circle cx="17.5" cy="20.5" r="1.4"/></svg>
@@ -367,6 +385,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div id="new-images-preview" class="current-images"></div>
       <div class="field-hint" data-i18n="f_images_reorder_hint">Arrastrá o usá las flechas para elegir el orden. La primera imagen es la principal.</div>
     </div>
+    <div class="field" style="flex-direction:row; align-items:center; gap:.5rem;">
+      <input type="checkbox" id="f-sold" style="width:auto;">
+      <label for="f-sold" style="margin:0; cursor:pointer;" data-i18n="already_sold_label">Ya vendida (obra vendida antes de esta web)</label>
+    </div>
     <button type="button" id="admin-upload-submit" class="modal-submit" data-i18n="admin_upload_submit">Publicar obra</button>
     <div id="admin-upload-msg" class="modal-msg"></div>
   </div>
@@ -416,6 +438,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field-hint" data-i18n="f_original_lang_hint">Así sabemos desde qué idioma traducir para los demás clientes.</div>
     </div>
     <div class="field"><label data-i18n="f_add_images">Agregar más imágenes</label><input type="file" id="ef-file" accept="image/*" multiple></div>
+    <div class="field" style="flex-direction:row; align-items:center; gap:.5rem;">
+      <input type="checkbox" id="ef-sold" style="width:auto;">
+      <label for="ef-sold" style="margin:0; cursor:pointer;" data-i18n="already_sold_label">Ya vendida (obra vendida antes de esta web)</label>
+    </div>
     <button type="button" id="admin-edit-submit" class="modal-submit" data-i18n="save_changes">Guardar cambios</button>
     <button type="button" id="admin-edit-delete" class="modal-danger" data-i18n="delete_product_btn">Eliminar esta obra</button>
     <div id="admin-edit-msg" class="modal-msg"></div>
@@ -464,6 +490,21 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div id="reorder-list" class="current-images" style="margin-top:.6rem; max-height:340px; overflow-y:auto;"></div>
     <button type="button" id="admin-reorder-save" class="modal-submit" data-i18n="save_order_btn">Guardar orden</button>
     <div id="admin-reorder-msg" class="modal-msg"></div>
+  </div>
+</div>
+
+<!-- ADMIN: PANEL DE PEDIDOS (pagados vía Stripe, pendientes de envío) -->
+<div id="admin-orders-overlay" class="modal-overlay">
+  <div class="modal-panel glass-panel" style="max-width:560px;">
+    <button type="button" class="modal-close" data-close-modal="admin-orders-overlay">×</button>
+    <h2 class="glow-cyan" data-i18n="manage_orders_title">Pedidos</h2>
+    <div class="field-hint" data-i18n="orders_hint">Pedidos ya pagados. Al marcar uno como enviado, las obras que contiene pasan solas a "Vendidos".</div>
+    <div class="orders-tabs" style="display:flex; gap:.5rem; margin:.6rem 0;">
+      <button type="button" class="collection-btn is-active" id="orders-tab-pending" data-i18n="orders_tab_pending">Por enviar</button>
+      <button type="button" class="collection-btn" id="orders-tab-shipped" data-i18n="orders_tab_shipped">Enviados</button>
+    </div>
+    <div id="orders-list" style="display:flex; flex-direction:column; gap:.7rem; max-height:420px; overflow-y:auto;"></div>
+    <div id="admin-orders-msg" class="modal-msg"></div>
   </div>
 </div>
 
@@ -549,6 +590,14 @@ const translations = {
     order_hint:"Przeciągnij lub użyj strzałek, aby wybrać kolejność wyświetlania prac w sklepie.",
     save_order_btn:"Zapisz kolejność", order_saved:"Kolejność zapisana", order_save_error:"Błąd przy zapisywaniu kolejności",
     move_earlier:"Wcześniej", move_later:"Później",
+    manage_orders_btn:"Zamówienia", manage_orders_title:"Zamówienia",
+    orders_hint:"Zamówienia już opłacone. Po oznaczeniu jako wysłane, prace z zamówienia automatycznie trafiają do \"Sprzedane\".",
+    orders_tab_pending:"Do wysłania", orders_tab_shipped:"Wysłane",
+    orders_empty_pending:"Nie ma zamówień oczekujących na wysyłkę.", orders_empty_shipped:"Jeszcze nie wysłano żadnego zamówienia.",
+    order_mark_shipped:"Oznacz jako wysłane", order_shipped_on:"Wysłane",
+    order_ship_error:"Błąd przy oznaczaniu jako wysłane", order_load_error:"Błąd przy pobieraniu zamówień",
+    no_shipping_address:"Bez adresu wysyłki (sztuka cyfrowa)",
+    already_sold_label:"Już sprzedana (praca sprzedana przed tą stroną)",
     lightbox_wa_btn:"Wolę kupić przez WhatsApp",
     wa_product_message:"Cześć! Interesuje mnie ta praca: \"{title}\" ({price}). Wolę kupić przez WhatsApp — czy możesz mi pomóc?"
   },
@@ -597,6 +646,14 @@ const translations = {
     order_hint:"Drag or use the arrows to choose the order pieces are shown in the shop.",
     save_order_btn:"Save order", order_saved:"Order saved", order_save_error:"Error saving order",
     move_earlier:"Earlier", move_later:"Later",
+    manage_orders_btn:"Orders", manage_orders_title:"Orders",
+    orders_hint:"Orders already paid for. Marking one as shipped automatically moves its pieces to \"Sold\".",
+    orders_tab_pending:"To ship", orders_tab_shipped:"Shipped",
+    orders_empty_pending:"No orders waiting to be shipped.", orders_empty_shipped:"No order has been shipped yet.",
+    order_mark_shipped:"Mark as shipped", order_shipped_on:"Shipped",
+    order_ship_error:"Error marking as shipped", order_load_error:"Error loading orders",
+    no_shipping_address:"No shipping address (digital art)",
+    already_sold_label:"Already sold (piece sold before this website existed)",
     lightbox_wa_btn:"I'd rather buy via WhatsApp",
     wa_product_message:"Hi! I'm interested in this piece: \"{title}\" ({price}). I'd rather buy via WhatsApp — could you help me?"
   },
@@ -645,6 +702,14 @@ const translations = {
     order_hint:"Arrastrá o usá las flechas para elegir en qué orden se muestran las obras en la tienda.",
     save_order_btn:"Guardar orden", order_saved:"Orden guardado", order_save_error:"Error al guardar el orden",
     move_earlier:"Antes", move_later:"Después",
+    manage_orders_btn:"Pedidos", manage_orders_title:"Pedidos",
+    orders_hint:"Pedidos ya pagados. Al marcar uno como enviado, las obras que contiene pasan solas a \"Vendidos\".",
+    orders_tab_pending:"Por enviar", orders_tab_shipped:"Enviados",
+    orders_empty_pending:"No hay pedidos esperando envío.", orders_empty_shipped:"Todavía no enviaste ningún pedido.",
+    order_mark_shipped:"Marcar como enviado", order_shipped_on:"Enviado",
+    order_ship_error:"Error al marcar como enviado", order_load_error:"Error al cargar los pedidos",
+    no_shipping_address:"Sin dirección de envío (arte digital)",
+    already_sold_label:"Ya vendida (obra vendida antes de esta web)",
     lightbox_wa_btn:"Prefiero comprar por WhatsApp",
     wa_product_message:"¡Hola! Me interesa esta obra: \"{title}\" ({price}). Prefiero comprar por WhatsApp, ¿podrías ayudarme?"
   },
@@ -693,6 +758,14 @@ const translations = {
     order_hint:"Trascina o usa le frecce per scegliere l'ordine in cui le opere appaiono nel negozio.",
     save_order_btn:"Salva ordine", order_saved:"Ordine salvato", order_save_error:"Errore nel salvataggio dell'ordine",
     move_earlier:"Prima", move_later:"Dopo",
+    manage_orders_btn:"Ordini", manage_orders_title:"Ordini",
+    orders_hint:"Ordini già pagati. Segnandone uno come spedito, le opere che contiene passano automaticamente a \"Venduto\".",
+    orders_tab_pending:"Da spedire", orders_tab_shipped:"Spediti",
+    orders_empty_pending:"Nessun ordine in attesa di spedizione.", orders_empty_shipped:"Nessun ordine ancora spedito.",
+    order_mark_shipped:"Segna come spedito", order_shipped_on:"Spedito",
+    order_ship_error:"Errore nel segnare come spedito", order_load_error:"Errore nel caricamento degli ordini",
+    no_shipping_address:"Nessun indirizzo di spedizione (arte digitale)",
+    already_sold_label:"Già venduta (opera venduta prima di questo sito)",
     lightbox_wa_btn:"Preferisco comprare su WhatsApp",
     wa_product_message:"Ciao! Sono interessato/a a quest'opera: \"{title}\" ({price}). Preferisco comprare su WhatsApp, potresti aiutarmi?"
   },
@@ -741,6 +814,14 @@ const translations = {
     order_hint:"Arraste ou use as setas para escolher a ordem em que as obras aparecem na loja.",
     save_order_btn:"Salvar ordem", order_saved:"Ordem salva", order_save_error:"Erro ao salvar a ordem",
     move_earlier:"Antes", move_later:"Depois",
+    manage_orders_btn:"Pedidos", manage_orders_title:"Pedidos",
+    orders_hint:"Pedidos já pagos. Ao marcar um como enviado, as obras dele passam automaticamente para \"Vendidos\".",
+    orders_tab_pending:"A enviar", orders_tab_shipped:"Enviados",
+    orders_empty_pending:"Nenhum pedido esperando envio.", orders_empty_shipped:"Nenhum pedido enviado ainda.",
+    order_mark_shipped:"Marcar como enviado", order_shipped_on:"Enviado",
+    order_ship_error:"Erro ao marcar como enviado", order_load_error:"Erro ao carregar os pedidos",
+    no_shipping_address:"Sem endereço de envio (arte digital)",
+    already_sold_label:"Já vendida (obra vendida antes deste site)",
     lightbox_wa_btn:"Prefiro comprar pelo WhatsApp",
     wa_product_message:"Olá! Tenho interesse nesta obra: \"{title}\" ({price}). Prefiro comprar pelo WhatsApp, você poderia me ajudar?"
   }
@@ -1439,6 +1520,7 @@ function updateAdminUiState(){
   document.getElementById("collections-trigger").style.display = adminToken ? "flex" : "none";
   document.getElementById("styles-trigger").style.display = adminToken ? "flex" : "none";
   document.getElementById("reorder-trigger").style.display = adminToken ? "flex" : "none";
+  document.getElementById("orders-trigger").style.display = adminToken ? "flex" : "none";
 }
 
 document.getElementById("admin-trigger").addEventListener("click", ()=>{
@@ -1446,6 +1528,7 @@ document.getElementById("admin-trigger").addEventListener("click", ()=>{
     document.getElementById("f-category").value = activeCategory;
     document.getElementById("f-collection").value = "";
     document.getElementById("f-style").value = "";
+    document.getElementById("f-sold").checked = false;
     openModal("admin-upload-overlay");
   }
   else{ openModal("admin-login-overlay"); }
@@ -1618,6 +1701,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   const dimensions = document.getElementById("f-dims").value.trim();
   const collection_id = document.getElementById("f-collection").value || null;
   const style = document.getElementById("f-style").value || null;
+  const is_sold = document.getElementById("f-sold").checked;
 
   if(!title || newImageItems.length===0 || isNaN(price)){
     msg.textContent = t("upload_error"); msg.classList.add("is-error");
@@ -1633,7 +1717,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, style, images, original_lang: currentLang, sort_order: nextSortOrder() }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, style, images, original_lang: currentLang, sort_order: nextSortOrder(), is_sold }
       })
     });
     const insertData = await insertRes.json();
@@ -1648,6 +1732,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     document.getElementById("f-collection").value = "";
     document.getElementById("f-style").value = "";
     document.getElementById("f-file").value = "";
+    document.getElementById("f-sold").checked = false;
     resetNewImagesPreview();
     await loadProducts();
     setTimeout(()=>closeModal("admin-upload-overlay"), 800);
@@ -1697,6 +1782,7 @@ function openEditModal(id){
   document.getElementById("ef-collection").value = p.collection_id || "";
   document.getElementById("ef-style").value = p.style || "";
   document.getElementById("ef-original-lang").value = p.original_lang || "pl";
+  document.getElementById("ef-sold").checked = !!p.is_sold;
   document.getElementById("ef-file").value = "";
   document.getElementById("admin-edit-msg").textContent = "";
   document.getElementById("admin-edit-msg").className = "modal-msg";
@@ -1726,6 +1812,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
   const collection_id = document.getElementById("ef-collection").value || null;
   const style = document.getElementById("ef-style").value || null;
   const original_lang = document.getElementById("ef-original-lang").value || "pl";
+  const is_sold = document.getElementById("ef-sold").checked;
 
   if(!title || isNaN(price)){
     msg.textContent = t("edit_error"); msg.classList.add("is-error");
@@ -1747,7 +1834,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"update", id: editingProductId,
-        product:{ title, description, category, price, technique, dimensions, collection_id, style, original_lang, images }
+        product:{ title, description, category, price, technique, dimensions, collection_id, style, original_lang, images, is_sold }
       })
     });
     const data = await res.json();
@@ -2057,6 +2144,130 @@ document.getElementById("admin-reorder-save").addEventListener("click", async ()
     msg.textContent = t("order_save_error"); msg.classList.add("is-error");
   }
 });
+
+/* ============================================================
+   ADMIN — PANEL DE PEDIDOS
+   Pedidos ya pagados (confirmados por el webhook de Stripe,
+   stripe-webhook, cuando el pago se acredita). Al marcar uno como
+   enviado, las obras de ese pedido pasan solas a "Vendidos"
+   (lo hace la propia Edge Function admin-orders).
+   ============================================================ */
+let ordersCache = []; // último "list" cargado desde admin-orders
+let ordersTab = "pending"; // "pending" (por enviar) | "shipped" (ya enviados)
+
+async function callOrdersApi(action, extra){
+  const res = await fetch(`${FUNCTIONS_URL}/admin-orders`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ token: adminToken, action, ...extra })
+  });
+  return res.json();
+}
+
+function formatOrderAddress(addr){
+  if(!addr) return t("no_shipping_address");
+  const parts = [addr.line1, addr.line2, [addr.postal_code, addr.city].filter(Boolean).join(" "), addr.state, addr.country].filter(Boolean);
+  return escapeHtml(parts.join(", "));
+}
+
+function renderOrdersList(){
+  const box = document.getElementById("orders-list");
+  const filtered = ordersCache.filter(o => ordersTab === "shipped" ? o.shipping_status === "shipped" : o.shipping_status !== "shipped");
+  if(filtered.length === 0){
+    box.innerHTML = `<div class="collections-empty">${ordersTab === "shipped" ? t("orders_empty_shipped") : t("orders_empty_pending")}</div>`;
+    return;
+  }
+  box.innerHTML = filtered.map(o=>{
+    const items = Array.isArray(o.items) ? o.items : [];
+    const dateStr = o.created_at ? new Date(o.created_at).toLocaleDateString(currentLang) : "";
+    const itemsHtml = items.map(it=>`
+      <div class="order-item-row">
+        ${it.image ? `<img src="${it.image}" alt="">` : ""}
+        <span>${escapeHtml(it.title)}${it.quantity > 1 ? ` ×${it.quantity}` : ""}</span>
+      </div>
+    `).join("");
+    return `
+    <div class="order-card" data-order-id="${o.id}">
+      <div class="order-card-head">
+        <strong>${escapeHtml(o.customer_name || o.customer_email || "—")}</strong>
+        <span>${dateStr}</span>
+      </div>
+      <div class="order-address">${formatOrderAddress(o.shipping_address)}${o.customer_email ? ` · ${escapeHtml(o.customer_email)}` : ""}</div>
+      <div class="order-items">${itemsHtml}</div>
+      <div class="order-card-head" style="margin-bottom:0;">
+        <span>${formatPrice(o.amount_total, o.currency)}</span>
+        ${o.shipping_status === "shipped"
+          ? `<span class="order-shipped-tag">✓ ${t("order_shipped_on")} ${o.shipped_at ? new Date(o.shipped_at).toLocaleDateString(currentLang) : ""}</span>`
+          : ""}
+      </div>
+      ${o.shipping_status !== "shipped" ? `<button type="button" class="order-ship-btn" data-mark-shipped="${o.id}" style="margin-top:.5rem;">${t("order_mark_shipped")}</button>` : ""}
+    </div>
+  `;
+  }).join("");
+}
+
+document.getElementById("orders-trigger").addEventListener("click", async ()=>{
+  if(!adminToken) return;
+  const msg = document.getElementById("admin-orders-msg");
+  msg.textContent = ""; msg.className = "modal-msg";
+  ordersTab = "pending";
+  document.getElementById("orders-tab-pending").classList.add("is-active");
+  document.getElementById("orders-tab-shipped").classList.remove("is-active");
+  document.getElementById("orders-list").innerHTML = "";
+  openModal("admin-orders-overlay");
+  try{
+    const data = await callOrdersApi("list", {});
+    if(!data.ok) throw new Error(data.error || "list-failed");
+    ordersCache = data.orders || [];
+    renderOrdersList();
+    updateOrdersBadge();
+  } catch(e){
+    msg.textContent = t("order_load_error"); msg.classList.add("is-error");
+  }
+});
+
+document.getElementById("orders-tab-pending").addEventListener("click", ()=>{
+  ordersTab = "pending";
+  document.getElementById("orders-tab-pending").classList.add("is-active");
+  document.getElementById("orders-tab-shipped").classList.remove("is-active");
+  renderOrdersList();
+});
+document.getElementById("orders-tab-shipped").addEventListener("click", ()=>{
+  ordersTab = "shipped";
+  document.getElementById("orders-tab-shipped").classList.add("is-active");
+  document.getElementById("orders-tab-pending").classList.remove("is-active");
+  renderOrdersList();
+});
+
+document.getElementById("orders-list").addEventListener("click", async (e)=>{
+  const btn = e.target.closest("[data-mark-shipped]");
+  if(!btn) return;
+  const id = btn.getAttribute("data-mark-shipped");
+  const msg = document.getElementById("admin-orders-msg");
+  msg.textContent = ""; msg.className = "modal-msg";
+  btn.disabled = true;
+  try{
+    const data = await callOrdersApi("mark_shipped", { id });
+    if(!data.ok) throw new Error(data.error || "mark-shipped-failed");
+    const idx = ordersCache.findIndex(o=>o.id===id);
+    if(idx !== -1) ordersCache[idx] = data.order;
+    renderOrdersList();
+    updateOrdersBadge();
+    await loadProducts(); // las obras del pedido ya pasaron a "vendida"
+  } catch(e2){
+    msg.textContent = t("order_ship_error"); msg.classList.add("is-error");
+    btn.disabled = false;
+  }
+});
+
+function updateOrdersBadge(){
+  const pendingCount = ordersCache.filter(o=>o.shipping_status !== "shipped").length;
+  const badge = document.getElementById("orders-badge");
+  badge.textContent = pendingCount;
+  badge.style.display = pendingCount > 0 ? "flex" : "none";
+}
+
+
 
 
 
