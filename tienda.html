@@ -103,11 +103,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .add-collection-row input{ flex:1; }
 .add-collection-row button{ flex:0 0 auto; padding:0 1.1rem; border-radius:12px; border:none; background:linear-gradient(135deg,var(--pink),var(--lilac)); color:#1a1024; font-family:'Unbounded',sans-serif; font-weight:700; font-size:.72rem; cursor:pointer; }
 
-/* ---------------- ANTI-DESCARGA DE IMÁGENES ----------------
-   Disuade el guardado rápido (click derecho, arrastrar, long-press
-   en móvil). No es 100% infalible -- cualquiera con DevTools o una
-   captura de pantalla puede igual conseguir la imagen -- pero bloquea
-   los caminos habituales de "guardar imagen". */
+/* ---------------- bloquedador de descargas de imagenes  ---------------- */
 .product-img-wrap img, #lightbox-img{
   -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
   -webkit-user-drag:none; -khtml-user-drag:none; -moz-user-drag:none; -o-user-drag:none; user-drag:none;
@@ -132,8 +128,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .product-img-wrap{ cursor:pointer; }
 
 /* ---------------- LIGHTBOX (visor de imágenes superpuesto) ---------------- */
-/* Ahora en dos columnas: imagen de un lado, info de la obra del otro.
-   En pantallas angostas se apilan (imagen arriba, info abajo, con scroll). */
+
 .lightbox-overlay{ position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center; padding:1.2rem; background:rgba(11,7,20,.85); backdrop-filter:blur(10px); opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
 .lightbox-overlay.is-open{ opacity:1; visibility:visible; }
 .lightbox-stage{ position:relative; display:flex; flex-direction:column; gap:1rem; max-width:560px; width:100%; max-height:92vh; overflow-y:auto; }
@@ -641,9 +636,7 @@ const translations = {
 };
 
 /* ------------------------------------------------------------
-   ESTILOS — lista fija de categorías de estilo/estética (Dreamcore,
-   Weirdcore, etc). A diferencia de las "colecciones" (que la admin
-   escribe a mano y administra libremente), esta lista es fija y
+   ESTILOS — lista fija de categorías de estilo/estética ,lista es fija y
    siempre la misma para todas las obras; solo se traduce su etiqueta
    según el idioma elegido por el cliente.
    ------------------------------------------------------------ */
@@ -723,11 +716,7 @@ function saveCart(){ localStorage.setItem("an_cart", JSON.stringify(cart)); upda
 
 /* ============================================================
    MONEDA / TIPOS DE CAMBIO
-   Todos los precios se cargan en EUR (así es como los guarda el
-   panel de administrador). Acá los convertimos "al vuelo" a la
-   moneda que la persona elija (o a PLN/EUR por defecto según idioma)
-   usando tasas en vivo de una API pública y gratuita, cacheadas en
-   este navegador para no golpearla en cada carga de página.
+   Todos los precios se cargan en EUR
    ============================================================ */
 const FX_CACHE_KEY = "an_fx_rates";
 const FX_MAX_AGE_MS = 12 * 60 * 60 * 1000; // refrescar cada 12hs
@@ -822,8 +811,7 @@ function getImages(p){
 
 /* ============================================================
    COLECCIONES / ESTILOS
-   Lectura pública directa (RLS permite SELECT a cualquiera, igual que
-   "products"). Crear/renombrar/borrar pasa por el Edge Function
+    Crear/renombrar/borrar pasa por el Edge Function
    admin-collections, protegido con el mismo token de administrador.
    ============================================================ */
 async function loadCollections(){
@@ -869,9 +857,7 @@ document.getElementById("collections-row").addEventListener("click", (e)=>{
 /* ------------------------------------------------------------
    Crear una colección directamente desde el propio desplegable del
    formulario (subir/editar obra), eligiendo la opción
-   "+ Agregar nueva colección…". Así no hace falta encontrar el
-   ícono de "Gestionar colecciones" arriba de la página para poder
-   crear la primera colección.
+   "+ Agregar nueva colección…". 
    ------------------------------------------------------------ */
 async function handleCollectionSelectChange(selectEl){
   if(selectEl.value !== "__new__") return;
@@ -1116,16 +1102,13 @@ document.getElementById("lightbox-info").addEventListener("click", (e)=>{
 
 /* ------------------------------------------------------------
    Traducción del título/descripción/técnica al idioma que el
-   cliente tiene elegido, sea cual sea el idioma en el que el
-   administrador la haya cargado. Se cachea en memoria (esta sesión
-   del navegador) y también en Supabase (para siempre, para todos
-   los visitantes) vía el Edge Function "translate-product".
+   cliente tiene elegido. Se cachea en memoria, vía el Edge Function "translate-product".
    ------------------------------------------------------------ */
 const translationCache = {};
 
 async function fetchProductTranslation(product, lang){
-  // Ojo: no asumimos que título/descripción/técnica están en el mismo
-  // idioma entre sí (a veces no lo están) — el Edge Function detecta el
+  //  no asumimos que título/descripción/técnica están en el mismo
+  //  el Edge Function detecta el
   // idioma de cada campo por separado y solo traduce el que haga falta.
   const cacheKey = `${product.id}::${lang}`;
   if(translationCache[cacheKey]) return translationCache[cacheKey];
@@ -1544,11 +1527,7 @@ document.getElementById("collections-manage-list").addEventListener("click", asy
 
 /* ============================================================
    ANTI-DESCARGA DE IMÁGENES
-   Bloquea el clic derecho ("Guardar imagen como…"), el arrastrar-y-soltar
-   y el guardado por mantener presionado en móvil, tanto en la grilla de
-   productos como en el visor (lightbox). Aviso: esto no es infalible —
-   cualquiera con herramientas de desarrollador o una captura de pantalla
-   puede seguir obteniendo la imagen — pero cubre los caminos más comunes.
+   
    ============================================================ */
 document.addEventListener("contextmenu", (e)=>{
   if(e.target.closest(".product-img-wrap") || e.target.id === "lightbox-img"){
