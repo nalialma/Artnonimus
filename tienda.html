@@ -209,7 +209,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* ---------------- ADMIN MODAL ---------------- */
 .modal-overlay{ position:fixed; inset:0; z-index:90; display:flex; align-items:center; justify-content:center; padding:1.5rem; background:rgba(11,7,20,.6); backdrop-filter:blur(6px); opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
 .modal-overlay.is-open{ opacity:1; visibility:visible; }
-.modal-panel{ position:relative; max-width:420px; width:100%; padding:2rem 1.7rem 1.7rem; }
+.modal-panel{ position:relative; max-width:420px; width:100%; padding:2rem 1.7rem 1.7rem; max-height:calc(100svh - 3rem); overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .modal-close{ position:absolute; top:.5rem; right:.5rem; width:34px; height:34px; border-radius:50%; border:1px solid var(--glass-brd); background:var(--glass-2); color:var(--pearl); font-size:1rem; cursor:pointer; }
 .modal-panel h2{ font-family:'Unbounded',sans-serif; font-weight:800; font-size:1.15rem; margin-bottom:1.2rem; text-align:center; }
 .field{ margin-bottom:.9rem; }
