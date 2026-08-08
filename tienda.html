@@ -252,6 +252,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <button type="button" id="collections-trigger" class="icon-btn admin-trigger" style="display:none" aria-label="Colecciones" title="Gestionar colecciones" data-i18n-title="manage_collections_btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
     </button>
+    <button type="button" id="styles-trigger" class="icon-btn admin-trigger" style="display:none" aria-label="Estilos" title="Gestionar estilos" data-i18n-title="manage_styles_btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.4 5.2L20 9l-4 3.9.9 5.5L12 15.8 7.1 18.4 8 12.9 4 9l5.6-.8L12 3Z"/></svg>
+    </button>
+    <button type="button" id="reorder-trigger" class="icon-btn admin-trigger" style="display:none" aria-label="Orden" title="Ordenar obras" data-i18n-title="manage_order_btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 7l-3 3 3 3M16 17l3-3-3-3M5 10h14M5 14h14"/></svg>
+    </button>
     <button type="button" id="cart-trigger" class="icon-btn" aria-label="Carrito">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9.5" cy="20.5" r="1.4"/><circle cx="17.5" cy="20.5" r="1.4"/></svg>
       <span class="cart-count" id="cart-count">0</span>
@@ -427,6 +433,35 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   </div>
 </div>
 
+<!-- ADMIN: GESTIONAR ESTILOS PERSONALIZADOS (además de los 13 fijos) -->
+<div id="admin-styles-overlay" class="modal-overlay">
+  <div class="modal-panel glass-panel">
+    <button type="button" class="modal-close" data-close-modal="admin-styles-overlay">×</button>
+    <h2 class="glow-cyan" data-i18n="manage_styles_title">Gestionar estilos</h2>
+    <div class="field-hint" data-i18n="styles_manage_hint">Los 13 estilos base ya existen para todas las obras. Acá podés agregar estilos propios adicionales.</div>
+    <div id="styles-manage-list" class="collections-list" style="margin-top:.6rem;">
+      <div class="collections-empty" data-i18n="styles_empty">Todavía no agregaste ningún estilo propio.</div>
+    </div>
+    <div class="add-collection-row">
+      <input type="text" id="new-style-name" data-i18n-placeholder="style_new_placeholder" placeholder="Nombre del nuevo estilo">
+      <button type="button" id="add-style-btn" data-i18n="style_add_btn">Agregar</button>
+    </div>
+    <div id="admin-styles-msg" class="modal-msg"></div>
+  </div>
+</div>
+
+<!-- ADMIN: ORDENAR OBRAS (posición elegida por el administrador) -->
+<div id="admin-reorder-overlay" class="modal-overlay">
+  <div class="modal-panel glass-panel">
+    <button type="button" class="modal-close" data-close-modal="admin-reorder-overlay">×</button>
+    <h2 class="glow-pink" data-i18n="manage_order_title">Ordenar obras</h2>
+    <div class="field-hint" data-i18n="order_hint">Arrastrá o usá las flechas para elegir en qué orden se muestran las obras en la tienda.</div>
+    <div id="reorder-list" class="current-images" style="margin-top:.6rem; max-height:340px; overflow-y:auto;"></div>
+    <button type="button" id="admin-reorder-save" class="modal-submit" data-i18n="save_order_btn">Guardar orden</button>
+    <div id="admin-reorder-msg" class="modal-msg"></div>
+  </div>
+</div>
+
 <!-- LIGHTBOX: visor de imágenes + info de la obra, en dos columnas -->
 <div id="lightbox-overlay" class="lightbox-overlay">
   <div class="lightbox-stage">
@@ -491,12 +526,23 @@ const translations = {
     f_original_lang:"Język, w którym napisany jest tekst", f_original_lang_hint:"Dzięki temu wiemy, z jakiego języka tłumaczyć dla innych klientów.",
     manage_collections_btn:"Zarządzaj kolekcjami", manage_collections_title:"Zarządzaj kolekcjami",
     collections_empty:"Nie masz jeszcze żadnej kolekcji.", collection_new_placeholder:"Nazwa nowej kolekcji",
-    add_new_collection_option:"+ Dodaj nową kolekcję…",
+    add_new_collection_option:"+ Dodaj nową kolekcję…", add_new_style_option:"+ Dodaj nowy styl…",
     collection_add_btn:"Dodaj", collection_rename_btn:"Zmień nazwę", collection_confirm_delete:"Usunąć tę kolekcję? Prace w niej pozostaną, ale bez kolekcji.",
     collection_created:"Kolekcja utworzona", collection_create_error:"Błąd przy tworzeniu kolekcji",
     collection_renamed:"Nazwa zmieniona", collection_rename_error:"Błąd przy zmianie nazwy",
     collection_deleted:"Kolekcja usunięta", collection_delete_error:"Błąd przy usuwaniu",
     collection_rename_prompt:"Nowa nazwa dla tej kolekcji:",
+    manage_styles_btn:"Zarządzaj stylami", manage_styles_title:"Zarządzaj stylami",
+    styles_manage_hint:"13 podstawowych stylów istnieje już dla wszystkich prac. Tutaj możesz dodać własne, dodatkowe style.",
+    styles_empty:"Nie dodałeś jeszcze żadnego własnego stylu.", style_new_placeholder:"Nazwa nowego stylu",
+    style_add_btn:"Dodaj", style_rename_btn:"Zmień nazwę", style_confirm_delete:"Usunąć ten styl? Prace nadal będą istnieć.",
+    style_created:"Styl utworzony", style_create_error:"Błąd przy tworzeniu stylu",
+    style_renamed:"Nazwa zmieniona", style_rename_error:"Błąd przy zmianie nazwy",
+    style_deleted:"Styl usunięty", style_delete_error:"Błąd przy usuwaniu",
+    style_rename_prompt:"Nowa nazwa dla tego stylu:",
+    manage_order_btn:"Ustaw kolejność", manage_order_title:"Ustaw kolejność prac",
+    order_hint:"Przeciągnij lub użyj strzałek, aby wybrać kolejność wyświetlania prac w sklepie.",
+    save_order_btn:"Zapisz kolejność", order_saved:"Kolejność zapisana", order_save_error:"Błąd przy zapisywaniu kolejności",
     lightbox_wa_btn:"Wolę kupić przez WhatsApp",
     wa_product_message:"Cześć! Interesuje mnie ta praca: \"{title}\" ({price}). Wolę kupić przez WhatsApp — czy możesz mi pomóc?"
   },
@@ -527,12 +573,23 @@ const translations = {
     f_original_lang:"Language the text is written in", f_original_lang_hint:"This is how we know which language to translate from for other customers.",
     manage_collections_btn:"Manage collections", manage_collections_title:"Manage collections",
     collections_empty:"You haven't created any collection yet.", collection_new_placeholder:"New collection name",
-    add_new_collection_option:"+ Add new collection…",
+    add_new_collection_option:"+ Add new collection…", add_new_style_option:"+ Add new style…",
     collection_add_btn:"Add", collection_rename_btn:"Rename", collection_confirm_delete:"Delete this collection? Pieces in it will remain, just without a collection.",
     collection_created:"Collection created", collection_create_error:"Error creating collection",
     collection_renamed:"Name updated", collection_rename_error:"Error renaming collection",
     collection_deleted:"Collection deleted", collection_delete_error:"Error deleting collection",
     collection_rename_prompt:"New name for this collection:",
+    manage_styles_btn:"Manage styles", manage_styles_title:"Manage styles",
+    styles_manage_hint:"The 13 base styles already exist for every piece. Here you can add your own extra styles.",
+    styles_empty:"You haven't added any custom style yet.", style_new_placeholder:"New style name",
+    style_add_btn:"Add", style_rename_btn:"Rename", style_confirm_delete:"Delete this style? Pieces in it will remain.",
+    style_created:"Style created", style_create_error:"Error creating style",
+    style_renamed:"Name updated", style_rename_error:"Error renaming style",
+    style_deleted:"Style deleted", style_delete_error:"Error deleting style",
+    style_rename_prompt:"New name for this style:",
+    manage_order_btn:"Set order", manage_order_title:"Order the pieces",
+    order_hint:"Drag or use the arrows to choose the order pieces are shown in the shop.",
+    save_order_btn:"Save order", order_saved:"Order saved", order_save_error:"Error saving order",
     lightbox_wa_btn:"I'd rather buy via WhatsApp",
     wa_product_message:"Hi! I'm interested in this piece: \"{title}\" ({price}). I'd rather buy via WhatsApp — could you help me?"
   },
@@ -563,12 +620,23 @@ const translations = {
     f_original_lang:"Idioma en el que está escrito el texto", f_original_lang_hint:"Así sabemos desde qué idioma traducir para los demás clientes.",
     manage_collections_btn:"Gestionar colecciones", manage_collections_title:"Gestionar colecciones",
     collections_empty:"Todavía no creaste ninguna colección.", collection_new_placeholder:"Nombre de la nueva colección",
-    add_new_collection_option:"+ Agregar nueva colección…",
+    add_new_collection_option:"+ Agregar nueva colección…", add_new_style_option:"+ Agregar nuevo estilo…",
     collection_add_btn:"Agregar", collection_rename_btn:"Renombrar", collection_confirm_delete:"¿Eliminar esta colección? Las obras que la tenían quedan sin colección.",
     collection_created:"Colección creada", collection_create_error:"Error al crear la colección",
     collection_renamed:"Nombre actualizado", collection_rename_error:"Error al renombrar",
     collection_deleted:"Colección eliminada", collection_delete_error:"Error al eliminar",
     collection_rename_prompt:"Nuevo nombre para esta colección:",
+    manage_styles_btn:"Gestionar estilos", manage_styles_title:"Gestionar estilos",
+    styles_manage_hint:"Los 13 estilos base ya existen para todas las obras. Acá podés agregar estilos propios adicionales.",
+    styles_empty:"Todavía no agregaste ningún estilo propio.", style_new_placeholder:"Nombre del nuevo estilo",
+    style_add_btn:"Agregar", style_rename_btn:"Renombrar", style_confirm_delete:"¿Eliminar este estilo? Las obras que lo tenían permanecen.",
+    style_created:"Estilo creado", style_create_error:"Error al crear el estilo",
+    style_renamed:"Nombre actualizado", style_rename_error:"Error al renombrar",
+    style_deleted:"Estilo eliminado", style_delete_error:"Error al eliminar",
+    style_rename_prompt:"Nuevo nombre para este estilo:",
+    manage_order_btn:"Ordenar obras", manage_order_title:"Ordenar obras",
+    order_hint:"Arrastrá o usá las flechas para elegir en qué orden se muestran las obras en la tienda.",
+    save_order_btn:"Guardar orden", order_saved:"Orden guardado", order_save_error:"Error al guardar el orden",
     lightbox_wa_btn:"Prefiero comprar por WhatsApp",
     wa_product_message:"¡Hola! Me interesa esta obra: \"{title}\" ({price}). Prefiero comprar por WhatsApp, ¿podrías ayudarme?"
   },
@@ -599,12 +667,23 @@ const translations = {
     f_original_lang:"Lingua in cui è scritto il testo", f_original_lang_hint:"Così sappiamo da quale lingua tradurre per gli altri clienti.",
     manage_collections_btn:"Gestisci collezioni", manage_collections_title:"Gestisci collezioni",
     collections_empty:"Non hai ancora creato nessuna collezione.", collection_new_placeholder:"Nome della nuova collezione",
-    add_new_collection_option:"+ Aggiungi nuova collezione…",
+    add_new_collection_option:"+ Aggiungi nuova collezione…", add_new_style_option:"+ Aggiungi nuovo stile…",
     collection_add_btn:"Aggiungi", collection_rename_btn:"Rinomina", collection_confirm_delete:"Eliminare questa collezione? Le opere resteranno, ma senza collezione.",
     collection_created:"Collezione creata", collection_create_error:"Errore nella creazione",
     collection_renamed:"Nome aggiornato", collection_rename_error:"Errore nella rinomina",
     collection_deleted:"Collezione eliminata", collection_delete_error:"Errore nell'eliminazione",
     collection_rename_prompt:"Nuovo nome per questa collezione:",
+    manage_styles_btn:"Gestisci stili", manage_styles_title:"Gestisci stili",
+    styles_manage_hint:"I 13 stili base esistono già per tutte le opere. Qui puoi aggiungere stili personalizzati.",
+    styles_empty:"Non hai ancora aggiunto nessuno stile personalizzato.", style_new_placeholder:"Nome del nuovo stile",
+    style_add_btn:"Aggiungi", style_rename_btn:"Rinomina", style_confirm_delete:"Eliminare questo stile? Le opere resteranno.",
+    style_created:"Stile creato", style_create_error:"Errore nella creazione dello stile",
+    style_renamed:"Nome aggiornato", style_rename_error:"Errore nella rinomina",
+    style_deleted:"Stile eliminato", style_delete_error:"Errore nell'eliminazione",
+    style_rename_prompt:"Nuovo nome per questo stile:",
+    manage_order_btn:"Ordina opere", manage_order_title:"Ordina le opere",
+    order_hint:"Trascina o usa le frecce per scegliere l'ordine in cui le opere appaiono nel negozio.",
+    save_order_btn:"Salva ordine", order_saved:"Ordine salvato", order_save_error:"Errore nel salvataggio dell'ordine",
     lightbox_wa_btn:"Preferisco comprare su WhatsApp",
     wa_product_message:"Ciao! Sono interessato/a a quest'opera: \"{title}\" ({price}). Preferisco comprare su WhatsApp, potresti aiutarmi?"
   },
@@ -635,12 +714,23 @@ const translations = {
     f_original_lang:"Idioma em que o texto está escrito", f_original_lang_hint:"Assim sabemos de qual idioma traduzir para os demais clientes.",
     manage_collections_btn:"Gerenciar coleções", manage_collections_title:"Gerenciar coleções",
     collections_empty:"Você ainda não criou nenhuma coleção.", collection_new_placeholder:"Nome da nova coleção",
-    add_new_collection_option:"+ Adicionar nova coleção…",
+    add_new_collection_option:"+ Adicionar nova coleção…", add_new_style_option:"+ Adicionar novo estilo…",
     collection_add_btn:"Adicionar", collection_rename_btn:"Renomear", collection_confirm_delete:"Excluir esta coleção? As obras nela permanecerão, apenas sem coleção.",
     collection_created:"Coleção criada", collection_create_error:"Erro ao criar a coleção",
     collection_renamed:"Nome atualizado", collection_rename_error:"Erro ao renomear",
     collection_deleted:"Coleção excluída", collection_delete_error:"Erro ao excluir",
     collection_rename_prompt:"Novo nome para esta coleção:",
+    manage_styles_btn:"Gerenciar estilos", manage_styles_title:"Gerenciar estilos",
+    styles_manage_hint:"Os 13 estilos base já existem para todas as obras. Aqui você pode adicionar estilos próprios.",
+    styles_empty:"Você ainda não adicionou nenhum estilo próprio.", style_new_placeholder:"Nome do novo estilo",
+    style_add_btn:"Adicionar", style_rename_btn:"Renomear", style_confirm_delete:"Excluir este estilo? As obras nele permanecerão.",
+    style_created:"Estilo criado", style_create_error:"Erro ao criar o estilo",
+    style_renamed:"Nome atualizado", style_rename_error:"Erro ao renomear",
+    style_deleted:"Estilo excluído", style_delete_error:"Erro ao excluir",
+    style_rename_prompt:"Novo nome para este estilo:",
+    manage_order_btn:"Ordenar obras", manage_order_title:"Ordenar as obras",
+    order_hint:"Arraste ou use as setas para escolher a ordem em que as obras aparecem na loja.",
+    save_order_btn:"Salvar ordem", order_saved:"Ordem salva", order_save_error:"Erro ao salvar a ordem",
     lightbox_wa_btn:"Prefiro comprar pelo WhatsApp",
     wa_product_message:"Olá! Tenho interesse nesta obra: \"{title}\" ({price}). Prefiro comprar pelo WhatsApp, você poderia me ajudar?"
   }
@@ -686,7 +776,12 @@ const styleLabels = {
 };
 function styleLabel(slug){
   if(!slug) return "";
-  return (styleLabels[currentLang] && styleLabels[currentLang][slug]) || styleLabels.es[slug] || slug;
+  if(styleLabels[currentLang] && styleLabels[currentLang][slug]) return styleLabels[currentLang][slug];
+  if(styleLabels.es[slug]) return styleLabels.es[slug];
+  // Estilo personalizado, agregado por el administrador (texto libre, mismo en todos los idiomas)
+  const custom = customStyles.find(s=>s.slug===slug);
+  if(custom) return custom.name;
+  return slug;
 }
 
 let currentLang = "pl";
@@ -719,7 +814,8 @@ let activeCategory = "fisica";
 let activeStatus = "available"; // "available" (en venta) | "sold" (vendidos)
 let collections = []; // colecciones cargadas desde Supabase (texto libre, administrable)
 let activeCollection = "all"; // "all" o el id de una colección
-let activeStyle = "all"; // "all" o uno de los slugs de STYLE_SLUGS
+let customStyles = []; // estilos personalizados cargados desde Supabase, además de STYLE_SLUGS
+let activeStyle = "all"; // "all" o uno de los slugs de STYLE_SLUGS / customStyles
 let cart = JSON.parse(localStorage.getItem("an_cart") || "[]");
 let adminToken = sessionStorage.getItem("an_admin_token") || null;
 
@@ -807,7 +903,7 @@ document.querySelectorAll(".currency-btn").forEach(btn=>{
    ============================================================ */
 async function loadProducts(){
   const grid = document.getElementById("product-grid");
-  const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending:false });
+  const { data, error } = await supabase.from("products").select("*").order("sort_order", { ascending:true }).order("created_at", { ascending:false });
   if(error){
     grid.innerHTML = `<div class="empty-note">Error: ${error.message}</div>`;
     return;
@@ -818,6 +914,12 @@ async function loadProducts(){
 
 function getImages(p){
   return (Array.isArray(p.images) && p.images.length > 0) ? p.images : (p.image_url ? [p.image_url] : []);
+}
+
+function nextSortOrder(){
+  // Las obras nuevas se agregan al final del orden actual elegido por el admin.
+  if(allProducts.length === 0) return 0;
+  return Math.max(...allProducts.map(p=>Number.isFinite(p.sort_order) ? p.sort_order : 0)) + 1;
 }
 
 /* ============================================================
@@ -891,14 +993,29 @@ document.getElementById("f-collection").addEventListener("change", (e)=>handleCo
 document.getElementById("ef-collection").addEventListener("change", (e)=>handleCollectionSelectChange(e.target));
 
 /* ------------------------------------------------------------
-   Filtro de ESTILOS (lista fija, separada de las colecciones).
+   Filtro de ESTILOS: los 13 estilos fijos (traducidos) + los estilos
+   personalizados que haya agregado el administrador (texto libre,
+   guardados en la tabla "styles" y administrados vía admin-styles).
    ------------------------------------------------------------ */
+async function loadCustomStyles(){
+  const { data, error } = await supabase.from("styles").select("*").order("sort_order").order("name");
+  if(!error){ customStyles = data || []; }
+  renderStyleButtons();
+  populateStyleSelects();
+}
+
 function renderStyleButtons(){
   const row = document.getElementById("styles-row");
   if(!row) return;
   const allBtn = `<button type="button" class="style-btn${activeStyle==="all"?" is-active":""}" data-style="all">${t("all_styles")}</button>`;
-  const rest = STYLE_SLUGS.map(slug=>`<button type="button" class="style-btn${activeStyle===slug?" is-active":""}" data-style="${slug}">${escapeHtml(styleLabel(slug))}</button>`).join("");
-  row.innerHTML = allBtn + rest;
+  const fixed = STYLE_SLUGS.map(slug=>`<button type="button" class="style-btn${activeStyle===slug?" is-active":""}" data-style="${slug}">${escapeHtml(styleLabel(slug))}</button>`).join("");
+  const custom = customStyles.map(s=>`<button type="button" class="style-btn${activeStyle===s.slug?" is-active":""}" data-style="${s.slug}">${escapeHtml(s.name)}</button>`).join("");
+  row.innerHTML = allBtn + fixed + custom;
+  // Si el estilo activo era personalizado y lo borraron, volvemos a "Todos".
+  if(activeStyle !== "all" && !STYLE_SLUGS.includes(activeStyle) && !customStyles.find(s=>s.slug===activeStyle)){
+    activeStyle = "all";
+    renderStyleButtons();
+  }
 }
 
 function populateStyleSelects(){
@@ -907,10 +1024,36 @@ function populateStyleSelects(){
     if(!sel) return;
     const current = sel.value;
     sel.innerHTML = `<option value="">${t("no_style")}</option>` +
-      STYLE_SLUGS.map(slug=>`<option value="${slug}">${escapeHtml(styleLabel(slug))}</option>`).join("");
+      STYLE_SLUGS.map(slug=>`<option value="${slug}">${escapeHtml(styleLabel(slug))}</option>`).join("") +
+      (customStyles.length ? customStyles.map(s=>`<option value="${s.slug}">${escapeHtml(s.name)}</option>`).join("") : "") +
+      `<option value="__new__">${t("add_new_style_option")}</option>`;
     if(current) sel.value = current;
   });
 }
+
+/* ------------------------------------------------------------
+   Crear un estilo directamente desde el propio desplegable del
+   formulario (subir/editar obra), eligiendo "+ Agregar nuevo estilo…".
+   ------------------------------------------------------------ */
+async function handleStyleSelectChange(selectEl){
+  if(selectEl.value !== "__new__") return;
+  const name = prompt(t("style_new_placeholder"));
+  if(!name || !name.trim()){
+    selectEl.value = "";
+    return;
+  }
+  try{
+    const data = await callStylesApi("insert", { name: name.trim() });
+    if(!data.ok) throw new Error(data.error || "insert-failed");
+    await loadCustomStyles();
+    selectEl.value = data.style.slug;
+  } catch(e){
+    alert(t("style_create_error"));
+    selectEl.value = "";
+  }
+}
+document.getElementById("f-style").addEventListener("change", (e)=>handleStyleSelectChange(e.target));
+document.getElementById("ef-style").addEventListener("change", (e)=>handleStyleSelectChange(e.target));
 
 document.getElementById("styles-row").addEventListener("click", (e)=>{
   const btn = e.target.closest("[data-style]");
@@ -1218,6 +1361,8 @@ document.querySelectorAll("[data-close-modal]").forEach(b=>{
 function updateAdminUiState(){
   document.getElementById("admin-trigger").classList.toggle("is-admin", !!adminToken);
   document.getElementById("collections-trigger").style.display = adminToken ? "flex" : "none";
+  document.getElementById("styles-trigger").style.display = adminToken ? "flex" : "none";
+  document.getElementById("reorder-trigger").style.display = adminToken ? "flex" : "none";
 }
 
 document.getElementById("admin-trigger").addEventListener("click", ()=>{
@@ -1412,7 +1557,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, style, images, original_lang: currentLang }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, style, images, original_lang: currentLang, sort_order: nextSortOrder() }
       })
     });
     const insertData = await insertRes.json();
@@ -1636,6 +1781,222 @@ document.getElementById("collections-manage-list").addEventListener("click", asy
 });
 
 /* ============================================================
+   ADMIN — GESTIONAR ESTILOS PERSONALIZADOS
+   (crear, renombrar, borrar — vía admin-styles Edge Function,
+   mismo patrón que las colecciones. Los 13 estilos fijos traducidos
+   no se tocan acá — solo los que agrega el administrador.)
+   ============================================================ */
+async function callStylesApi(action, extra){
+  const res = await fetch(`${FUNCTIONS_URL}/admin-styles`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ token: adminToken, action, ...extra })
+  });
+  return res.json();
+}
+
+function renderStylesManageList(){
+  const box = document.getElementById("styles-manage-list");
+  if(!box) return;
+  if(customStyles.length === 0){
+    box.innerHTML = `<div class="collections-empty">${t("styles_empty")}</div>`;
+    return;
+  }
+  box.innerHTML = customStyles.map(s=>`
+    <div class="collection-row" data-id="${s.id}">
+      <span>${escapeHtml(s.name)}</span>
+      <button type="button" class="coll-rename" data-rename-style-id="${s.id}" aria-label="${t("style_rename_btn")}" title="${t("style_rename_btn")}">✎</button>
+      <button type="button" class="coll-delete" data-delete-style-id="${s.id}" aria-label="Eliminar" title="Eliminar">×</button>
+    </div>
+  `).join("");
+}
+
+document.getElementById("styles-trigger").addEventListener("click", ()=>{
+  if(!adminToken) return;
+  renderStylesManageList();
+  document.getElementById("admin-styles-msg").textContent = "";
+  document.getElementById("admin-styles-msg").className = "modal-msg";
+  openModal("admin-styles-overlay");
+});
+
+document.getElementById("add-style-btn").addEventListener("click", async ()=>{
+  const input = document.getElementById("new-style-name");
+  const msg = document.getElementById("admin-styles-msg");
+  const name = input.value.trim();
+  msg.textContent = ""; msg.className = "modal-msg";
+  if(!name) return;
+  try{
+    const data = await callStylesApi("insert", { name });
+    if(!data.ok) throw new Error(data.error || "insert-failed");
+    input.value = "";
+    msg.textContent = t("style_created"); msg.classList.add("is-ok");
+    await loadCustomStyles();
+    renderStylesManageList();
+  } catch(e){
+    msg.textContent = t("style_create_error"); msg.classList.add("is-error");
+  }
+});
+
+document.getElementById("styles-manage-list").addEventListener("click", async (e)=>{
+  const msg = document.getElementById("admin-styles-msg");
+  msg.textContent = ""; msg.className = "modal-msg";
+
+  const renameBtn = e.target.closest("[data-rename-style-id]");
+  if(renameBtn){
+    const id = renameBtn.getAttribute("data-rename-style-id");
+    const current = customStyles.find(s=>s.id===id);
+    const name = prompt(t("style_rename_prompt"), current ? current.name : "");
+    if(!name || !name.trim()) return;
+    try{
+      const data = await callStylesApi("update", { id, name: name.trim() });
+      if(!data.ok) throw new Error(data.error || "update-failed");
+      msg.textContent = t("style_renamed"); msg.classList.add("is-ok");
+      await loadCustomStyles();
+      renderStylesManageList();
+      await loadProducts();
+    } catch(e2){
+      msg.textContent = t("style_rename_error"); msg.classList.add("is-error");
+    }
+    return;
+  }
+
+  const deleteBtn = e.target.closest("[data-delete-style-id]");
+  if(deleteBtn){
+    const id = deleteBtn.getAttribute("data-delete-style-id");
+    if(!confirm(t("style_confirm_delete"))) return;
+    try{
+      const data = await callStylesApi("delete", { id });
+      if(!data.ok) throw new Error(data.error || "delete-failed");
+      msg.textContent = t("style_deleted"); msg.classList.add("is-ok");
+      await loadCustomStyles();
+      renderStylesManageList();
+      await loadProducts();
+    } catch(e2){
+      msg.textContent = t("style_delete_error"); msg.classList.add("is-error");
+    }
+  }
+});
+
+/* ============================================================
+   ADMIN — ORDENAR OBRAS (posición manual elegida por el admin)
+   Reutiliza el mismo sistema de arrastrar/soltar + flechas ↑↓ que
+   las imágenes, aplicado a la lista completa de obras. Al guardar,
+   se manda sort_order=índice por cada obra vía admin-product "update"
+   (incluyendo weight_kg/shipping_size actuales para no perderlos:
+   la Edge Function siempre pisa esos dos campos con lo que reciba).
+   ============================================================ */
+let reorderItems = [];
+
+function renderReorderList(){
+  const box = document.getElementById("reorder-list");
+  if(!box) return;
+  box.innerHTML = reorderItems.map((it,i)=>`
+    <div class="img-row" draggable="true" data-idx="${i}">
+      <span class="img-order-badge">${i+1}</span>
+      <div class="thumb"><img src="${it.url}" alt=""></div>
+      <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.85rem;">${escapeHtml(it.title)}</span>
+      <div class="img-row-actions">
+        <button type="button" class="img-move-btn" data-move-up="${i}" ${i===0?"disabled":""} aria-label="Subir">↑</button>
+        <button type="button" class="img-move-btn" data-move-down="${i}" ${i===reorderItems.length-1?"disabled":""} aria-label="Bajar">↓</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function wireReorderList(){
+  const box = document.getElementById("reorder-list");
+  if(!box) return;
+  let dragFrom = null;
+
+  box.addEventListener("click", (e)=>{
+    const upBtn = e.target.closest("[data-move-up]");
+    const downBtn = e.target.closest("[data-move-down]");
+    if(upBtn){
+      const idx = Number(upBtn.getAttribute("data-move-up"));
+      moveArrayItem(reorderItems, idx, idx-1);
+      renderReorderList();
+    } else if(downBtn){
+      const idx = Number(downBtn.getAttribute("data-move-down"));
+      moveArrayItem(reorderItems, idx, idx+1);
+      renderReorderList();
+    }
+  });
+  box.addEventListener("dragstart", (e)=>{
+    const row = e.target.closest(".img-row");
+    if(!row){ return; }
+    dragFrom = Number(row.getAttribute("data-idx"));
+    row.classList.add("is-dragging");
+    if(e.dataTransfer){ e.dataTransfer.effectAllowed = "move"; }
+  });
+  box.addEventListener("dragend", ()=>{
+    box.querySelectorAll(".img-row").forEach(r=>r.classList.remove("is-dragging","is-dragover"));
+    dragFrom = null;
+  });
+  box.addEventListener("dragover", (e)=>{
+    const row = e.target.closest(".img-row");
+    if(!row || dragFrom===null) return;
+    e.preventDefault();
+    row.classList.add("is-dragover");
+  });
+  box.addEventListener("dragleave", (e)=>{
+    const row = e.target.closest(".img-row");
+    if(row) row.classList.remove("is-dragover");
+  });
+  box.addEventListener("drop", (e)=>{
+    const row = e.target.closest(".img-row");
+    if(!row || dragFrom===null) return;
+    e.preventDefault();
+    const dragTo = Number(row.getAttribute("data-idx"));
+    moveArrayItem(reorderItems, dragFrom, dragTo);
+    dragFrom = null;
+    renderReorderList();
+  });
+}
+wireReorderList();
+
+document.getElementById("reorder-trigger").addEventListener("click", ()=>{
+  if(!adminToken) return;
+  reorderItems = allProducts.map(p=>({
+    id: p.id,
+    title: p.title || "",
+    url: getImages(p)[0] || "",
+    weight_kg: p.weight_kg,
+    shipping_size: p.shipping_size
+  }));
+  document.getElementById("admin-reorder-msg").textContent = "";
+  document.getElementById("admin-reorder-msg").className = "modal-msg";
+  renderReorderList();
+  openModal("admin-reorder-overlay");
+});
+
+document.getElementById("admin-reorder-save").addEventListener("click", async ()=>{
+  const msg = document.getElementById("admin-reorder-msg");
+  msg.textContent = ""; msg.className = "modal-msg";
+  try{
+    for(let i=0; i<reorderItems.length; i++){
+      const it = reorderItems[i];
+      const res = await fetch(`${FUNCTIONS_URL}/admin-product`, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+        body: JSON.stringify({
+          token: adminToken, action:"update", id: it.id,
+          product:{ sort_order: i, weight_kg: it.weight_kg, shipping_size: it.shipping_size }
+        })
+      });
+      const data = await res.json();
+      if(!data.ok) throw new Error(data.error || "update-failed");
+    }
+    msg.textContent = t("order_saved"); msg.classList.add("is-ok");
+    await loadProducts();
+    setTimeout(()=>closeModal("admin-reorder-overlay"), 700);
+  } catch(e){
+    msg.textContent = t("order_save_error"); msg.classList.add("is-error");
+  }
+});
+
+
+
+/* ============================================================
    ANTI-DESCARGA DE IMÁGENES
    
    ============================================================ */
@@ -1666,6 +2027,7 @@ updateCartUI();
 renderStyleButtons();
 populateStyleSelects();
 loadCollections();
+loadCustomStyles();
 loadProducts();
 </script>
 </body>
