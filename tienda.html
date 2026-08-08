@@ -241,6 +241,63 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .modal-msg.is-ok{ color:var(--cyan); }
 .admin-row-2{ display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
 
+/* ---------------- ARTE VIRTUAL: formatos, mockups, descargas ---------------- */
+.format-section{ margin:.7rem 0; display:flex; flex-direction:column; gap:.5rem; }
+.format-section-label{ font-family:'Space Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:rgba(246,238,252,.55); }
+.format-options{ display:flex; flex-direction:column; gap:.45rem; }
+.format-pill{ display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.6rem .8rem; border-radius:14px; border:1px solid var(--glass-brd); background:var(--glass-2); cursor:pointer; transition:.25s; text-align:left; }
+.format-pill span.fp-name{ font-size:.82rem; font-weight:600; }
+.format-pill span.fp-price{ font-family:'Space Mono',monospace; font-size:.78rem; color:var(--pink); flex:0 0 auto; }
+.format-pill.is-active{ border-color:var(--cyan); background:rgba(184,242,255,.12); box-shadow:0 0 14px rgba(184,242,255,.25); }
+.format-pill:hover{ border-color:var(--pink-soft); }
+.mockup-trigger-btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.75rem 1rem; border-radius:999px; border:1px solid var(--cyan-soft); background:rgba(184,242,255,.08); color:var(--cyan); font-family:'Unbounded',sans-serif; font-weight:700; font-size:.72rem; letter-spacing:.02em; text-transform:uppercase; cursor:pointer; transition:.3s; }
+.mockup-trigger-btn:hover{ box-shadow:0 0 18px rgba(184,242,255,.35); }
+
+/* Modal de mockups (probar la obra en distintos formatos) */
+.mockup-panel{ max-width:520px; }
+.mockup-tabs{ display:flex; gap:.4rem; margin-bottom:1rem; flex-wrap:wrap; justify-content:center; }
+.mockup-tab{ padding:.5rem 1rem; border-radius:999px; border:1px solid var(--glass-brd); background:var(--glass-2); color:rgba(246,238,252,.65); font-family:'Unbounded',sans-serif; font-weight:600; font-size:.68rem; text-transform:uppercase; cursor:pointer; transition:.25s; }
+.mockup-tab.is-active{ color:#1a1024; background:var(--pink); border-color:var(--pink); }
+.mockup-stage{ display:flex; align-items:center; justify-content:center; min-height:300px; padding:1rem 0; }
+.mockup-frame{ position:relative; }
+.mockup-art{ background-size:cover; background-position:center; }
+
+/* mockup: agenda / cuaderno */
+.mockup-agenda{ width:200px; height:270px; border-radius:6px 10px 10px 6px; box-shadow:0 18px 40px rgba(0,0,0,.55); overflow:hidden; position:relative; background:#1a1024; }
+.mockup-agenda .mockup-art{ position:absolute; inset:0; }
+.mockup-agenda::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:16px; background:repeating-linear-gradient(180deg, rgba(0,0,0,.55) 0 6px, transparent 6px 14px); z-index:2; }
+.mockup-agenda::after{ content:''; position:absolute; inset:0; box-shadow: inset 0 0 30px rgba(0,0,0,.45); z-index:1; pointer-events:none; }
+
+/* mockup: fondo de pantalla (celular) */
+.mockup-phone{ width:190px; height:390px; border-radius:34px; border:8px solid #17101f; box-shadow:0 18px 40px rgba(0,0,0,.55); overflow:hidden; position:relative; background:#000; }
+.mockup-phone .mockup-art{ position:absolute; inset:0; }
+.mockup-phone .mockup-notch{ position:absolute; top:0; left:50%; transform:translateX(-50%); width:70px; height:20px; background:#17101f; border-radius:0 0 14px 14px; z-index:3; }
+.mockup-phone .mockup-statusbar{ position:absolute; top:8px; left:0; right:0; display:flex; justify-content:space-between; padding:0 16px; font-family:'Space Mono',monospace; font-size:.6rem; color:#fff; z-index:2; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+
+/* mockup: cuadro enmarcado */
+.mockup-wall{ width:280px; height:280px; border-radius:10px; background:radial-gradient(ellipse at 50% 20%, #2a2036, #120c1c); display:flex; align-items:center; justify-content:center; box-shadow:0 18px 40px rgba(0,0,0,.5); }
+.mockup-frame-outer{ padding:14px; background:linear-gradient(135deg,#cbb99a,#8a7357); border-radius:3px; box-shadow:0 10px 26px rgba(0,0,0,.5); }
+.mockup-frame-inner{ padding:8px; background:#0b0714; }
+.mockup-cuadro{ width:150px; height:150px; }
+.mockup-cuadro .mockup-art{ width:100%; height:100%; }
+.mockup-size-label{ text-align:center; font-family:'Space Mono',monospace; font-size:.66rem; letter-spacing:.06em; color:rgba(246,238,252,.55); margin-top:.4rem; }
+
+/* Modal de descargas post-compra */
+.download-thanks{ text-align:center; font-size:.88rem; line-height:1.5; color:rgba(246,238,252,.8); margin-bottom:1rem; }
+.download-list{ display:flex; flex-direction:column; gap:.6rem; }
+.download-item{ display:flex; align-items:center; gap:.7rem; padding:.7rem .8rem; border-radius:14px; background:var(--glass-2); border:1px solid var(--glass-brd); }
+.download-item img{ width:44px; height:44px; border-radius:8px; object-fit:cover; flex:0 0 auto; }
+.download-item-info{ flex:1; min-width:0; }
+.download-item-info strong{ display:block; font-size:.8rem; }
+.download-item-info span{ font-family:'Space Mono',monospace; font-size:.62rem; color:rgba(246,238,252,.5); }
+.download-btn{ flex:0 0 auto; padding:.5rem .9rem; border-radius:999px; border:none; background:linear-gradient(135deg,var(--pink),var(--lilac)); color:#1a1024; font-family:'Unbounded',sans-serif; font-weight:700; font-size:.66rem; text-transform:uppercase; cursor:pointer; text-align:center; }
+
+/* Admin: vista previa (solo lectura) del menú fijo de formatos */
+.formats-only{ display:none; }
+.format-menu-preview{ display:flex; flex-direction:column; gap:.3rem; margin-top:.4rem; }
+.format-menu-preview .fmp-row{ display:flex; justify-content:space-between; gap:.6rem; padding:.4rem .6rem; border-radius:10px; background:var(--glass-2); border:1px solid var(--glass-brd); font-size:.76rem; }
+.format-menu-preview .fmp-row span:last-child{ font-family:'Space Mono',monospace; color:var(--pink); flex:0 0 auto; }
+
 .site-footer{ position:fixed; bottom:14px; left:0; right:0; z-index:20; display:flex; justify-content:center; }
 .footer-credit{ font-family:'Space Mono',monospace; font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(246,238,252,.4); padding:.5rem 1rem; border-radius:999px; }
 .footer-credit:hover{ color:var(--cyan); }
@@ -385,6 +442,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div id="new-images-preview" class="current-images"></div>
       <div class="field-hint" data-i18n="f_images_reorder_hint">Arrastrá o usá las flechas para elegir el orden. La primera imagen es la principal.</div>
     </div>
+    <div class="field formats-only" id="f-formats-block">
+      <label data-i18n="f_formats">Formatos que va a poder elegir la persona</label>
+      <div class="field-hint" data-i18n="f_formats_hint">Estos 5 formatos aparecen automáticamente en todas las obras de Arte Virtual, con un recargo fijo sobre el precio base que pusiste arriba. No hace falta cargar nada acá.</div>
+      <div id="f-formats-preview" class="format-menu-preview"></div>
+    </div>
+    <div class="field formats-only" id="f-download-block">
+      <label data-i18n="f_download_file">Archivo entregable (alta resolución)</label>
+      <input type="file" id="f-download-file" accept="image/*,application/pdf">
+      <div class="field-hint" data-i18n="f_download_file_hint">Es el archivo que la persona va a poder descargar recién después de pagar, sin importar qué formato haya elegido. No se muestra públicamente en la tienda.</div>
+      <div id="f-download-file-name" class="field-hint"></div>
+    </div>
     <div class="field" style="flex-direction:row; align-items:center; gap:.5rem;">
       <input type="checkbox" id="f-sold" style="width:auto;">
       <label for="f-sold" style="margin:0; cursor:pointer;" data-i18n="already_sold_label">Ya vendida (obra vendida antes de esta web)</label>
@@ -438,6 +506,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <div class="field-hint" data-i18n="f_original_lang_hint">Así sabemos desde qué idioma traducir para los demás clientes.</div>
     </div>
     <div class="field"><label data-i18n="f_add_images">Agregar más imágenes</label><input type="file" id="ef-file" accept="image/*" multiple></div>
+    <div class="field formats-only" id="ef-formats-block">
+      <label data-i18n="f_formats">Formatos que va a poder elegir la persona</label>
+      <div class="field-hint" data-i18n="f_formats_hint">Estos 5 formatos aparecen automáticamente en todas las obras de Arte Virtual, con un recargo fijo sobre el precio base que pusiste arriba. No hace falta cargar nada acá.</div>
+      <div id="ef-formats-preview" class="format-menu-preview"></div>
+    </div>
+    <div class="field formats-only" id="ef-download-block">
+      <label data-i18n="f_download_file">Archivo entregable (alta resolución)</label>
+      <input type="file" id="ef-download-file" accept="image/*,application/pdf">
+      <div class="field-hint" data-i18n="f_download_file_hint">Es el archivo que la persona va a poder descargar recién después de pagar, sin importar qué formato haya elegido. No se muestra públicamente en la tienda.</div>
+      <div id="ef-download-file-name" class="field-hint"></div>
+    </div>
     <div class="field" style="flex-direction:row; align-items:center; gap:.5rem;">
       <input type="checkbox" id="ef-sold" style="width:auto;">
       <label for="ef-sold" style="margin:0; cursor:pointer;" data-i18n="already_sold_label">Ya vendida (obra vendida antes de esta web)</label>
@@ -490,6 +569,32 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     <div id="reorder-list" class="current-images" style="margin-top:.6rem; max-height:340px; overflow-y:auto;"></div>
     <button type="button" id="admin-reorder-save" class="modal-submit" data-i18n="save_order_btn">Guardar orden</button>
     <div id="admin-reorder-msg" class="modal-msg"></div>
+  </div>
+</div>
+
+<!-- PROBAR LA OBRA EN DISTINTOS FORMATOS (mockups: agenda / fondo de pantalla / cuadro) -->
+<div id="mockup-overlay" class="modal-overlay">
+  <div class="modal-panel glass-panel mockup-panel">
+    <button type="button" class="modal-close" data-close-modal="mockup-overlay">×</button>
+    <h2 class="glow-cyan" data-i18n="mockup_title">Probá la obra en distintos formatos</h2>
+    <div class="mockup-tabs">
+      <button type="button" class="mockup-tab is-active" data-mockup="cuadro" data-i18n="mockup_frame">Cuadro</button>
+      <button type="button" class="mockup-tab" data-mockup="agenda" data-i18n="mockup_agenda">Tapa de agenda</button>
+      <button type="button" class="mockup-tab" data-mockup="wallpaper" data-i18n="mockup_wallpaper">Fondo de pantalla</button>
+    </div>
+    <div class="mockup-stage" id="mockup-stage"></div>
+    <div class="mockup-size-label" id="mockup-size-label"></div>
+  </div>
+</div>
+
+<!-- DESCARGAS DESPUÉS DEL PAGO (arte virtual) -->
+<div id="download-overlay" class="modal-overlay">
+  <div class="modal-panel glass-panel">
+    <button type="button" class="modal-close" data-close-modal="download-overlay">×</button>
+    <h2 class="glow-pink" data-i18n="download_title">¡Gracias por tu compra!</h2>
+    <p class="download-thanks" data-i18n="download_thanks">Ya podés descargar tus obras. El enlace también queda disponible por un tiempo limitado.</p>
+    <div id="download-list" class="download-list"></div>
+    <div id="download-msg" class="modal-msg"></div>
   </div>
 </div>
 
@@ -559,7 +664,7 @@ const translations = {
     admin_wrong_password:"Błędne hasło", admin_login_ok:"Zalogowano",
     admin_upload_title:"Dodaj nową pracę", admin_upload_submit:"Opublikuj pracę",
     f_title:"Tytuł", f_desc:"Opis", f_category:"Kategoria", f_price:"Cena (EUR)",
-    f_technique:"Technika", f_dims:"Wymiary", f_file:"Zdjęcie", f_file_hint:"Możesz wybrać kilka zdjęć naraz.",
+    f_technique:"Technika", f_dims:"Wymiary", f_file:"Zdjęcie", f_file_hint:"Minimum 3 zdjęcia. Możesz wybrać kilka naraz.",
     upload_ok:"Praca opublikowana", upload_error:"Błąd przy publikacji",
     confirm_delete:"Usunąć tę pracę?", checkout_error:"Błąd płatności, spróbuj ponownie.",
     admin_edit_title:"Edytuj pracę", edit_label:"Edytuj", save_changes:"Zapisz zmiany",
@@ -599,7 +704,17 @@ const translations = {
     no_shipping_address:"Bez adresu wysyłki (sztuka cyfrowa)",
     already_sold_label:"Już sprzedana (praca sprzedana przed tą stroną)",
     lightbox_wa_btn:"Wolę kupić przez WhatsApp",
-    wa_product_message:"Cześć! Interesuje mnie ta praca: \"{title}\" ({price}). Wolę kupić przez WhatsApp — czy możesz mi pomóc?"
+    wa_product_message:"Cześć! Interesuje mnie ta praca: \"{title}\" ({price}). Wolę kupić przez WhatsApp — czy możesz mi pomóc?",
+    f_formats:"Formaty, które klient będzie mógł wybrać", f_formats_hint:"Te 5 formatów pojawia się automatycznie przy każdej pracy w Sztuce Wirtualnej, z ustalonym dopłatą do ceny bazowej podanej wyżej. Nie trzeba nic tu dodawać.",
+    format_add_row:"+ Dodaj format", format_name_placeholder:"Nazwa (np. A4 - Druk)", format_price_placeholder:"Cena EUR",
+    f_download_file:"Plik do pobrania (wysoka rozdzielczość)", f_download_file_hint:"To plik, który klient będzie mógł pobrać dopiero po zapłacie. Nie jest widoczny publicznie w sklepie.",
+    format_choose:"Wybierz format i rozmiar", format_from:"Od",
+    mockup_btn:"Wypróbuj w różnych formatach", mockup_title:"Wypróbuj tę pracę w różnych formatach",
+    mockup_frame:"Obraz w ramie", mockup_agenda:"Okładka kalendarza", mockup_wallpaper:"Tapeta",
+    mockup_size_note:"Podgląd poglądowy — plik do pobrania jest w wysokiej rozdzielczości.",
+    download_title:"Dziękujemy za zakup!", download_thanks:"Możesz już pobrać swoje prace.", download_btn:"Pobierz",
+    download_loading:"Szukamy Twoich plików do pobrania…", download_error:"Nie udało się zweryfikować płatności. Jeśli już zapłaciłeś/aś, napisz do nas na WhatsApp z potwierdzeniem.",
+    download_none:"Brak plików do pobrania dla tego zamówienia."
   },
   en:{
     shop_eyebrow:"SHOP · POLAND", shop_h1:"Virtual Store",
@@ -615,7 +730,7 @@ const translations = {
     admin_wrong_password:"Wrong password", admin_login_ok:"Logged in",
     admin_upload_title:"Upload new piece", admin_upload_submit:"Publish piece",
     f_title:"Title", f_desc:"Description", f_category:"Category", f_price:"Price (EUR)",
-    f_technique:"Technique", f_dims:"Dimensions", f_file:"Images", f_file_hint:"You can select several images at once.",
+    f_technique:"Technique", f_dims:"Dimensions", f_file:"Images", f_file_hint:"Minimum 3 images. You can select several at once.",
     upload_ok:"Piece published", upload_error:"Error publishing",
     confirm_delete:"Delete this piece?", checkout_error:"Payment error, please try again.",
     admin_edit_title:"Edit piece", edit_label:"Edit", save_changes:"Save changes",
@@ -655,7 +770,17 @@ const translations = {
     no_shipping_address:"No shipping address (digital art)",
     already_sold_label:"Already sold (piece sold before this website existed)",
     lightbox_wa_btn:"I'd rather buy via WhatsApp",
-    wa_product_message:"Hi! I'm interested in this piece: \"{title}\" ({price}). I'd rather buy via WhatsApp — could you help me?"
+    wa_product_message:"Hi! I'm interested in this piece: \"{title}\" ({price}). I'd rather buy via WhatsApp — could you help me?",
+    f_formats:"Formats the customer will be able to choose", f_formats_hint:"These 5 formats appear automatically on every Virtual Art piece, with a fixed surcharge over the base price above. You don't need to add anything here.",
+    format_add_row:"+ Add format", format_name_placeholder:"Name (e.g. A4 - Print)", format_price_placeholder:"Price EUR",
+    f_download_file:"Download file (high resolution)", f_download_file_hint:"This is the file the customer will be able to download right after paying. It is not shown publicly in the shop.",
+    format_choose:"Choose format and size", format_from:"From",
+    mockup_btn:"Preview in different formats", mockup_title:"Preview this piece in different formats",
+    mockup_frame:"Framed print", mockup_agenda:"Planner cover", mockup_wallpaper:"Wallpaper",
+    mockup_size_note:"Illustrative preview — the file you'll download is high resolution.",
+    download_title:"Thanks for your purchase!", download_thanks:"You can now download your pieces.", download_btn:"Download",
+    download_loading:"Looking up your downloads…", download_error:"We couldn't verify the payment. If you already paid, message us on WhatsApp with your receipt.",
+    download_none:"No download files for this order."
   },
   es:{
     shop_eyebrow:"TIENDA · POLONIA", shop_h1:"Tienda Virtual",
@@ -671,7 +796,7 @@ const translations = {
     admin_wrong_password:"Contraseña incorrecta", admin_login_ok:"Sesión iniciada",
     admin_upload_title:"Subir nueva obra", admin_upload_submit:"Publicar obra",
     f_title:"Título", f_desc:"Descripción", f_category:"Categoría", f_price:"Precio (EUR)",
-    f_technique:"Técnica", f_dims:"Dimensiones", f_file:"Imágenes", f_file_hint:"Podés seleccionar varias imágenes a la vez.",
+    f_technique:"Técnica", f_dims:"Dimensiones", f_file:"Imágenes", f_file_hint:"Mínimo 3 imágenes. Podés seleccionar varias a la vez.",
     upload_ok:"Obra publicada", upload_error:"Error al publicar",
     confirm_delete:"¿Eliminar esta obra?", checkout_error:"Error en el pago, intentá de nuevo.",
     admin_edit_title:"Editar obra", edit_label:"Editar", save_changes:"Guardar cambios",
@@ -711,7 +836,17 @@ const translations = {
     no_shipping_address:"Sin dirección de envío (arte digital)",
     already_sold_label:"Ya vendida (obra vendida antes de esta web)",
     lightbox_wa_btn:"Prefiero comprar por WhatsApp",
-    wa_product_message:"¡Hola! Me interesa esta obra: \"{title}\" ({price}). Prefiero comprar por WhatsApp, ¿podrías ayudarme?"
+    wa_product_message:"¡Hola! Me interesa esta obra: \"{title}\" ({price}). Prefiero comprar por WhatsApp, ¿podrías ayudarme?",
+    f_formats:"Formatos que va a poder elegir la persona", f_formats_hint:"Estos 5 formatos aparecen automáticamente en todas las obras de Arte Virtual, con un recargo fijo sobre el precio base de arriba. No hace falta cargar nada acá.",
+    format_add_row:"+ Agregar formato", format_name_placeholder:"Nombre (ej: A4 - Impresión)", format_price_placeholder:"Precio EUR",
+    f_download_file:"Archivo de descarga (alta resolución)", f_download_file_hint:"Es el archivo que la persona va a poder descargar recién después de pagar. No se muestra públicamente en la tienda.",
+    format_choose:"Elegí el formato y tamaño", format_from:"Desde",
+    mockup_btn:"Probar en distintos formatos", mockup_title:"Probá la obra en distintos formatos",
+    mockup_frame:"Cuadro", mockup_agenda:"Tapa de agenda", mockup_wallpaper:"Fondo de pantalla",
+    mockup_size_note:"Vista previa ilustrativa — el archivo que vas a descargar es de alta resolución.",
+    download_title:"¡Gracias por tu compra!", download_thanks:"Ya podés descargar tus obras.", download_btn:"Descargar",
+    download_loading:"Buscando tus descargas…", download_error:"No pudimos verificar el pago. Si ya pagaste, escribinos por WhatsApp con tu comprobante.",
+    download_none:"No hay archivos de descarga para este pedido."
   },
   it:{
     shop_eyebrow:"NEGOZIO · POLONIA", shop_h1:"Negozio Virtuale",
@@ -727,7 +862,7 @@ const translations = {
     admin_wrong_password:"Password errata", admin_login_ok:"Accesso effettuato",
     admin_upload_title:"Carica nuova opera", admin_upload_submit:"Pubblica opera",
     f_title:"Titolo", f_desc:"Descrizione", f_category:"Categoria", f_price:"Prezzo (EUR)",
-    f_technique:"Tecnica", f_dims:"Dimensioni", f_file:"Immagini", f_file_hint:"Puoi selezionare più immagini insieme.",
+    f_technique:"Tecnica", f_dims:"Dimensioni", f_file:"Immagini", f_file_hint:"Minimo 3 immagini. Puoi selezionarne più di una insieme.",
     upload_ok:"Opera pubblicata", upload_error:"Errore nella pubblicazione",
     confirm_delete:"Eliminare questa opera?", checkout_error:"Errore nel pagamento, riprova.",
     admin_edit_title:"Modifica opera", edit_label:"Modifica", save_changes:"Salva modifiche",
@@ -767,7 +902,17 @@ const translations = {
     no_shipping_address:"Nessun indirizzo di spedizione (arte digitale)",
     already_sold_label:"Già venduta (opera venduta prima di questo sito)",
     lightbox_wa_btn:"Preferisco comprare su WhatsApp",
-    wa_product_message:"Ciao! Sono interessato/a a quest'opera: \"{title}\" ({price}). Preferisco comprare su WhatsApp, potresti aiutarmi?"
+    wa_product_message:"Ciao! Sono interessato/a a quest'opera: \"{title}\" ({price}). Preferisco comprare su WhatsApp, potresti aiutarmi?",
+    f_formats:"Formati che il cliente potrà scegliere", f_formats_hint:"Questi 5 formati compaiono automaticamente in ogni opera di Arte Virtuale, con un sovrapprezzo fisso sul prezzo base sopra indicato. Non serve aggiungere nulla qui.",
+    format_add_row:"+ Aggiungi formato", format_name_placeholder:"Nome (es: A4 - Stampa)", format_price_placeholder:"Prezzo EUR",
+    f_download_file:"File da scaricare (alta risoluzione)", f_download_file_hint:"È il file che il cliente potrà scaricare subito dopo il pagamento. Non è visibile pubblicamente nel negozio.",
+    format_choose:"Scegli formato e dimensione", format_from:"Da",
+    mockup_btn:"Prova in diversi formati", mockup_title:"Prova quest'opera in diversi formati",
+    mockup_frame:"Quadro incorniciato", mockup_agenda:"Copertina agenda", mockup_wallpaper:"Sfondo",
+    mockup_size_note:"Anteprima illustrativa — il file che scaricherai è ad alta risoluzione.",
+    download_title:"Grazie per il tuo acquisto!", download_thanks:"Ora puoi scaricare le tue opere.", download_btn:"Scarica",
+    download_loading:"Stiamo cercando i tuoi download…", download_error:"Non siamo riusciti a verificare il pagamento. Se hai già pagato, scrivici su WhatsApp con la ricevuta.",
+    download_none:"Nessun file da scaricare per questo ordine."
   },
   pt:{
     shop_eyebrow:"LOJA · POLÔNIA", shop_h1:"Loja Virtual",
@@ -783,7 +928,7 @@ const translations = {
     admin_wrong_password:"Senha incorreta", admin_login_ok:"Login realizado",
     admin_upload_title:"Enviar nova obra", admin_upload_submit:"Publicar obra",
     f_title:"Título", f_desc:"Descrição", f_category:"Categoria", f_price:"Preço (EUR)",
-    f_technique:"Técnica", f_dims:"Dimensões", f_file:"Imagens", f_file_hint:"Você pode selecionar várias imagens de uma vez.",
+    f_technique:"Técnica", f_dims:"Dimensões", f_file:"Imagens", f_file_hint:"Mínimo de 3 imagens. Você pode selecionar várias de uma vez.",
     upload_ok:"Obra publicada", upload_error:"Erro ao publicar",
     confirm_delete:"Excluir esta obra?", checkout_error:"Erro no pagamento, tente novamente.",
     admin_edit_title:"Editar obra", edit_label:"Editar", save_changes:"Salvar alterações",
@@ -823,7 +968,17 @@ const translations = {
     no_shipping_address:"Sem endereço de envio (arte digital)",
     already_sold_label:"Já vendida (obra vendida antes deste site)",
     lightbox_wa_btn:"Prefiro comprar pelo WhatsApp",
-    wa_product_message:"Olá! Tenho interesse nesta obra: \"{title}\" ({price}). Prefiro comprar pelo WhatsApp, você poderia me ajudar?"
+    wa_product_message:"Olá! Tenho interesse nesta obra: \"{title}\" ({price}). Prefiro comprar pelo WhatsApp, você poderia me ajudar?",
+    f_formats:"Formatos que a pessoa vai poder escolher", f_formats_hint:"Esses 5 formatos aparecem automaticamente em todas as obras de Arte Virtual, com um acréscimo fixo sobre o preço base acima. Não precisa adicionar nada aqui.",
+    format_add_row:"+ Adicionar formato", format_name_placeholder:"Nome (ex: A4 - Impressão)", format_price_placeholder:"Preço EUR",
+    f_download_file:"Arquivo para download (alta resolução)", f_download_file_hint:"É o arquivo que a pessoa poderá baixar assim que o pagamento for aprovado. Não aparece publicamente na loja.",
+    format_choose:"Escolha o formato e tamanho", format_from:"A partir de",
+    mockup_btn:"Testar em diferentes formatos", mockup_title:"Teste esta obra em diferentes formatos",
+    mockup_frame:"Quadro emoldurado", mockup_agenda:"Capa de agenda", mockup_wallpaper:"Papel de parede",
+    mockup_size_note:"Pré-visualização ilustrativa — o arquivo para download é em alta resolução.",
+    download_title:"Obrigado pela sua compra!", download_thanks:"Você já pode baixar suas obras.", download_btn:"Baixar",
+    download_loading:"Procurando seus downloads…", download_error:"Não foi possível verificar o pagamento. Se você já pagou, escreva para nós no WhatsApp com o comprovante.",
+    download_none:"Nenhum arquivo para download neste pedido."
   }
 };
 
@@ -1005,6 +1160,28 @@ async function loadProducts(){
 
 function getImages(p){
   return (Array.isArray(p.images) && p.images.length > 0) ? p.images : (p.image_url ? [p.image_url] : []);
+}
+
+/* ------------------------------------------------------------
+   ARTE VIRTUAL — menú FIJO de formatos/tamaños, igual al que ya usan
+   las Edge Functions "create-checkout-session" y "stripe-webhook"
+   (constante FORMAT_ADDONS en esos dos archivos). Si en algún momento
+   cambiás precios o formatos, hay que actualizarlo EN LOS TRES lugares
+   para que el precio que ve la persona acá coincida con lo que Stripe
+   termina cobrando.
+   ------------------------------------------------------------ */
+const FORMAT_ADDONS = {
+  screen: { label: "Digital HD (pantalla)", addon: 0 },
+  a4:     { label: "Impresión A4 (21×29,7 cm)", addon: 8 },
+  a3:     { label: "Impresión A3 (29,7×42 cm)", addon: 15 },
+  b2:     { label: "Impresión 50×70 cm", addon: 25 },
+  xl:     { label: "Impresión 70×100 cm", addon: 40 },
+};
+const FORMAT_ORDER = ["screen","a4","a3","b2","xl"];
+
+function getFormats(p){
+  if(!p || p.category !== "virtual") return [];
+  return FORMAT_ORDER.map(key=>({ id:key, label:FORMAT_ADDONS[key].label, price: Number(p.price) + FORMAT_ADDONS[key].addon }));
 }
 
 function nextSortOrder(){
@@ -1298,10 +1475,11 @@ function updateCartUI(){
     checkoutBtn.disabled = true;
   } else {
     itemsBox.innerHTML = cart.map(i=>`
-      <div class="cart-item" data-cart-id="${i.id}">
+      <div class="cart-item" data-cart-id="${i.cart_key || i.id}">
         <img src="${i.image}" alt="${escapeHtml(i.title)}">
         <div class="cart-item-info">
           <h4>${escapeHtml(i.title)}</h4>
+          ${i.format_label ? `<div class="product-meta">${escapeHtml(i.format_label)}</div>` : ""}
           <div class="qty-row">
             <button type="button" class="qty-btn" data-qty="-1">−</button>
             <span>${i.quantity}</span>
@@ -1320,23 +1498,37 @@ function updateCartUI(){
   totalEl.textContent = formatPrice(total, currency);
 }
 
-function addToCart(id){
+function addToCart(id, formatKey){
   const p = allProducts.find(x=>x.id===id);
   if(!p || p.is_sold) return;
-  const existing = cart.find(i=>i.id===id);
+  const isVirtual = p.category === "virtual";
+  // Arte virtual: es obligatorio elegir un formato (screen/a4/a3/b2/xl)
+  // antes de agregarlo, así que si todavía no se eligió abrimos el visor.
+  if(isVirtual && !formatKey){
+    openLightbox(id);
+    return;
+  }
+  const fmt = isVirtual ? (FORMAT_ADDONS[formatKey] || FORMAT_ADDONS.screen) : null;
+  const price = fmt ? Number(p.price) + fmt.addon : p.price;
+  const cartKey = isVirtual ? `${p.id}::${formatKey}` : p.id;
+  const existing = cart.find(i=>(i.cart_key || i.id) === cartKey);
   if(existing) existing.quantity += 1;
-  else cart.push({ id:p.id, title:p.title, price:p.price, currency:p.currency, image:getImages(p)[0] || "", quantity:1 });
+  else cart.push({
+    id:p.id, cart_key:cartKey, title:p.title, price, currency:p.currency, category:p.category,
+    image:getImages(p)[0] || "", quantity:1,
+    format: isVirtual ? formatKey : null, format_label: fmt ? fmt.label : null
+  });
   saveCart();
   openCart();
 }
-function changeQty(id, delta){
-  const item = cart.find(i=>i.id===id);
+function changeQty(cartKey, delta){
+  const item = cart.find(i=>(i.cart_key || i.id)===cartKey);
   if(!item) return;
   item.quantity += delta;
-  if(item.quantity<=0) cart = cart.filter(i=>i.id!==id);
+  if(item.quantity<=0) cart = cart.filter(i=>(i.cart_key || i.id)!==cartKey);
   saveCart();
 }
-function removeFromCart(id){ cart = cart.filter(i=>i.id!==id); saveCart(); }
+function removeFromCart(cartKey){ cart = cart.filter(i=>(i.cart_key || i.id)!==cartKey); saveCart(); }
 
 const cartOverlay = document.getElementById("cart-overlay");
 const cartDrawer = document.getElementById("cart-drawer");
@@ -1376,6 +1568,7 @@ document.getElementById("cart-items").addEventListener("click", (e)=>{
 let lightboxImages = [];
 let lightboxIndex = 0;
 let currentLightboxProduct = null;
+let selectedFormatId = null; // formato elegido en el lightbox para la obra virtual actual
 const lightboxOverlay = document.getElementById("lightbox-overlay");
 const lightboxImg = document.getElementById("lightbox-img");
 const lightboxCounter = document.getElementById("lightbox-counter");
@@ -1388,6 +1581,8 @@ function openLightbox(productId){
   if(lightboxImages.length===0) return;
   lightboxIndex = 0;
   currentLightboxProduct = p;
+  const formats = getFormats(p);
+  selectedFormatId = formats.length > 0 ? formats[0].id : null;
   renderLightbox();
   renderLightboxInfo(p);
   lightboxOverlay.classList.add("is-open");
@@ -1407,8 +1602,16 @@ document.getElementById("lightbox-close").addEventListener("click", closeLightbo
 document.getElementById("lightbox-prev").addEventListener("click", ()=>lightboxStep(-1));
 document.getElementById("lightbox-next").addEventListener("click", ()=>lightboxStep(1));
 document.getElementById("lightbox-info").addEventListener("click", (e)=>{
+  const formatBtn = e.target.closest("[data-format-id]");
+  if(formatBtn){
+    selectedFormatId = formatBtn.getAttribute("data-format-id");
+    if(currentLightboxProduct) renderLightboxInfo(currentLightboxProduct);
+    return;
+  }
+  const mockupBtn = e.target.closest("[data-mockup-open]");
+  if(mockupBtn){ openMockupModal(mockupBtn.getAttribute("data-mockup-open")); return; }
   const addBtn = e.target.closest("[data-add-id]");
-  if(addBtn){ addToCart(addBtn.getAttribute("data-add-id")); }
+  if(addBtn){ addToCart(addBtn.getAttribute("data-add-id"), selectedFormatId); }
 });
 
 /* ------------------------------------------------------------
@@ -1451,16 +1654,37 @@ function renderLightboxInfo(p){
   // Mostramos ya mismo el texto tal cual está guardado (para que no quede
   // en blanco mientras llega la traducción), y lo reemplazamos apenas
   // la traducción esté lista.
+  const formats = getFormats(p);
+  const isVirtual = p.category === "virtual";
+
   const draw = (title, description, technique) => {
     if(currentLightboxProduct !== p) return; // la persona ya cerró/cambió de obra
     const metaLineNow = [technique, p.dimensions, p.style?styleLabel(p.style):null].filter(Boolean).join(" · ");
+    const activeFormat = formats.find(f=>f.id===selectedFormatId) || null;
+    const displayPrice = activeFormat ? activeFormat.price : p.price;
+
+    const formatsHtml = formats.length > 0 ? `
+      <div class="format-section">
+        <div class="format-section-label">${t("format_choose")}</div>
+        <div class="format-options">
+          ${formats.map(f=>`
+            <button type="button" class="format-pill${f.id===selectedFormatId?" is-active":""}" data-format-id="${f.id}">
+              <span class="fp-name">${escapeHtml(f.label)}</span>
+              <span class="fp-price">${formatPrice(f.price, p.currency)}</span>
+            </button>
+          `).join("")}
+        </div>
+      </div>` : "";
+
     lightboxInfoBox.innerHTML = `
       ${soldBadge}
       <h3 class="lightbox-info-title">${escapeHtml(title)}</h3>
       ${metaLineNow ? `<div class="lightbox-info-meta">${escapeHtml(metaLineNow)}</div>` : ""}
-      <div class="lightbox-info-price">${formatPrice(p.price, p.currency)}</div>
+      <div class="lightbox-info-price">${formatPrice(displayPrice, p.currency)}</div>
       ${description ? `<p class="lightbox-info-desc">${escapeHtml(description)}</p>` : ""}
+      ${formatsHtml}
       <div class="lightbox-info-actions">
+        ${isVirtual ? `<button type="button" class="mockup-trigger-btn" data-mockup-open="${p.id}">${t("mockup_btn")}</button>` : ""}
         <button type="button" class="add-cart-btn" data-add-id="${p.id}" ${p.is_sold ? "disabled" : ""} style="margin-top:0;">${t("add_to_cart")}</button>
         <a class="lightbox-wa-btn" target="_blank" rel="noopener" href="${waProductLink(p, title)}">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.84.5 3.56 1.36 5.03L2 22l5.21-1.46a9.85 9.85 0 0 0 4.82 1.27h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.78 14.06c-.24.69-1.4 1.32-1.93 1.36-.5.04-1 .25-3.37-.7-2.86-1.14-4.7-4.05-4.84-4.24-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.08 1-2.37.26-.28.58-.35.77-.35.19 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.31-.3.48-.14.16-.3.36-.43.49-.14.14-.29.29-.13.57.17.28.74 1.22 1.59 1.98 1.1.98 2.02 1.28 2.3 1.43.28.14.45.12.61-.07.17-.19.71-.83.9-1.11.19-.28.38-.23.64-.14.26.1 1.66.78 1.94.93.28.14.47.21.54.33.07.12.07.68-.17 1.36Z"/></svg>
@@ -1482,6 +1706,132 @@ document.addEventListener("keydown", (e)=>{
 });
 
 /* ============================================================
+   PROBAR EN DISTINTOS FORMATOS (mockups ilustrativos con CSS/SVG:
+   cuadro enmarcado, tapa de agenda, fondo de pantalla). No usa fotos
+   externas — arma el marco con CSS y le pone la imagen de la obra
+   como fondo, así funciona para cualquier obra sin depender de
+   assets adicionales.
+   ============================================================ */
+let mockupProduct = null;
+let activeMockupType = "cuadro";
+const MOCKUP_TYPES = ["cuadro","agenda","wallpaper"];
+
+function openMockupModal(productId){
+  const p = allProducts.find(x=>x.id===productId);
+  if(!p) return;
+  mockupProduct = p;
+  activeMockupType = "cuadro";
+  document.querySelectorAll(".mockup-tab").forEach(b=>b.classList.toggle("is-active", b.getAttribute("data-mockup")===activeMockupType));
+  renderMockupStage();
+  openModal("mockup-overlay");
+}
+
+function renderMockupStage(){
+  const stage = document.getElementById("mockup-stage");
+  const label = document.getElementById("mockup-size-label");
+  if(!stage || !mockupProduct) return;
+  const img = getImages(mockupProduct)[0] || "";
+  const bg = `background-image:url('${img.replace(/'/g,"%27")}')`;
+
+  if(activeMockupType === "agenda"){
+    stage.innerHTML = `<div class="mockup-frame mockup-agenda"><div class="mockup-art" style="${bg}"></div></div>`;
+  } else if(activeMockupType === "wallpaper"){
+    stage.innerHTML = `
+      <div class="mockup-frame mockup-phone">
+        <div class="mockup-art" style="${bg}"></div>
+        <div class="mockup-notch"></div>
+        <div class="mockup-statusbar"><span>9:41</span><span>100%</span></div>
+      </div>`;
+  } else {
+    stage.innerHTML = `
+      <div class="mockup-wall">
+        <div class="mockup-frame-outer">
+          <div class="mockup-frame-inner">
+            <div class="mockup-frame mockup-cuadro"><div class="mockup-art" style="${bg}"></div></div>
+          </div>
+        </div>
+      </div>`;
+  }
+  label.textContent = t("mockup_size_note");
+}
+
+document.querySelectorAll(".mockup-tab").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    activeMockupType = btn.getAttribute("data-mockup");
+    document.querySelectorAll(".mockup-tab").forEach(b=>b.classList.toggle("is-active", b===btn));
+    renderMockupStage();
+  });
+});
+
+/* ============================================================
+   DESCARGAS DESPUÉS DEL PAGO (arte virtual)
+   Al volver del checkout de Stripe con éxito, la URL trae
+   ?pago=exito&session_id=... . Ese session_id se manda al Edge
+   Function "get-download" (sin login, la sesión de Stripe hace de
+   contraseña), que devuelve enlaces de descarga firmados y
+   temporales a cada obra virtual del pedido. Si el pedido todavía
+   figura "pending" (el webhook de Stripe puede tardar unos segundos
+   más que el redirect), reintenta un par de veces antes de avisar.
+   ============================================================ */
+async function fetchDownloads(sessionId, attempt){
+  const res = await fetch(`${FUNCTIONS_URL}/get-download`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ sessionId })
+  });
+  const data = await res.json();
+  if(data.error) throw new Error(data.error);
+  if(data.status !== "paid" && attempt < 4){
+    await new Promise(r=>setTimeout(r, 2000));
+    return fetchDownloads(sessionId, attempt + 1);
+  }
+  return data;
+}
+
+async function checkForPostPaymentDownloads(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get("pago") !== "exito"){
+    if(params.get("pago") === "cancelado"){
+      // Solo limpiamos la URL, no hace falta avisar nada más.
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+    return;
+  }
+  const sessionId = params.get("session_id");
+  window.history.replaceState({}, "", window.location.pathname);
+  cart = []; saveCart(); // el pago ya se hizo, vaciamos el carrito local
+
+  const listBox = document.getElementById("download-list");
+  const msg = document.getElementById("download-msg");
+  listBox.innerHTML = "";
+  msg.textContent = t("download_loading"); msg.className = "modal-msg";
+  openModal("download-overlay");
+
+  if(!sessionId){ msg.textContent = t("download_error"); msg.classList.add("is-error"); return; }
+
+  try{
+    const data = await fetchDownloads(sessionId, 0);
+    const items = (data.downloads || []).filter(it=>it.url);
+    if(items.length === 0){
+      msg.textContent = t("download_none"); msg.className = "modal-msg";
+    } else {
+      msg.textContent = "";
+      listBox.innerHTML = items.map(it=>`
+        <div class="download-item">
+          <div class="download-item-info">
+            <strong>${escapeHtml(it.title)}</strong>
+            ${it.format_label ? `<span>${escapeHtml(it.format_label)}</span>` : ""}
+          </div>
+          <a class="download-btn" href="${it.url}" target="_blank" rel="noopener" download>${t("download_btn")}</a>
+        </div>
+      `).join("");
+    }
+  } catch(e){
+    msg.textContent = t("download_error"); msg.classList.add("is-error");
+  }
+}
+
+/* ============================================================
    CHECKOUT (Stripe vía Edge Function)
    ============================================================ */
 document.getElementById("checkout-btn").addEventListener("click", async ()=>{
@@ -1493,7 +1843,7 @@ document.getElementById("checkout-btn").addEventListener("click", async ()=>{
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         items: cart,
-        successUrl: window.location.origin + window.location.pathname + "?pago=exito",
+        successUrl: window.location.origin + window.location.pathname + "?pago=exito&session_id={CHECKOUT_SESSION_ID}",
         cancelUrl: window.location.origin + window.location.pathname + "?pago=cancelado",
       })
     });
@@ -1529,6 +1879,8 @@ document.getElementById("admin-trigger").addEventListener("click", ()=>{
     document.getElementById("f-collection").value = "";
     document.getElementById("f-style").value = "";
     document.getElementById("f-sold").checked = false;
+    resetNewDigitalFile();
+    toggleFormatsBlocks("f");
     openModal("admin-upload-overlay");
   }
   else{ openModal("admin-login-overlay"); }
@@ -1670,6 +2022,51 @@ function wireImageList(containerId, getItems, onChange){
   });
 }
 
+/* ============================================================
+   ADMIN — vista previa (solo lectura) del menú fijo de formatos, y
+   subida del archivo entregable en alta resolución de una obra
+   virtual (bucket privado "digital-deliverables", vía la acción
+   "get-digital-upload-url" de la función admin-product).
+   ============================================================ */
+function renderFormatMenuPreview(containerId, basePrice){
+  const box = document.getElementById(containerId);
+  if(!box) return;
+  const price = Number(basePrice) || 0;
+  box.innerHTML = FORMAT_ORDER.map(key=>{
+    const f = FORMAT_ADDONS[key];
+    return `<div class="fmp-row"><span>${escapeHtml(f.label)}</span><span>${formatPrice(price + f.addon, "EUR")}</span></div>`;
+  }).join("");
+}
+function toggleFormatsBlocks(prefix){
+  const cat = document.getElementById(`${prefix}-category`).value;
+  const show = cat === "virtual";
+  document.getElementById(`${prefix}-formats-block`).style.display = show ? "block" : "none";
+  document.getElementById(`${prefix}-download-block`).style.display = show ? "block" : "none";
+  if(show){
+    const priceInput = document.getElementById(`${prefix}-price`);
+    renderFormatMenuPreview(`${prefix}-formats-preview`, priceInput ? priceInput.value : 0);
+  }
+}
+document.getElementById("f-category").addEventListener("change", ()=>toggleFormatsBlocks("f"));
+document.getElementById("ef-category").addEventListener("change", ()=>toggleFormatsBlocks("ef"));
+document.getElementById("f-price").addEventListener("input", ()=>toggleFormatsBlocks("f"));
+document.getElementById("ef-price").addEventListener("input", ()=>toggleFormatsBlocks("ef"));
+
+async function uploadDigitalFile(file){
+  const urlRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ token: adminToken, action:"get-digital-upload-url", fileName:file.name })
+  });
+  const urlData = await urlRes.json();
+  if(!urlData.signedUrl) throw new Error("no-digital-upload-url");
+  const { error: upErr } = await supabase.storage
+    .from("digital-deliverables")
+    .uploadToSignedUrl(urlData.path, urlData.token, file);
+  if(upErr) throw upErr;
+  return urlData.path; // guardamos el path (bucket privado, no hay URL pública)
+}
+
 /* -------- Subir obra nueva: vista previa reordenable -------- */
 let newImageItems = [];
 
@@ -1690,6 +2087,17 @@ function resetNewImagesPreview(){
   renderNewImagesPreview();
 }
 
+let newDigitalFile = null;
+document.getElementById("f-download-file").addEventListener("change", (e)=>{
+  newDigitalFile = (e.target.files && e.target.files[0]) || null;
+  document.getElementById("f-download-file-name").textContent = newDigitalFile ? newDigitalFile.name : "";
+});
+function resetNewDigitalFile(){
+  newDigitalFile = null;
+  document.getElementById("f-download-file").value = "";
+  document.getElementById("f-download-file-name").textContent = "";
+}
+
 document.getElementById("admin-upload-submit").addEventListener("click", async ()=>{
   const msg = document.getElementById("admin-upload-msg");
   msg.textContent = ""; msg.className = "modal-msg";
@@ -1703,7 +2111,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
   const style = document.getElementById("f-style").value || null;
   const is_sold = document.getElementById("f-sold").checked;
 
-  if(!title || newImageItems.length===0 || isNaN(price)){
+  if(!title || newImageItems.length < 3 || isNaN(price)){
     msg.textContent = t("upload_error"); msg.classList.add("is-error");
     return;
   }
@@ -1712,12 +2120,15 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     const images = [];
     for(const item of newImageItems){ images.push(await uploadOneFile(item.file)); }
 
+    let digital_file_path = null;
+    if(category === "virtual" && newDigitalFile){ digital_file_path = await uploadDigitalFile(newDigitalFile); }
+
     const insertRes = await fetch(`${FUNCTIONS_URL}/admin-product`, {
       method:"POST",
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"insert",
-        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, style, images, original_lang: currentLang, sort_order: nextSortOrder(), is_sold }
+        product:{ title, description, category, price, currency:"EUR", technique, dimensions, collection_id, style, images, original_lang: currentLang, sort_order: nextSortOrder(), is_sold, digital_file_path }
       })
     });
     const insertData = await insertRes.json();
@@ -1734,6 +2145,7 @@ document.getElementById("admin-upload-submit").addEventListener("click", async (
     document.getElementById("f-file").value = "";
     document.getElementById("f-sold").checked = false;
     resetNewImagesPreview();
+    resetNewDigitalFile();
     await loadProducts();
     setTimeout(()=>closeModal("admin-upload-overlay"), 800);
   } catch(e){
@@ -1767,6 +2179,15 @@ let editImageItems = []; // { url, file? } — reordenable por el administrador
 function renderEditImages(){ renderImageItems("edit-current-images", editImageItems); }
 wireImageList("edit-current-images", ()=>editImageItems, renderEditImages);
 
+let editDigitalFile = null; // nuevo archivo elegido (reemplaza al existente si lo hay)
+let editDigitalFileExisting = false; // true si la obra ya tiene un archivo entregable cargado
+document.getElementById("ef-download-file").addEventListener("change", (e)=>{
+  editDigitalFile = (e.target.files && e.target.files[0]) || null;
+  document.getElementById("ef-download-file-name").textContent = editDigitalFile
+    ? editDigitalFile.name
+    : (editDigitalFileExisting ? "✓" : "");
+});
+
 function openEditModal(id){
   const p = allProducts.find(x=>x.id===id);
   if(!p) return;
@@ -1787,6 +2208,13 @@ function openEditModal(id){
   document.getElementById("admin-edit-msg").textContent = "";
   document.getElementById("admin-edit-msg").className = "modal-msg";
   renderEditImages();
+
+  editDigitalFile = null;
+  editDigitalFileExisting = !!p.digital_file_path;
+  document.getElementById("ef-download-file").value = "";
+  document.getElementById("ef-download-file-name").textContent = editDigitalFileExisting ? "✓" : "";
+  toggleFormatsBlocks("ef");
+
   openModal("admin-edit-overlay");
 }
 
@@ -1818,7 +2246,7 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
     msg.textContent = t("edit_error"); msg.classList.add("is-error");
     return;
   }
-  if(editImageItems.length===0){
+  if(editImageItems.length < 3){
     msg.textContent = t("edit_error"); msg.classList.add("is-error");
     return;
   }
@@ -1829,12 +2257,22 @@ document.getElementById("admin-edit-submit").addEventListener("click", async ()=
       images.push(item.file ? await uploadOneFile(item.file) : item.url);
     }
 
+    let digital_file_path; // undefined = no tocar el campo; null = borrar; string = nuevo archivo
+    if(category !== "virtual"){
+      digital_file_path = null;
+    } else if(editDigitalFile){
+      digital_file_path = await uploadDigitalFile(editDigitalFile);
+    } // si no eligió un archivo nuevo, no se manda el campo y se conserva el que ya había
+
+    const productPayload = { title, description, category, price, technique, dimensions, collection_id, style, original_lang, images, is_sold };
+    if(digital_file_path !== undefined) productPayload.digital_file_path = digital_file_path;
+
     const res = await fetch(`${FUNCTIONS_URL}/admin-product`, {
       method:"POST",
       headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         token: adminToken, action:"update", id: editingProductId,
-        product:{ title, description, category, price, technique, dimensions, collection_id, style, original_lang, images, is_sold }
+        product: productPayload
       })
     });
     const data = await res.json();
@@ -2304,6 +2742,7 @@ populateStyleSelects();
 loadCollections();
 loadCustomStyles();
 loadProducts();
+checkForPostPaymentDownloads();
 </script>
 </body>
 </html>
