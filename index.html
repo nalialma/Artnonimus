@@ -10,6 +10,12 @@
 <meta name="robots" content="index, follow">
 <meta name="geo.region" content="PL">
 <meta name="geo.placename" content="Poland">
+<meta name="theme-color" content="#0b0714">
+<link rel="icon" type="image/png" href="https://i.ibb.co/mPQjbWs/1784228306856.png">
+<link rel="apple-touch-icon" href="https://i.ibb.co/mPQjbWs/1784228306856.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://i.ibb.co">
 <link rel="canonical" href="https://artnonimus.art/">
 
 <!-- hreflang alternates: same single-page app, language selected via ?lang= -->
@@ -58,6 +64,16 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ArtNonimu's", "item": "https://artnonimus.art/" },
+    { "@type": "ListItem", "position": 2, "name": "Tienda", "item": "https://artnonimus.art/tienda.html" }
+  ]
+}
+</script>
 <style>
 /* ============================================================
    ArtNonimu's — DREAMCORE / WEIRDCORE / LIMINAL
@@ -95,6 +111,14 @@ body{
 img{ max-width:100%; display:block; }
 button{ font-family:inherit; }
 a{ color:inherit; text-decoration:none; }
+
+/* Visualmente oculto pero legible por buscadores y lectores de pantalla
+   (para el <h1> real de la página, sin tocar el diseño). */
+.sr-only{
+  position:absolute; width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
 
 /* BACKGROUND VIDEO — mobile gets Vdo1a, desktop gets Vdo4 */
 .bg-video{
@@ -225,12 +249,32 @@ a{ color:inherit; text-decoration:none; }
   position:absolute; inset:0; border-radius:50%;
   border:1px solid rgba(255,255,255,.14);
   pointer-events:none;
+  transition: border-color .45s var(--ease-dream), box-shadow .45s var(--ease-dream), transform .45s var(--ease-dream);
 }
 .logo-ring.r1{ animation: ringBreathe 5s ease-in-out infinite; }
 .logo-ring.r2{ inset:-8px; animation: ringBreathe 5s ease-in-out infinite 1.2s; border-color:rgba(184,242,255,.12); }
 @keyframes ringBreathe{
   0%,100%{ transform:scale(1); opacity:.5; }
   50%{ transform:scale(1.05); opacity:.9; }
+}
+/* Luz LED que se enciende alrededor del logo al pasar el mouse (o al enfocar
+   con teclado) — un tercer anillo, más grande y más brillante que los dos
+   de "respiración" constante. */
+.logo-orbit::before{
+  content:'';
+  position:absolute; inset:-18px; border-radius:50%;
+  pointer-events:none; z-index:3;
+  box-shadow: 0 0 0 rgba(255,184,230,0);
+  opacity:0;
+  transition: opacity .5s var(--ease-dream), box-shadow .5s var(--ease-dream);
+}
+.logo-orbit:hover::before,
+.logo-orbit:has(.logo-btn:focus-visible)::before{
+  opacity:1;
+  box-shadow:
+    0 0 22px 6px var(--pink-soft),
+    0 0 46px 14px var(--cyan-soft),
+    0 0 70px 20px rgba(217,194,255,.28);
 }
 
 .logo-img{
@@ -241,11 +285,16 @@ a{ color:inherit; text-decoration:none; }
   pointer-events:none; /* clicks always resolve to the button, never get "stuck" on the image */
 }
 .logo-btn:hover .logo-img,
-.logo-btn.is-open .logo-img{
-  transform: scale(1.045);
-  filter: contrast(1.28) brightness(1.3) saturate(1.35)
-          drop-shadow(0 0 18px var(--pink-soft))
-          drop-shadow(0 0 34px var(--cyan-soft));
+.logo-btn:focus-visible .logo-img{
+  transform: scale(1.16);
+  filter: contrast(1.32) brightness(1.35) saturate(1.4)
+          drop-shadow(0 0 22px var(--pink-soft))
+          drop-shadow(0 0 42px var(--cyan-soft));
+}
+.logo-btn:hover .logo-ring,
+.logo-btn:focus-visible .logo-ring{
+  border-color: var(--pearl);
+  box-shadow: 0 0 14px var(--pink-soft), 0 0 26px var(--cyan-soft);
 }
 .logo-btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:6px; border-radius:50%; }
 
@@ -253,6 +302,7 @@ a{ color:inherit; text-decoration:none; }
    extra-large tap target that also opens the menu (handled via delegation). */
 .tap-badge{
   position:absolute; inset:-34px;
+  display:block;
   cursor:pointer;
   clip-path:circle(50%);
   z-index:4;
@@ -268,47 +318,6 @@ a{ color:inherit; text-decoration:none; }
 }
 @keyframes spinBadge{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
 @media (prefers-reduced-motion: reduce){ .tap-badge{ animation:none; } }
-
-.radial-menu{
-  position:absolute; inset:0;
-  pointer-events:none;
-}
-.radial-item{
-  position:absolute; top:50%; left:50%;
-  transform: translate(-50%,-50%) scale(.3);
-  opacity:0; pointer-events:none;
-  transition: transform .55s var(--ease-dream), opacity .4s ease;
-  will-change: transform, opacity;
-}
-.radial-menu.is-open .radial-item{
-  transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1);
-  opacity:1; pointer-events:auto;
-}
-.radial-menu.is-open .radial-item:nth-child(1){ transition-delay:.02s; }
-.radial-menu.is-open .radial-item:nth-child(2){ transition-delay:.09s; }
-.radial-menu.is-open .radial-item:nth-child(3){ transition-delay:.16s; }
-
-.radial-led{
-  display:flex; align-items:center; justify-content:center;
-  min-width:96px; padding:.7rem 1rem;
-  border-radius:16px;
-  border:1px solid var(--glass-brd);
-  background:rgba(20,14,32,.62);
-  backdrop-filter:blur(14px);
-  color:var(--pearl);
-  font-family:'Unbounded',sans-serif; font-weight:600; font-size:.66rem;
-  letter-spacing:.04em; text-align:center; text-transform:uppercase;
-  cursor:pointer;
-  transition: box-shadow .35s, border-color .35s, color .35s, transform .35s;
-}
-.radial-led.tone-pink{ box-shadow: 0 0 16px rgba(255,184,230,.35), inset 0 0 14px rgba(255,184,230,.14); border-color: rgba(255,184,230,.4); }
-.radial-led.tone-cyan{ box-shadow: 0 0 16px rgba(184,242,255,.35), inset 0 0 14px rgba(184,242,255,.14); border-color: rgba(184,242,255,.4); }
-.radial-led:hover, .radial-led:focus-visible{
-  transform:translateY(-3px);
-  border-color:var(--pearl);
-  color:#fff;
-  box-shadow: 0 0 16px var(--pink-soft), 0 0 34px var(--cyan-soft), inset 0 0 18px rgba(255,255,255,.1);
-}
 
 .social-row{
   display:flex; align-items:center; justify-content:center; gap:.9rem;
@@ -458,30 +467,30 @@ a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-of
 
   <main class="stage">
 
-    <div class="logo-orbit">
-      <div id="radial-menu" class="radial-menu" aria-hidden="true"></div>
+    <h1 class="sr-only" data-i18n="h1_title">ArtNonimu's — Espacio de Arte | Retratos hechos a mano | Polonia</h1>
 
-      <div class="tap-badge" aria-hidden="true">
+    <div class="logo-orbit">
+
+      <a class="tap-badge" href="tienda.html" aria-hidden="true" tabindex="-1">
         <svg class="tap-badge-svg" viewBox="0 0 200 200">
           <defs>
             <path id="tapCirclePath" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"/>
           </defs>
           <text class="tap-badge-text">
-            <textPath href="#tapCirclePath" startOffset="0%" data-i18n="tap_badge_text">DOTKNIJ MNIE • DOTKNIJ MNIE • </textPath>
+            <textPath href="#tapCirclePath" startOffset="0%" data-i18n="tap_badge_text">DOTKNIJ LOGO • DOTKNIJ LOGO • </textPath>
           </text>
         </svg>
-      </div>
+      </a>
 
-      <button id="logo-btn" class="logo-btn" type="button"
-              aria-haspopup="true" aria-expanded="false" aria-controls="radial-menu"
-              aria-label="Abrir menú">
+      <a id="logo-btn" class="logo-btn" href="tienda.html"
+         data-i18n-aria-label="logo_aria_label" aria-label="Przejdź do sklepu ArtNonimu's">
         <span class="logo-ring r1"></span>
         <span class="logo-ring r2"></span>
-        <img class="logo-img" src="https://i.ibb.co/mPQjbWs/1784228306856.png" alt="ArtNonimu's">
-      </button>
+        <img class="logo-img" src="https://i.ibb.co/mPQjbWs/1784228306856.png" alt="ArtNonimu's — Espacio de Arte" width="200" height="200" fetchpriority="high">
+      </a>
     </div>
 
-    <p class="tagline glow-lilac float-c" data-i18n="tagline">Przestrzeń Sztuki</p>
+    <h2 class="tagline glow-lilac float-c" data-i18n="tagline">Przestrzeń Sztuki</h2>
 
     <div class="social-row" aria-label="Media społecznościowe">
       <a class="social-btn float-a" href="https://www.facebook.com/share/1HShtjirCN/" target="_blank" rel="noopener" aria-label="Facebook">
@@ -575,7 +584,9 @@ const translations = {
     info_cta:"Napisz na WhatsApp",
     stat_techniques:"Techniki", stat_ship:"Dostawa", stat_original:"Oryginał",
     wa_generic:"Cześć! Chcę zamówić portret. Proszę o więcej informacji.",
-    tap_badge_text:"DOTKNIJ MNIE • DOTKNIJ MNIE • ",
+    tap_badge_text:"DOTKNIJ LOGO • DOTKNIJ LOGO • ",
+    h1_title:"ArtNonimu's — Przestrzeń Sztuki | Portrety w świecie snu | Polska",
+    logo_aria_label:"Przejdź do sklepu ArtNonimu's",
     page_title:"ArtNonimu's — Przestrzeń Sztuki | Portrety w świecie snu | Polska",
     meta_description:"ArtNonimu's — przestrzeń sztuki dreamcore. Ręcznie malowane portrety zwierząt i ludzi na zamówienie, sztuka fizyczna i cyfrowa. Pracownia w Polsce z wysyłką do całej Europy i Ameryki Łacińskiej."
   },
@@ -589,7 +600,9 @@ const translations = {
     info_cta:"Message on WhatsApp",
     stat_techniques:"Techniques", stat_ship:"Delivery", stat_original:"Original",
     wa_generic:"Hi! I'd like to order a portrait. Could you tell me more?",
-    tap_badge_text:"TOUCH ME • TOUCH ME • ",
+    tap_badge_text:"TOUCH THE LOGO • TOUCH THE LOGO • ",
+    h1_title:"ArtNonimu's — Art Space | Dreamlike Portraits | Poland",
+    logo_aria_label:"Go to ArtNonimu's shop",
     page_title:"ArtNonimu's — Art Space | Dreamlike Portraits | Poland",
     meta_description:"ArtNonimu's — a dreamcore art space. Hand-painted custom portraits of pets and people, physical and digital art. Based in Poland, shipping across Europe and Latin America."
   },
@@ -603,7 +616,9 @@ const translations = {
     info_cta:"Escribir por WhatsApp",
     stat_techniques:"Técnicas", stat_ship:"Envío", stat_original:"Original",
     wa_generic:"¡Hola! Quiero encargar un retrato. ¿Podrías darme más información?",
-    tap_badge_text:"TÓCAME • TÓCAME • ",
+    tap_badge_text:"TOCA EL LOGO • TOCA EL LOGO • ",
+    h1_title:"ArtNonimu's — Espacio de Arte | Retratos de Ensueño | Polonia",
+    logo_aria_label:"Ir a la tienda de ArtNonimu's",
     page_title:"ArtNonimu's — Espacio de Arte | Retratos de Ensueño | Polonia",
     meta_description:"ArtNonimu's — un espacio de arte dreamcore. Retratos personalizados de mascotas y personas hechos a mano, arte física y arte digital. Con sede en Polonia y envíos a toda Europa y Latinoamérica."
   },
@@ -617,7 +632,9 @@ const translations = {
     info_cta:"Scrivi su WhatsApp",
     stat_techniques:"Tecniche", stat_ship:"Spedizione", stat_original:"Originale",
     wa_generic:"Ciao! Vorrei ordinare un ritratto. Potresti darmi maggiori informazioni?",
-    tap_badge_text:"TOCCAMI • TOCCAMI • ",
+    tap_badge_text:"TOCCA IL LOGO • TOCCA IL LOGO • ",
+    h1_title:"ArtNonimu's — Spazio d'Arte | Ritratti Onirici | Polonia",
+    logo_aria_label:"Vai al negozio di ArtNonimu's",
     page_title:"ArtNonimu's — Spazio d'Arte | Ritratti Onirici | Polonia",
     meta_description:"ArtNonimu's — uno spazio d'arte dreamcore. Ritratti personalizzati di animali e persone dipinti a mano, arte fisica e arte digitale. Con sede in Polonia, spedizioni in tutta Europa e America Latina."
   },
@@ -631,7 +648,9 @@ const translations = {
     info_cta:"Escrever no WhatsApp",
     stat_techniques:"Técnicas", stat_ship:"Envio", stat_original:"Original",
     wa_generic:"Olá! Gostaria de encomendar um retrato. Poderia me dar mais informações?",
-    tap_badge_text:"TOQUE AQUI • TOQUE AQUI • ",
+    tap_badge_text:"TOQUE NO LOGO • TOQUE NO LOGO • ",
+    h1_title:"ArtNonimu's — Espaço de Arte | Retratos Oníricos | Polônia",
+    logo_aria_label:"Ir para a loja da ArtNonimu's",
     page_title:"ArtNonimu's — Espaço de Arte | Retratos Oníricos | Polônia",
     meta_description:"ArtNonimu's — um espaço de arte dreamcore. Retratos personalizados de pets e pessoas pintados à mão, arte física e arte digital. Sediado na Polônia, com envios para toda a Europa e América Latina."
   }
@@ -669,72 +688,29 @@ function applyLanguage(lang){
     const v=t(k);
     if(v) el.textContent=v;
   });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach(el=>{
+    const k=el.getAttribute("data-i18n-aria-label");
+    const v=t(k);
+    if(v) el.setAttribute("aria-label",v);
+  });
   document.documentElement.setAttribute("lang",currentLang);
   document.querySelectorAll(".lang-pill").forEach(b=>b.classList.toggle("is-active",b.getAttribute("data-lang")===currentLang));
   updateWaLinks();
   updateSeoMeta();
-  layoutRadial();
-  buildRadialItems();
 }
 
 /* ============================================================
-   INDEX PAGE — radial menu + info modal
+   INDEX PAGE — info modal
    ============================================================ */
-/* Un solo acceso: el botón lleva directo a la tienda (que ya reúne
-   arte física y arte digital, con sus propias pestañas internas). */
-const menuItems = [
-  { key:"shop", labelKey:"menu_shop", href:"tienda.html", tone:"tone-cyan" }
-];
-
-const radialMenu = document.getElementById("radial-menu");
-const logoBtn = document.getElementById("logo-btn");
+/* El logo y el anillo "TOCA EL LOGO" son enlaces reales a tienda.html
+   (ver <a id="logo-btn"> y <a class="tap-badge"> en el HTML): la
+   navegación la resuelve el propio navegador, sin JS de por medio y
+   sin ningún cartel/menú intermedio. */
 const infoModal = document.getElementById("info-modal");
 
-function buildRadialItems(){
-  if(!radialMenu) return;
-  radialMenu.innerHTML = menuItems.map(item=>{
-    const label = t(item.labelKey);
-    if(item.action==="info"){
-      return `<div class="radial-item"><button type="button" class="radial-led ${item.tone} float-c" data-action="info">${label}</button></div>`;
-    }
-    return `<div class="radial-item"><a class="radial-led ${item.tone} float-a" href="${item.href}">${label}</a></div>`;
-  }).join("");
-  layoutRadial();
-}
-
-function layoutRadial(){
-  if(!radialMenu) return;
-  const items = radialMenu.querySelectorAll(".radial-item");
-  const n = items.length;
-  const radius = Math.max(88, Math.min(window.innerWidth * 0.26, 140));
-  const arcStart = -160, arcEnd = -20;
-  items.forEach((el,i)=>{
-    const angle = n===1 ? -90 : arcStart + (arcEnd-arcStart)*(i/(n-1));
-    const rad = angle*Math.PI/180;
-    const x = radius*Math.cos(rad);
-    const y = radius*Math.sin(rad);
-    el.style.setProperty("--tx", x.toFixed(1)+"px");
-    el.style.setProperty("--ty", y.toFixed(1)+"px");
-  });
-}
-
-function openMenu(){
-  radialMenu.classList.add("is-open");
-  logoBtn.classList.add("is-open");
-  logoBtn.setAttribute("aria-expanded","true");
-}
-function closeMenu(){
-  radialMenu.classList.remove("is-open");
-  logoBtn.classList.remove("is-open");
-  logoBtn.setAttribute("aria-expanded","false");
-}
-function toggleMenu(){
-  if(radialMenu.classList.contains("is-open")) closeMenu(); else openMenu();
-}
 function openInfo(){
   infoModal.classList.add("is-open");
   infoModal.setAttribute("aria-hidden","false");
-  closeMenu();
 }
 function closeInfo(){
   infoModal.classList.remove("is-open");
@@ -752,9 +728,6 @@ document.addEventListener("click", (e)=>{
   const langBtn = e.target.closest("[data-lang]");
   if(langBtn){ applyLanguage(langBtn.getAttribute("data-lang")); return; }
 
-  const logoHit = e.target.closest("#logo-btn") || e.target.closest(".tap-badge");
-  if(logoHit){ toggleMenu(); return; }
-
   const infoAction = e.target.closest('[data-action="info"]');
   if(infoAction){ openInfo(); return; }
 
@@ -762,18 +735,11 @@ document.addEventListener("click", (e)=>{
   if(closeBtn){ closeInfo(); return; }
 
   if(e.target === infoModal){ closeInfo(); return; }
-
-  if(radialMenu && radialMenu.classList.contains("is-open") &&
-     !e.target.closest("#radial-menu")){
-    closeMenu();
-  }
 });
 
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){ closeMenu(); closeInfo(); }
+  if(e.key==="Escape"){ closeInfo(); }
 });
-
-window.addEventListener("resize",()=>{ layoutRadial(); });
 
 /* Honor ?lang=xx in the URL (used by the hreflang alternates in <head>)
    so each language has a real, linkable entry point. */
@@ -781,7 +747,6 @@ const urlLang = new URLSearchParams(window.location.search).get("lang");
 if(urlLang && translations[urlLang] && urlLang!=="pl"){
   applyLanguage(urlLang);
 } else {
-  buildRadialItems();
   updateWaLinks();
 }
 
