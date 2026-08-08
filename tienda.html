@@ -180,6 +180,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .add-cart-btn{ margin-top:.5rem; display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:.65rem 1rem; border-radius:999px; background:linear-gradient(135deg,var(--pink),var(--lilac)); color:#1a1024; font-family:'Unbounded',sans-serif; font-weight:600; font-size:.7rem; letter-spacing:.03em; text-transform:uppercase; border:none; cursor:pointer; transition: box-shadow .3s, transform .3s; }
 .add-cart-btn:hover{ box-shadow:0 0 22px rgba(255,184,230,.5); transform:translateY(-2px); }
 .add-cart-btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; transform:none; }
+.reorder-controls{ display:flex; gap:.4rem; margin-top:.2rem; }
+.reorder-btn{ flex:1; padding:.45rem 0; border-radius:10px; border:1px solid var(--cyan-soft); background:rgba(8,16,20,.5); color:var(--cyan); font-size:.85rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s; }
+.reorder-btn:hover:not(:disabled){ box-shadow:0 0 10px rgba(184,242,255,.35); }
+.reorder-btn:disabled{ opacity:.25; cursor:default; }
+.product-card.is-reordering{ opacity:.5; pointer-events:none; }
 .empty-note{ text-align:center; font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(246,238,252,.4); padding:3rem 0; grid-column:1/-1; }
 
 /* ---------------- CART DRAWER ---------------- */
@@ -543,6 +548,7 @@ const translations = {
     manage_order_btn:"Ustaw kolejność", manage_order_title:"Ustaw kolejność prac",
     order_hint:"Przeciągnij lub użyj strzałek, aby wybrać kolejność wyświetlania prac w sklepie.",
     save_order_btn:"Zapisz kolejność", order_saved:"Kolejność zapisana", order_save_error:"Błąd przy zapisywaniu kolejności",
+    move_earlier:"Wcześniej", move_later:"Później",
     lightbox_wa_btn:"Wolę kupić przez WhatsApp",
     wa_product_message:"Cześć! Interesuje mnie ta praca: \"{title}\" ({price}). Wolę kupić przez WhatsApp — czy możesz mi pomóc?"
   },
@@ -590,6 +596,7 @@ const translations = {
     manage_order_btn:"Set order", manage_order_title:"Order the pieces",
     order_hint:"Drag or use the arrows to choose the order pieces are shown in the shop.",
     save_order_btn:"Save order", order_saved:"Order saved", order_save_error:"Error saving order",
+    move_earlier:"Earlier", move_later:"Later",
     lightbox_wa_btn:"I'd rather buy via WhatsApp",
     wa_product_message:"Hi! I'm interested in this piece: \"{title}\" ({price}). I'd rather buy via WhatsApp — could you help me?"
   },
@@ -637,6 +644,7 @@ const translations = {
     manage_order_btn:"Ordenar obras", manage_order_title:"Ordenar obras",
     order_hint:"Arrastrá o usá las flechas para elegir en qué orden se muestran las obras en la tienda.",
     save_order_btn:"Guardar orden", order_saved:"Orden guardado", order_save_error:"Error al guardar el orden",
+    move_earlier:"Antes", move_later:"Después",
     lightbox_wa_btn:"Prefiero comprar por WhatsApp",
     wa_product_message:"¡Hola! Me interesa esta obra: \"{title}\" ({price}). Prefiero comprar por WhatsApp, ¿podrías ayudarme?"
   },
@@ -684,6 +692,7 @@ const translations = {
     manage_order_btn:"Ordina opere", manage_order_title:"Ordina le opere",
     order_hint:"Trascina o usa le frecce per scegliere l'ordine in cui le opere appaiono nel negozio.",
     save_order_btn:"Salva ordine", order_saved:"Ordine salvato", order_save_error:"Errore nel salvataggio dell'ordine",
+    move_earlier:"Prima", move_later:"Dopo",
     lightbox_wa_btn:"Preferisco comprare su WhatsApp",
     wa_product_message:"Ciao! Sono interessato/a a quest'opera: \"{title}\" ({price}). Preferisco comprare su WhatsApp, potresti aiutarmi?"
   },
@@ -731,6 +740,7 @@ const translations = {
     manage_order_btn:"Ordenar obras", manage_order_title:"Ordenar as obras",
     order_hint:"Arraste ou use as setas para escolher a ordem em que as obras aparecem na loja.",
     save_order_btn:"Salvar ordem", order_saved:"Ordem salva", order_save_error:"Erro ao salvar a ordem",
+    move_earlier:"Antes", move_later:"Depois",
     lightbox_wa_btn:"Prefiro comprar pelo WhatsApp",
     wa_product_message:"Olá! Tenho interesse nesta obra: \"{title}\" ({price}). Prefiro comprar pelo WhatsApp, você poderia me ajudar?"
   }
@@ -922,6 +932,31 @@ function nextSortOrder(){
   return Math.max(...allProducts.map(p=>Number.isFinite(p.sort_order) ? p.sort_order : 0)) + 1;
 }
 
+/* ------------------------------------------------------------
+   Guarda un orden nuevo: le asigna sort_order = índice (0,1,2…) a cada
+   obra de la lista, en ese orden, y lo persiste vía admin-product
+   "update" (incluyendo weight_kg/shipping_size actuales de cada obra,
+   porque esa Edge Function siempre pisa esos dos campos con lo que
+   reciba — así no se pierden al reordenar).
+   Se usa tanto desde las flechas de cada tarjeta como desde el modal
+   "Ordenar obras".
+   ------------------------------------------------------------ */
+async function persistOrder(orderedList){
+  for(let i=0; i<orderedList.length; i++){
+    const it = orderedList[i];
+    const res = await fetch(`${FUNCTIONS_URL}/admin-product`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({
+        token: adminToken, action:"update", id: it.id,
+        product:{ sort_order: i, weight_kg: it.weight_kg, shipping_size: it.shipping_size }
+      })
+    });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "update-failed");
+  }
+}
+
 /* ============================================================
    COLECCIONES / ESTILOS
     Crear/renombrar/borrar pasa por el Edge Function
@@ -1063,6 +1098,8 @@ document.getElementById("styles-row").addEventListener("click", (e)=>{
   renderProducts();
 });
 
+let currentRenderedList = []; // último listado filtrado/renderizado (para saber qué obra es "vecina" al reordenar)
+
 function renderProducts(){
   const grid = document.getElementById("product-grid");
   const list = allProducts.filter(p=>{
@@ -1072,12 +1109,13 @@ function renderProducts(){
     const isSold = !!p.is_sold;
     return activeStatus === "sold" ? isSold : !isSold;
   });
+  currentRenderedList = list;
   if(list.length===0){
     grid.innerHTML = `<div class="empty-note">${activeStatus === "sold" ? t("empty_sold") : t("empty")}</div>`;
     return;
   }
 
-  grid.innerHTML = list.map(p=>{
+  grid.innerHTML = list.map((p,idx)=>{
     const imgs = getImages(p);
     return `
     <div class="product-card glass-panel" data-id="${p.id}">
@@ -1092,11 +1130,45 @@ function renderProducts(){
         <h3>${escapeHtml(p.title)}</h3>
         ${(()=>{ const metaParts=[p.technique, p.dimensions, p.style?styleLabel(p.style):null].filter(Boolean); return metaParts.length ? `<div class="product-meta">${escapeHtml(metaParts.join(" · "))}</div>` : ""; })()}
         <div class="product-price">${formatPrice(p.price, p.currency)}</div>
+        ${adminToken ? `
+        <div class="reorder-controls">
+          <button type="button" class="reorder-btn" data-move-earlier="${p.id}" ${idx===0?"disabled":""} aria-label="${t("move_earlier")}" title="${t("move_earlier")}">‹ ${t("move_earlier")}</button>
+          <button type="button" class="reorder-btn" data-move-later="${p.id}" ${idx===list.length-1?"disabled":""} aria-label="${t("move_later")}" title="${t("move_later")}">${t("move_later")} ›</button>
+        </div>` : ""}
         <button type="button" class="add-cart-btn" data-add-id="${p.id}" ${p.is_sold ? "disabled" : ""}>${t("add_to_cart")}</button>
       </div>
     </div>
   `;
   }).join("");
+}
+
+/* ------------------------------------------------------------
+   Reordenar obras directamente desde las flechas de cada tarjeta,
+   en la propia página (no hace falta abrir ningún modal aparte).
+   Intercambia de lugar con la obra vecina EN LA LISTA QUE SE ESTÁ
+   VIENDO en ese momento y guarda el nuevo orden al instante.
+   ------------------------------------------------------------ */
+let reorderBusy = false;
+async function moveCardInGrid(id, delta){
+  if(reorderBusy || !adminToken) return;
+  const idx = currentRenderedList.findIndex(p=>p.id===id);
+  if(idx === -1) return;
+  const swapIdx = idx + delta;
+  if(swapIdx < 0 || swapIdx >= currentRenderedList.length) return;
+
+  const newList = currentRenderedList.slice();
+  [newList[idx], newList[swapIdx]] = [newList[swapIdx], newList[idx]];
+
+  reorderBusy = true;
+  document.querySelectorAll(".product-card").forEach(el=>el.classList.add("is-reordering"));
+  try{
+    await persistOrder(newList);
+    await loadProducts();
+  } catch(e){
+    alert(t("order_save_error"));
+  } finally{
+    reorderBusy = false;
+  }
 }
 
 function formatPrice(price, currency){
@@ -1200,6 +1272,10 @@ document.getElementById("product-grid").addEventListener("click", (e)=>{
   if(delBtn){ deleteProduct(delBtn.getAttribute("data-delete-id")); return; }
   const editBtn = e.target.closest("[data-edit-id]");
   if(editBtn){ openEditModal(editBtn.getAttribute("data-edit-id")); return; }
+  const moveEarlierBtn = e.target.closest("[data-move-earlier]");
+  if(moveEarlierBtn){ moveCardInGrid(moveEarlierBtn.getAttribute("data-move-earlier"), -1); return; }
+  const moveLaterBtn = e.target.closest("[data-move-later]");
+  if(moveLaterBtn){ moveCardInGrid(moveLaterBtn.getAttribute("data-move-later"), 1); return; }
   const imgWrap = e.target.closest("[data-lightbox-id]");
   if(imgWrap){ openLightbox(imgWrap.getAttribute("data-lightbox-id")); return; }
 });
@@ -1973,19 +2049,7 @@ document.getElementById("admin-reorder-save").addEventListener("click", async ()
   const msg = document.getElementById("admin-reorder-msg");
   msg.textContent = ""; msg.className = "modal-msg";
   try{
-    for(let i=0; i<reorderItems.length; i++){
-      const it = reorderItems[i];
-      const res = await fetch(`${FUNCTIONS_URL}/admin-product`, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
-        body: JSON.stringify({
-          token: adminToken, action:"update", id: it.id,
-          product:{ sort_order: i, weight_kg: it.weight_kg, shipping_size: it.shipping_size }
-        })
-      });
-      const data = await res.json();
-      if(!data.ok) throw new Error(data.error || "update-failed");
-    }
+    await persistOrder(reorderItems);
     msg.textContent = t("order_saved"); msg.classList.add("is-ok");
     await loadProducts();
     setTimeout(()=>closeModal("admin-reorder-overlay"), 700);
