@@ -181,6 +181,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .tattoo-card .cap span{
   display:block; font-family:'Space Mono',monospace; font-weight:400; font-size:.7rem; opacity:.75; margin-top:2px;
 }
+.tattoo-card .count-badge{
+  position:absolute; top:10px; right:10px; z-index:2;
+  display:flex; align-items:center; gap:4px;
+  padding:4px 9px; border-radius:999px;
+  background:rgba(11,7,20,.6); border:1px solid var(--glass-brd);
+  font-family:'Space Mono',monospace; font-size:.7rem; backdrop-filter:blur(4px);
+}
+.tattoo-card .count-badge svg{ width:11px; height:11px; }
 .gallery-empty, .gallery-loading{ text-align:center; opacity:.7; padding:40px 10px; font-size:.95rem; }
 
 /* LIGHTBOX */
@@ -191,12 +199,36 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 .lightbox.is-open{ display:flex; }
 .lightbox-panel{ max-width:560px; width:100%; padding:20px; position:relative; }
-.lightbox-panel img{ border-radius:18px; width:100%; max-height:60vh; object-fit:contain; background:rgba(0,0,0,.3); }
+.lightbox-media{ position:relative; }
+.lightbox-panel img.lightbox-main-img{ border-radius:18px; width:100%; max-height:60vh; object-fit:contain; background:rgba(0,0,0,.3); user-select:none; }
 .lightbox-close{
   position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%;
   background:var(--glass); border:1px solid var(--glass-brd); color:var(--pearl);
-  font-size:1.1rem; cursor:pointer;
+  font-size:1.1rem; cursor:pointer; z-index:3;
 }
+.lightbox-nav{
+  position:absolute; top:50%; transform:translateY(-50%); z-index:2;
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(11,7,20,.55); border:1px solid var(--glass-brd); color:var(--pearl);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:background .2s, transform .2s;
+}
+.lightbox-nav:hover{ background:rgba(11,7,20,.8); }
+.lightbox-nav.prev{ left:6px; }
+.lightbox-nav.next{ right:6px; }
+.lightbox-nav svg{ width:18px; height:18px; }
+.lightbox-dots{ display:flex; justify-content:center; gap:6px; margin-top:10px; }
+.lightbox-dots button{
+  width:7px; height:7px; border-radius:50%; padding:0; border:none;
+  background:rgba(255,255,255,.28); cursor:pointer; transition:background .2s, transform .2s;
+}
+.lightbox-dots button.is-active{ background:linear-gradient(135deg, var(--pink), var(--cyan)); transform:scale(1.25); }
+.lightbox-thumbs{ display:flex; gap:6px; margin-top:10px; overflow-x:auto; padding-bottom:2px; }
+.lightbox-thumbs img{
+  width:52px; height:52px; object-fit:cover; border-radius:10px; flex:0 0 auto; cursor:pointer;
+  border:1.5px solid transparent; opacity:.6; transition:opacity .2s, border-color .2s;
+}
+.lightbox-thumbs img.is-active{ opacity:1; border-color:var(--pink); }
 .lightbox-info{ padding:14px 4px 4px; }
 .lightbox-info h3{ font-family:'Unbounded',sans-serif; font-size:1.15rem; }
 .lightbox-info .cat{ font-family:'Space Mono',monospace; font-size:.78rem; opacity:.7; margin-top:2px; }
@@ -379,7 +411,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 <div id="lightbox" class="lightbox" aria-hidden="true">
   <div class="lightbox-panel glass-panel">
     <button class="lightbox-close" id="lightbox-close" aria-label="Cerrar">×</button>
-    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-media">
+      <button class="lightbox-nav prev" id="lightbox-prev" aria-label="Anterior" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <img id="lightbox-img" class="lightbox-main-img" src="" alt="">
+      <button class="lightbox-nav next" id="lightbox-next" aria-label="Siguiente" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="lightbox-dots" id="lightbox-dots"></div>
+    <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
     <div class="lightbox-info">
       <h3 id="lightbox-title" class="glow-lilac"></h3>
       <div class="cat" id="lightbox-cat"></div>
@@ -511,9 +553,13 @@ function renderGallery(){
   }
   grid.innerHTML = "";
   items.forEach(item=>{
+    const imgs = Array.isArray(item.images) && item.images.length>0 ? item.images : [item.image_url];
     const card = document.createElement("div");
     card.className = "tattoo-card";
-    card.innerHTML = '<img src="'+item.image_url+'" alt="'+(item.title||"").replace(/"/g,"")+'" loading="lazy">'+
+    const badge = imgs.length>1
+      ? '<span class="count-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 21h11a2 2 0 0 0 2-2V8"/></svg>'+imgs.length+'</span>'
+      : '';
+    card.innerHTML = badge+'<img src="'+imgs[0]+'" alt="'+(item.title||"").replace(/"/g,"")+'" loading="lazy">'+
       '<div class="cap">'+(item.title||"")+(item.category?'<span>'+item.category+'</span>':'')+'</div>';
     card.addEventListener("click", ()=>openLightbox(item));
     grid.appendChild(card);
@@ -539,10 +585,53 @@ async function loadGallery(){
   }
 }
 
-/* ---------------- Lightbox ---------------- */
+/* ---------------- Lightbox (con carrusel) ---------------- */
 const lightbox = document.getElementById("lightbox");
+const lbImg = document.getElementById("lightbox-img");
+const lbDots = document.getElementById("lightbox-dots");
+const lbThumbs = document.getElementById("lightbox-thumbs");
+const lbPrev = document.getElementById("lightbox-prev");
+const lbNext = document.getElementById("lightbox-next");
+let lbImages = [];
+let lbIndex = 0;
+
+function renderLbImage(){
+  lbImg.src = lbImages[lbIndex];
+  Array.from(lbDots.children).forEach((d,i)=>d.classList.toggle("is-active", i===lbIndex));
+  Array.from(lbThumbs.children).forEach((th,i)=>th.classList.toggle("is-active", i===lbIndex));
+  const activeThumb = lbThumbs.children[lbIndex];
+  if(activeThumb) activeThumb.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" });
+}
+function lbGoTo(i){
+  lbIndex = (i + lbImages.length) % lbImages.length;
+  renderLbImage();
+}
+
 function openLightbox(item){
-  document.getElementById("lightbox-img").src = item.image_url;
+  lbImages = Array.isArray(item.images) && item.images.length>0 ? item.images : [item.image_url];
+  lbIndex = 0;
+
+  const multi = lbImages.length > 1;
+  lbPrev.style.display = multi ? "flex" : "none";
+  lbNext.style.display = multi ? "flex" : "none";
+
+  lbDots.innerHTML = "";
+  lbThumbs.innerHTML = "";
+  if(multi){
+    lbImages.forEach((url,i)=>{
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.addEventListener("click", ()=>lbGoTo(i));
+      lbDots.appendChild(dot);
+      const th = document.createElement("img");
+      th.src = url; th.alt = "";
+      th.addEventListener("click", ()=>lbGoTo(i));
+      lbThumbs.appendChild(th);
+    });
+  }
+
+  renderLbImage();
+
   document.getElementById("lightbox-title").textContent = item.title||"";
   document.getElementById("lightbox-cat").textContent = item.category||"";
   document.getElementById("lightbox-desc").textContent = item.description||"";
@@ -559,8 +648,25 @@ function closeLightbox(){
   lightbox.setAttribute("aria-hidden","true");
 }
 document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+lbPrev.addEventListener("click", ()=>lbGoTo(lbIndex-1));
+lbNext.addEventListener("click", ()=>lbGoTo(lbIndex+1));
 lightbox.addEventListener("click", e=>{ if(e.target===lightbox) closeLightbox(); });
-document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeLightbox(); });
+document.addEventListener("keydown", e=>{
+  if(!lightbox.classList.contains("is-open")) return;
+  if(e.key==="Escape") closeLightbox();
+  if(e.key==="ArrowLeft") lbGoTo(lbIndex-1);
+  if(e.key==="ArrowRight") lbGoTo(lbIndex+1);
+});
+/* swipe táctil en el carrusel */
+let touchStartX = null;
+const lbMedia = document.querySelector(".lightbox-media");
+lbMedia.addEventListener("touchstart", e=>{ touchStartX = e.touches[0].clientX; }, { passive:true });
+lbMedia.addEventListener("touchend", e=>{
+  if(touchStartX===null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(Math.abs(dx) > 40){ dx > 0 ? lbGoTo(lbIndex-1) : lbGoTo(lbIndex+1); }
+  touchStartX = null;
+});
 document.addEventListener("click", e=>{
   const langBtn = e.target.closest("[data-lang]");
   if(langBtn){ applyLanguage(langBtn.getAttribute("data-lang")); return; }
