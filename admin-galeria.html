@@ -48,15 +48,40 @@ button:disabled{ opacity:.5; cursor:default; }
 
 /* Fotos */
 .upload-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px; }
-.thumbs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-.thumbs img{ width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--glass-brd); }
+.thumbs{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.thumb-item{
+  position:relative; width:84px; text-align:center;
+}
+.thumb-item img{
+  width:84px; height:84px; object-fit:cover; border-radius:10px; border:1px solid var(--glass-brd); display:block;
+}
+.thumb-item .cover-tag{
+  position:absolute; top:4px; left:4px; font-size:.6rem; font-weight:700; letter-spacing:.03em;
+  padding:2px 6px; border-radius:6px; background:rgba(11,7,20,.7); color:var(--cyan);
+}
+.thumb-item .thumb-controls{
+  display:flex; justify-content:center; gap:4px; margin-top:4px;
+}
+.thumb-item .thumb-controls button{
+  padding:3px 7px; font-size:.68rem; border-radius:7px; background:var(--glass-2); color:var(--pearl); border:1px solid var(--glass-brd);
+}
+.thumb-item .thumb-controls button.rm{ background:rgba(255,120,120,.16); color:#ffb0b0; border-color:rgba(255,120,120,.35); }
+.thumb-hint{ font-size:.72rem; opacity:.6; margin-top:6px; }
+.edit-banner{
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
+  padding:9px 14px; border-radius:12px; margin-bottom:14px;
+  background:rgba(184,242,255,.12); border:1px solid rgba(184,242,255,.3); font-size:.82rem;
+}
+.edit-banner button{ font-size:.75rem; padding:6px 12px; }
 .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-top:16px; }
 .card{ background:var(--glass-2); border:1px solid var(--glass-brd); border-radius:16px; overflow:hidden; }
 .card img{ width:100%; aspect-ratio:4/5; object-fit:cover; }
 .card .body{ padding:10px 12px; }
 .card .body h4{ font-size:.85rem; }
 .card .body .cat{ font-size:.7rem; opacity:.65; font-family:'Space Mono',monospace; }
-.card .body button{ width:100%; margin-top:8px; font-size:.75rem; padding:7px; }
+.card .body .n-photos{ font-size:.68rem; opacity:.55; margin-top:2px; }
+.card .body .card-actions{ display:flex; gap:6px; margin-top:8px; }
+.card .body .card-actions button{ flex:1; font-size:.72rem; padding:7px 4px; }
 .status-msg{ font-size:.8rem; margin-top:10px; min-height:18px; }
 .status-msg.ok{ color:var(--ok); }
 .status-msg.bad{ color:var(--bad); }
@@ -110,7 +135,11 @@ button:disabled{ opacity:.5; cursor:default; }
 
     <div class="tab-content is-active" id="tab-fotos">
       <div class="panel">
-        <h3 style="margin-bottom:10px;">Agregar tatuaje</h3>
+        <div class="edit-banner" id="edit-banner" style="display:none;">
+          <span>✎ Editando: <strong id="edit-banner-title"></strong></span>
+          <button class="secondary" id="cancel-edit-btn" type="button">Cancelar edición</button>
+        </div>
+        <h3 style="margin-bottom:10px;" id="form-title">Agregar tatuaje</h3>
         <label for="t-title">Título</label>
         <input id="t-title" type="text" placeholder="Ej: Lobo geométrico">
         <label for="t-category">Estilo / categoría</label>
@@ -122,6 +151,7 @@ button:disabled{ opacity:.5; cursor:default; }
           <input id="t-files" type="file" accept="image/*" multiple style="width:auto;">
         </div>
         <div class="thumbs" id="t-thumbs"></div>
+        <div class="thumb-hint" id="thumb-hint" style="display:none;">La primera foto (marcada "portada") es la que se ve en la tarjeta de la galería. Usá ◀ ▶ para acomodar el orden.</div>
         <button id="t-save-btn" style="margin-top:14px;">Publicar en la galería</button>
         <div class="status-msg" id="t-status"></div>
       </div>
@@ -212,17 +242,54 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
 });
 
 /* ---------------- Fotos ---------------- */
-let pendingImages = []; // {file, publicUrl|null}
+// Estado unificado de imágenes del formulario: cada entrada es
+// { key, type:'existing'|'new', url (existentes), file (nuevas) }.
+// El orden del array ES el orden que se guarda (la [0] = portada).
+let currentImages = [];
+let editingId = null;
+let allTattoosCache = [];
+let imgKeySeq = 0;
+
+function renderThumbs(){
+  const thumbs = document.getElementById("t-thumbs");
+  const hint = document.getElementById("thumb-hint");
+  thumbs.innerHTML = "";
+  hint.style.display = currentImages.length>1 ? "block" : "none";
+  currentImages.forEach((entry, i)=>{
+    const src = entry.type==="existing" ? entry.url : entry._previewUrl;
+    const wrap = document.createElement("div");
+    wrap.className = "thumb-item";
+    wrap.innerHTML =
+      (i===0 ? '<span class="cover-tag">portada</span>' : '') +
+      '<img src="'+src+'" alt="">' +
+      '<div class="thumb-controls">' +
+        '<button type="button" class="mv-left" '+(i===0?"disabled":"")+'>◀</button>' +
+        '<button type="button" class="mv-right" '+(i===currentImages.length-1?"disabled":"")+'>▶</button>' +
+        '<button type="button" class="rm">✕</button>' +
+      '</div>';
+    wrap.querySelector(".mv-left").addEventListener("click", ()=>moveImage(i,-1));
+    wrap.querySelector(".mv-right").addEventListener("click", ()=>moveImage(i,1));
+    wrap.querySelector(".rm").addEventListener("click", ()=>removeImage(i));
+    thumbs.appendChild(wrap);
+  });
+}
+function moveImage(i, dir){
+  const j = i+dir;
+  if(j<0 || j>=currentImages.length) return;
+  [currentImages[i], currentImages[j]] = [currentImages[j], currentImages[i]];
+  renderThumbs();
+}
+function removeImage(i){
+  currentImages.splice(i,1);
+  renderThumbs();
+}
 
 document.getElementById("t-files").addEventListener("change", (e)=>{
-  pendingImages = Array.from(e.target.files).map(f=>({ file:f, publicUrl:null }));
-  const thumbs = document.getElementById("t-thumbs");
-  thumbs.innerHTML = "";
-  pendingImages.forEach(p=>{
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(p.file);
-    thumbs.appendChild(img);
+  Array.from(e.target.files).forEach(f=>{
+    currentImages.push({ key:"new-"+(imgKeySeq++), type:"new", file:f, _previewUrl:URL.createObjectURL(f) });
   });
+  renderThumbs();
+  e.target.value = "";
 });
 
 async function uploadOne(file){
@@ -232,6 +299,39 @@ async function uploadOne(file){
   return up.publicUrl;
 }
 
+function resetForm(){
+  editingId = null;
+  currentImages = [];
+  document.getElementById("t-title").value = "";
+  document.getElementById("t-category").value = "";
+  document.getElementById("t-desc").value = "";
+  document.getElementById("t-files").value = "";
+  document.getElementById("edit-banner").style.display = "none";
+  document.getElementById("form-title").textContent = "Agregar tatuaje";
+  document.getElementById("t-save-btn").textContent = "Publicar en la galería";
+  renderThumbs();
+}
+
+function startEdit(item){
+  editingId = item.id;
+  currentImages = (item.images && item.images.length ? item.images : [item.image_url]).map(url=>({
+    key:"existing-"+(imgKeySeq++), type:"existing", url
+  }));
+  document.getElementById("t-title").value = item.title || "";
+  document.getElementById("t-category").value = item.category || "";
+  document.getElementById("t-desc").value = item.description || "";
+  document.getElementById("t-files").value = "";
+  document.getElementById("edit-banner").style.display = "flex";
+  document.getElementById("edit-banner-title").textContent = item.title || "(sin título)";
+  document.getElementById("form-title").textContent = "Editar tatuaje";
+  document.getElementById("t-save-btn").textContent = "Guardar cambios";
+  document.getElementById("t-status").textContent = "";
+  renderThumbs();
+  document.querySelector("#tab-fotos .panel").scrollIntoView({ behavior:"smooth" });
+}
+
+document.getElementById("cancel-edit-btn").addEventListener("click", resetForm);
+
 document.getElementById("t-save-btn").addEventListener("click", async ()=>{
   const statusEl = document.getElementById("t-status");
   statusEl.className = "status-msg"; statusEl.textContent = "";
@@ -239,22 +339,25 @@ document.getElementById("t-save-btn").addEventListener("click", async ()=>{
   const category = document.getElementById("t-category").value.trim();
   const description = document.getElementById("t-desc").value.trim();
   if(!title){ statusEl.className="status-msg bad"; statusEl.textContent="Falta el título."; return; }
-  if(pendingImages.length===0){ statusEl.className="status-msg bad"; statusEl.textContent="Elegí al menos una foto."; return; }
+  if(currentImages.length===0){ statusEl.className="status-msg bad"; statusEl.textContent="Elegí al menos una foto."; return; }
 
   const btn = document.getElementById("t-save-btn");
-  btn.disabled = true; statusEl.textContent = "Subiendo fotos…";
+  btn.disabled = true; statusEl.textContent = "Subiendo fotos nuevas…";
   try{
     const urls = [];
-    for(const p of pendingImages){ urls.push(await uploadOne(p.file)); }
+    for(const entry of currentImages){
+      if(entry.type==="existing"){ urls.push(entry.url); }
+      else{ urls.push(await uploadOne(entry.file)); }
+    }
     statusEl.textContent = "Guardando...";
-    await callFn("admin-tattoo", { token, action:"insert", tattoo:{ title, category, description, images:urls } });
-    statusEl.className = "status-msg ok"; statusEl.textContent = "¡Publicado!";
-    document.getElementById("t-title").value = "";
-    document.getElementById("t-category").value = "";
-    document.getElementById("t-desc").value = "";
-    document.getElementById("t-files").value = "";
-    document.getElementById("t-thumbs").innerHTML = "";
-    pendingImages = [];
+    if(editingId){
+      await callFn("admin-tattoo", { token, action:"update", id:editingId, tattoo:{ title, category, description, images:urls } });
+      statusEl.className = "status-msg ok"; statusEl.textContent = "¡Cambios guardados!";
+    }else{
+      await callFn("admin-tattoo", { token, action:"insert", tattoo:{ title, category, description, images:urls } });
+      statusEl.className = "status-msg ok"; statusEl.textContent = "¡Publicado!";
+    }
+    resetForm();
     loadTattoos();
   }catch(e){
     statusEl.className = "status-msg bad"; statusEl.textContent = e.message;
@@ -270,15 +373,22 @@ async function loadTattoos(){
       headers:{ apikey:SUPABASE_ANON_KEY, Authorization:"Bearer "+SUPABASE_ANON_KEY }
     });
     const data = await res.json();
-    if(!Array.isArray(data) || data.length===0){ grid.innerHTML = '<div class="empty-note">Todavía no hay fotos.</div>'; return; }
+    allTattoosCache = Array.isArray(data) ? data : [];
+    if(allTattoosCache.length===0){ grid.innerHTML = '<div class="empty-note">Todavía no hay fotos.</div>'; return; }
     grid.innerHTML = "";
-    data.forEach(item=>{
+    allTattoosCache.forEach(item=>{
+      const n = Array.isArray(item.images) ? item.images.length : 1;
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = '<img src="'+item.image_url+'" alt="">'+
         '<div class="body"><h4>'+(item.title||"")+'</h4><div class="cat">'+(item.category||"")+'</div>'+
-        '<button class="danger" data-id="'+item.id+'">Eliminar</button></div>';
-      card.querySelector("button").addEventListener("click", ()=>deleteTattoo(item.id));
+        '<div class="n-photos">'+n+(n===1?' foto':' fotos')+'</div>'+
+        '<div class="card-actions">'+
+          '<button class="secondary edit-btn">Editar</button>'+
+          '<button class="danger del-btn">Eliminar</button>'+
+        '</div></div>';
+      card.querySelector(".edit-btn").addEventListener("click", ()=>startEdit(item));
+      card.querySelector(".del-btn").addEventListener("click", ()=>deleteTattoo(item.id));
       grid.appendChild(card);
     });
   }catch(e){
@@ -290,6 +400,7 @@ async function deleteTattoo(id){
   if(!confirm("¿Eliminar este tatuaje de la galería?")) return;
   try{
     await callFn("admin-tattoo", { token, action:"delete", id });
+    if(editingId===id) resetForm();
     loadTattoos();
   }catch(e){ alert(e.message); }
 }
