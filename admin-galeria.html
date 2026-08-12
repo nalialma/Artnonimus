@@ -146,6 +146,15 @@ button:disabled{ opacity:.5; cursor:default; }
         <input id="t-category" type="text" placeholder="Ej: blackwork, fineline, realismo...">
         <label for="t-desc">Descripción (opcional)</label>
         <textarea id="t-desc" rows="2" placeholder="Notas sobre la pieza, técnica, tiempo de sesión..."></textarea>
+        <label for="t-lang">¿En qué idioma escribiste esto?</label>
+        <select id="t-lang">
+          <option value="es" selected>Español</option>
+          <option value="pl">Polski</option>
+          <option value="en">English</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+        </select>
+        <div class="thumb-hint" style="display:block;">Así traducimos automáticamente para los visitantes que vean la web en otro idioma.</div>
         <label>Fotos</label>
         <div class="upload-row">
           <input id="t-files" type="file" accept="image/*" multiple style="width:auto;">
@@ -305,6 +314,7 @@ function resetForm(){
   document.getElementById("t-title").value = "";
   document.getElementById("t-category").value = "";
   document.getElementById("t-desc").value = "";
+  document.getElementById("t-lang").value = "es";
   document.getElementById("t-files").value = "";
   document.getElementById("edit-banner").style.display = "none";
   document.getElementById("form-title").textContent = "Agregar tatuaje";
@@ -320,6 +330,7 @@ function startEdit(item){
   document.getElementById("t-title").value = item.title || "";
   document.getElementById("t-category").value = item.category || "";
   document.getElementById("t-desc").value = item.description || "";
+  document.getElementById("t-lang").value = item.original_lang || "es";
   document.getElementById("t-files").value = "";
   document.getElementById("edit-banner").style.display = "flex";
   document.getElementById("edit-banner-title").textContent = item.title || "(sin título)";
@@ -338,6 +349,7 @@ document.getElementById("t-save-btn").addEventListener("click", async ()=>{
   const title = document.getElementById("t-title").value.trim();
   const category = document.getElementById("t-category").value.trim();
   const description = document.getElementById("t-desc").value.trim();
+  const original_lang = document.getElementById("t-lang").value;
   if(!title){ statusEl.className="status-msg bad"; statusEl.textContent="Falta el título."; return; }
   if(currentImages.length===0){ statusEl.className="status-msg bad"; statusEl.textContent="Elegí al menos una foto."; return; }
 
@@ -351,10 +363,10 @@ document.getElementById("t-save-btn").addEventListener("click", async ()=>{
     }
     statusEl.textContent = "Guardando...";
     if(editingId){
-      await callFn("admin-tattoo", { token, action:"update", id:editingId, tattoo:{ title, category, description, images:urls } });
+      await callFn("admin-tattoo", { token, action:"update", id:editingId, tattoo:{ title, category, description, images:urls, original_lang } });
       statusEl.className = "status-msg ok"; statusEl.textContent = "¡Cambios guardados!";
     }else{
-      await callFn("admin-tattoo", { token, action:"insert", tattoo:{ title, category, description, images:urls } });
+      await callFn("admin-tattoo", { token, action:"insert", tattoo:{ title, category, description, images:urls, original_lang } });
       statusEl.className = "status-msg ok"; statusEl.textContent = "¡Publicado!";
     }
     resetForm();
