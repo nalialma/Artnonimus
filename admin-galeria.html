@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Galería de Tatuajes</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Quicksand:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --pearl:#f6eefc; --pink:#ffb8e6; --cyan:#b8f2ff; --lilac:#d9c2ff;
+  --void:#0b0714; --glass: rgba(255,255,255,.07); --glass-2: rgba(255,255,255,.045); --glass-brd: rgba(255,255,255,.16);
+  --ok:#8ee8a8; --warn:#ffd479; --bad:#ff8f8f;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  min-height:100vh; font-family:'Quicksand',sans-serif; color:var(--pearl);
+  background: radial-gradient(ellipse 90% 60% at 50% -10%, #221a33 0%, var(--void) 55%);
+  padding:24px 16px 60px;
+}
+a{ color:inherit; }
+h1{ font-family:'Unbounded',sans-serif; font-size:1.4rem; margin-bottom:4px; }
+.wrap{ max-width:960px; margin:0 auto; }
+.panel{ background:var(--glass); border:1px solid var(--glass-brd); border-radius:22px; padding:22px; backdrop-filter:blur(14px); margin-bottom:20px; }
+input, select, textarea, button{ font-family:inherit; }
+input, select, textarea{
+  width:100%; padding:10px 13px; border-radius:12px; background:rgba(255,255,255,.06);
+  border:1px solid var(--glass-brd); color:var(--pearl); font-size:.9rem; margin-top:4px;
+}
+label{ font-size:.78rem; font-weight:700; opacity:.85; display:block; margin-top:12px; }
+label:first-child{ margin-top:0; }
+button{
+  cursor:pointer; border:none; border-radius:12px; padding:10px 18px; font-weight:700; font-size:.85rem;
+  background:linear-gradient(135deg, var(--pink), var(--cyan)); color:var(--void);
+}
+button.secondary{ background:var(--glass-2); color:var(--pearl); border:1px solid var(--glass-brd); }
+button.danger{ background:rgba(255,120,120,.18); color:#ffb0b0; border:1px solid rgba(255,120,120,.4); }
+button:disabled{ opacity:.5; cursor:default; }
+.top-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.tabs{ display:flex; gap:8px; margin-bottom:18px; }
+.tab-btn{ background:var(--glass-2); color:var(--pearl); border:1px solid var(--glass-brd); }
+.tab-btn.is-active{ background:linear-gradient(135deg, var(--pink), var(--cyan)); color:var(--void); }
+.tab-content{ display:none; }
+.tab-content.is-active{ display:block; }
+#login-screen{ max-width:380px; margin:80px auto; text-align:center; }
+#login-screen h1{ margin-bottom:16px; }
+.err-msg{ color:var(--bad); font-size:.82rem; margin-top:10px; min-height:18px; }
+
+/* Fotos */
+.upload-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px; }
+.thumbs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.thumbs img{ width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--glass-brd); }
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-top:16px; }
+.card{ background:var(--glass-2); border:1px solid var(--glass-brd); border-radius:16px; overflow:hidden; }
+.card img{ width:100%; aspect-ratio:4/5; object-fit:cover; }
+.card .body{ padding:10px 12px; }
+.card .body h4{ font-size:.85rem; }
+.card .body .cat{ font-size:.7rem; opacity:.65; font-family:'Space Mono',monospace; }
+.card .body button{ width:100%; margin-top:8px; font-size:.75rem; padding:7px; }
+.status-msg{ font-size:.8rem; margin-top:10px; min-height:18px; }
+.status-msg.ok{ color:var(--ok); }
+.status-msg.bad{ color:var(--bad); }
+
+/* Turnos */
+.filter-row{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.filter-row button{ padding:7px 14px; font-size:.78rem; }
+.booking-card{ background:var(--glass-2); border:1px solid var(--glass-brd); border-radius:16px; padding:16px; margin-bottom:12px; }
+.booking-card .head{ display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; }
+.booking-card h4{ font-size:1rem; }
+.badge{ font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:.03em; }
+.badge.pendiente{ background:rgba(255,212,121,.18); color:var(--warn); }
+.badge.confirmado{ background:rgba(142,232,168,.18); color:var(--ok); }
+.badge.cancelado{ background:rgba(255,143,143,.18); color:var(--bad); }
+.booking-card dl{ display:grid; grid-template-columns:auto 1fr; gap:4px 12px; margin-top:10px; font-size:.83rem; }
+.booking-card dt{ opacity:.6; }
+.booking-card .actions{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.booking-card .actions button{ font-size:.75rem; padding:7px 14px; }
+.ref-thumb{ width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:8px; }
+.empty-note{ opacity:.6; font-size:.85rem; padding:20px 0; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="login-screen">
+    <h1 class="glow">🔒 Panel de Galería</h1>
+    <div class="panel">
+      <label for="pw">Contraseña de administración</label>
+      <input id="pw" type="password" placeholder="••••••••">
+      <button id="login-btn" style="width:100%; margin-top:14px;">Entrar</button>
+      <div class="err-msg" id="login-err"></div>
+    </div>
+  </div>
+
+  <div id="app-screen" style="display:none;">
+    <div class="top-row">
+      <div>
+        <h1>Galería de Tatuajes — Admin</h1>
+      </div>
+      <div>
+        <a href="galeria.html" target="_blank"><button class="secondary">Ver galería pública ↗</button></a>
+        <button class="secondary" id="logout-btn">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn is-active" data-tab="fotos">Fotos</button>
+      <button class="tab-btn" data-tab="turnos">Turnos</button>
+    </div>
+
+    <div class="tab-content is-active" id="tab-fotos">
+      <div class="panel">
+        <h3 style="margin-bottom:10px;">Agregar tatuaje</h3>
+        <label for="t-title">Título</label>
+        <input id="t-title" type="text" placeholder="Ej: Lobo geométrico">
+        <label for="t-category">Estilo / categoría</label>
+        <input id="t-category" type="text" placeholder="Ej: blackwork, fineline, realismo...">
+        <label for="t-desc">Descripción (opcional)</label>
+        <textarea id="t-desc" rows="2" placeholder="Notas sobre la pieza, técnica, tiempo de sesión..."></textarea>
+        <label>Fotos</label>
+        <div class="upload-row">
+          <input id="t-files" type="file" accept="image/*" multiple style="width:auto;">
+        </div>
+        <div class="thumbs" id="t-thumbs"></div>
+        <button id="t-save-btn" style="margin-top:14px;">Publicar en la galería</button>
+        <div class="status-msg" id="t-status"></div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:4px;">Tatuajes publicados</h3>
+        <div class="grid" id="tattoo-grid"><div class="empty-note">Cargando…</div></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-turnos">
+      <div class="panel">
+        <div class="filter-row" id="booking-filters">
+          <button data-status="" class="is-active">Todos</button>
+          <button data-status="pendiente">Pendientes</button>
+          <button data-status="confirmado">Confirmados</button>
+          <button data-status="cancelado">Cancelados</button>
+        </div>
+        <div id="bookings-list"><div class="empty-note">Cargando…</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+const SUPABASE_URL = "https://fllsxgotovkljbohucum.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsbHN4Z290b3ZrbGpib2h1Y3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzMDc0MzYsImV4cCI6MjA5OTg4MzQzNn0.p2WMf76sSO25CbA63vxdi4jzfkQKGcfFIvLN29zMEfQ";
+
+function callFn(name, payload){
+  return fetch(SUPABASE_URL+"/functions/v1/"+name, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer "+SUPABASE_ANON_KEY },
+    body: JSON.stringify(payload)
+  }).then(async res=>{
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error || "Error de red");
+    return data;
+  });
+}
+
+let token = sessionStorage.getItem("admin_token") || null;
+
+function showApp(){
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app-screen").style.display = "block";
+  loadTattoos();
+  loadBookings();
+}
+
+if(token){ showApp(); }
+
+document.getElementById("login-btn").addEventListener("click", async ()=>{
+  const pw = document.getElementById("pw").value;
+  const errEl = document.getElementById("login-err");
+  errEl.textContent = "";
+  try{
+    const res = await fetch(SUPABASE_URL+"/functions/v1/admin-login", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer "+SUPABASE_ANON_KEY },
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "Contraseña incorrecta");
+    token = data.token;
+    sessionStorage.setItem("admin_token", token);
+    showApp();
+  }catch(e){
+    errEl.textContent = e.message;
+  }
+});
+document.getElementById("pw").addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("login-btn").click(); });
+
+document.getElementById("logout-btn").addEventListener("click", ()=>{
+  sessionStorage.removeItem("admin_token");
+  location.reload();
+});
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("is-active"));
+    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("is-active"));
+    btn.classList.add("is-active");
+    document.getElementById("tab-"+btn.dataset.tab).classList.add("is-active");
+  });
+});
+
+/* ---------------- Fotos ---------------- */
+let pendingImages = []; // {file, publicUrl|null}
+
+document.getElementById("t-files").addEventListener("change", (e)=>{
+  pendingImages = Array.from(e.target.files).map(f=>({ file:f, publicUrl:null }));
+  const thumbs = document.getElementById("t-thumbs");
+  thumbs.innerHTML = "";
+  pendingImages.forEach(p=>{
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(p.file);
+    thumbs.appendChild(img);
+  });
+});
+
+async function uploadOne(file){
+  const up = await callFn("admin-tattoo", { token, action:"get-upload-url", fileName:file.name });
+  const putRes = await fetch(up.signedUrl, { method:"PUT", headers:{ "Content-Type": file.type || "application/octet-stream" }, body:file });
+  if(!putRes.ok) throw new Error("Error subiendo "+file.name);
+  return up.publicUrl;
+}
+
+document.getElementById("t-save-btn").addEventListener("click", async ()=>{
+  const statusEl = document.getElementById("t-status");
+  statusEl.className = "status-msg"; statusEl.textContent = "";
+  const title = document.getElementById("t-title").value.trim();
+  const category = document.getElementById("t-category").value.trim();
+  const description = document.getElementById("t-desc").value.trim();
+  if(!title){ statusEl.className="status-msg bad"; statusEl.textContent="Falta el título."; return; }
+  if(pendingImages.length===0){ statusEl.className="status-msg bad"; statusEl.textContent="Elegí al menos una foto."; return; }
+
+  const btn = document.getElementById("t-save-btn");
+  btn.disabled = true; statusEl.textContent = "Subiendo fotos…";
+  try{
+    const urls = [];
+    for(const p of pendingImages){ urls.push(await uploadOne(p.file)); }
+    statusEl.textContent = "Guardando...";
+    await callFn("admin-tattoo", { token, action:"insert", tattoo:{ title, category, description, images:urls } });
+    statusEl.className = "status-msg ok"; statusEl.textContent = "¡Publicado!";
+    document.getElementById("t-title").value = "";
+    document.getElementById("t-category").value = "";
+    document.getElementById("t-desc").value = "";
+    document.getElementById("t-files").value = "";
+    document.getElementById("t-thumbs").innerHTML = "";
+    pendingImages = [];
+    loadTattoos();
+  }catch(e){
+    statusEl.className = "status-msg bad"; statusEl.textContent = e.message;
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+async function loadTattoos(){
+  const grid = document.getElementById("tattoo-grid");
+  try{
+    const res = await fetch(SUPABASE_URL+"/rest/v1/tattoos?select=*&order=sort_order.asc,created_at.desc", {
+      headers:{ apikey:SUPABASE_ANON_KEY, Authorization:"Bearer "+SUPABASE_ANON_KEY }
+    });
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length===0){ grid.innerHTML = '<div class="empty-note">Todavía no hay fotos.</div>'; return; }
+    grid.innerHTML = "";
+    data.forEach(item=>{
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = '<img src="'+item.image_url+'" alt="">'+
+        '<div class="body"><h4>'+(item.title||"")+'</h4><div class="cat">'+(item.category||"")+'</div>'+
+        '<button class="danger" data-id="'+item.id+'">Eliminar</button></div>';
+      card.querySelector("button").addEventListener("click", ()=>deleteTattoo(item.id));
+      grid.appendChild(card);
+    });
+  }catch(e){
+    grid.innerHTML = '<div class="empty-note">Error cargando la galería.</div>';
+  }
+}
+
+async function deleteTattoo(id){
+  if(!confirm("¿Eliminar este tatuaje de la galería?")) return;
+  try{
+    await callFn("admin-tattoo", { token, action:"delete", id });
+    loadTattoos();
+  }catch(e){ alert(e.message); }
+}
+
+/* ---------------- Turnos ---------------- */
+let activeStatus = "";
+
+document.getElementById("booking-filters").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-status]");
+  if(!btn) return;
+  document.querySelectorAll("#booking-filters button").forEach(b=>b.classList.remove("is-active"));
+  btn.classList.add("is-active");
+  activeStatus = btn.dataset.status;
+  loadBookings();
+});
+
+async function loadBookings(){
+  const list = document.getElementById("bookings-list");
+  list.innerHTML = '<div class="empty-note">Cargando…</div>';
+  try{
+    const data = await callFn("admin-bookings", { token, action:"list", status: activeStatus || undefined });
+    const bookings = data.bookings || [];
+    if(bookings.length===0){ list.innerHTML = '<div class="empty-note">No hay turnos acá.</div>'; return; }
+    list.innerHTML = "";
+    bookings.forEach(b=>{
+      const el = document.createElement("div");
+      el.className = "booking-card";
+      const dateStr = b.preferred_date ? b.preferred_date : "—";
+      el.innerHTML =
+        '<div class="head"><h4>'+b.name+'</h4><span class="badge '+b.status+'">'+b.status+'</span></div>'+
+        '<dl>'+
+          '<dt>Contacto</dt><dd>'+b.contact_method+': '+b.contact_value+'</dd>'+
+          '<dt>Fecha</dt><dd>'+dateStr+(b.preferred_time?' — '+b.preferred_time:'')+'</dd>'+
+          (b.style?'<dt>Estilo</dt><dd>'+b.style+'</dd>':'')+
+          (b.placement?'<dt>Zona</dt><dd>'+b.placement+'</dd>':'')+
+          (b.size_estimate?'<dt>Tamaño</dt><dd>'+b.size_estimate+'</dd>':'')+
+          '<dt>Descuento</dt><dd>'+(b.discount_applied?'10% aplicado':'—')+'</dd>'+
+          (b.message?'<dt>Mensaje</dt><dd>'+b.message+'</dd>':'')+
+        '</dl>'+
+        (b.reference_image_url?'<img class="ref-thumb" src="'+b.reference_image_url+'" alt="referencia">':'')+
+        '<div class="actions">'+
+          (b.status!=="confirmado"?'<button class="conf-btn">Confirmar</button>':'')+
+          (b.status!=="cancelado"?'<button class="secondary canc-btn">Cancelar</button>':'')+
+          '<button class="danger del-btn">Eliminar</button>'+
+        '</div>';
+      const confBtn = el.querySelector(".conf-btn");
+      if(confBtn) confBtn.addEventListener("click", ()=>updateBookingStatus(b.id, "confirmado"));
+      const cancBtn = el.querySelector(".canc-btn");
+      if(cancBtn) cancBtn.addEventListener("click", ()=>updateBookingStatus(b.id, "cancelado"));
+      el.querySelector(".del-btn").addEventListener("click", ()=>deleteBooking(b.id));
+      list.appendChild(el);
+    });
+  }catch(e){
+    list.innerHTML = '<div class="empty-note">Error cargando turnos.</div>';
+  }
+}
+
+async function updateBookingStatus(id, status){
+  try{ await callFn("admin-bookings", { token, action:"update_status", id, status }); loadBookings(); }
+  catch(e){ alert(e.message); }
+}
+async function deleteBooking(id){
+  if(!confirm("¿Eliminar este turno?")) return;
+  try{ await callFn("admin-bookings", { token, action:"delete", id }); loadBookings(); }
+  catch(e){ alert(e.message); }
+}
+
+})();
+</script>
+</body>
+</html>
