@@ -520,11 +520,63 @@ function applyLanguage(lang){
   document.querySelectorAll(".lang-pill").forEach(b=>b.classList.toggle("is-active", b.getAttribute("data-lang")===currentLang));
   const filterAllBtn = document.querySelector('.filter-pill[data-cat=""]');
   if(filterAllBtn) filterAllBtn.textContent = t("filter_all");
+  refreshTranslatedContent();
 }
 
 /* ---------------- Gallery ---------------- */
 let allTattoos = [];
 let activeCat = "";
+let currentLightboxItem = null;
+
+/* --- Traducción automática de título/descripción de cada tatuaje ---
+   El admin escribe cada ficha en el idioma que quiera; acá detectamos
+   ese idioma (guardado como original_lang) y, si el visitante eligió
+   otro idioma, pedimos la traducción (se cachea en tattoo_translations
+   para no repetirla la próxima vez). Mientras llega, se muestra el
+   texto original como respaldo. */
+let translationCache = {}; // "tattooId:lang" -> {title, description}
+function trKey(id, lang){ return id+":"+lang; }
+function getDisplayTitle(item){
+  if(!item) return "";
+  if(currentLang === item.original_lang) return item.title || "";
+  const c = translationCache[trKey(item.id, currentLang)];
+  return (c && c.title) ? c.title : (item.title || "");
+}
+function getDisplayDesc(item){
+  if(!item) return "";
+  if(currentLang === item.original_lang) return item.description || "";
+  const c = translationCache[trKey(item.id, currentLang)];
+  return (c && c.description!=null) ? c.description : (item.description || "");
+}
+async function loadCachedTranslations(lang){
+  try{
+    const { data, error } = await sb.from("tattoo_translations").select("tattoo_id,title,description").eq("lang", lang);
+    if(error) throw error;
+    (data||[]).forEach(row=>{ translationCache[trKey(row.tattoo_id, lang)] = { title:row.title, description:row.description }; });
+  }catch(e){ /* si falla, seguimos mostrando el idioma original */ }
+}
+async function ensureTranslations(lang){
+  const missing = allTattoos.filter(item => item.original_lang !== lang && !translationCache[trKey(item.id, lang)]);
+  if(missing.length===0) return;
+  await Promise.all(missing.map(async item=>{
+    try{
+      const data = await callFn("translate-tattoo", { tattoo_id:item.id, lang });
+      if(data && data.translation) translationCache[trKey(item.id, lang)] = data.translation;
+    }catch(e){ /* se queda con el texto original */ }
+  }));
+}
+async function refreshTranslatedContent(){
+  if(allTattoos.length===0) return;
+  renderGallery(); // primero con lo que ya haya en caché (instantáneo)
+  await loadCachedTranslations(currentLang);
+  renderGallery();
+  await ensureTranslations(currentLang);
+  renderGallery();
+  if(lightbox.classList.contains("is-open") && currentLightboxItem){
+    document.getElementById("lightbox-title").textContent = getDisplayTitle(currentLightboxItem);
+    document.getElementById("lightbox-desc").textContent = getDisplayDesc(currentLightboxItem);
+  }
+}
 
 function renderFilters(){
   const cats = Array.from(new Set(allTattoos.map(t=>t.category).filter(Boolean)));
@@ -554,13 +606,14 @@ function renderGallery(){
   grid.innerHTML = "";
   items.forEach(item=>{
     const imgs = Array.isArray(item.images) && item.images.length>0 ? item.images : [item.image_url];
+    const title = getDisplayTitle(item);
     const card = document.createElement("div");
     card.className = "tattoo-card";
     const badge = imgs.length>1
       ? '<span class="count-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 21h11a2 2 0 0 0 2-2V8"/></svg>'+imgs.length+'</span>'
       : '';
-    card.innerHTML = badge+'<img src="'+imgs[0]+'" alt="'+(item.title||"").replace(/"/g,"")+'" loading="lazy">'+
-      '<div class="cap">'+(item.title||"")+(item.category?'<span>'+item.category+'</span>':'')+'</div>';
+    card.innerHTML = badge+'<img src="'+imgs[0]+'" alt="'+title.replace(/"/g,"")+'" loading="lazy">'+
+      '<div class="cap">'+title+(item.category?'<span>'+item.category+'</span>':'')+'</div>';
     card.addEventListener("click", ()=>openLightbox(item));
     grid.appendChild(card);
   });
@@ -580,6 +633,10 @@ async function loadGallery(){
     renderFilters();
     renderGallery();
     populateStyleDatalist();
+    await loadCachedTranslations(currentLang);
+    renderGallery();
+    await ensureTranslations(currentLang);
+    renderGallery();
   }catch(e){
     document.getElementById("gallery-grid").innerHTML = '<div class="gallery-empty">'+t("empty")+'</div>';
   }
@@ -632,9 +689,10 @@ function openLightbox(item){
 
   renderLbImage();
 
-  document.getElementById("lightbox-title").textContent = item.title||"";
+  currentLightboxItem = item;
+  document.getElementById("lightbox-title").textContent = getDisplayTitle(item);
   document.getElementById("lightbox-cat").textContent = item.category||"";
-  document.getElementById("lightbox-desc").textContent = item.description||"";
+  document.getElementById("lightbox-desc").textContent = getDisplayDesc(item);
   document.getElementById("lightbox-book").onclick = ()=>{
     closeLightbox();
     document.getElementById("f-style").value = item.category || item.title || "";
@@ -646,6 +704,7 @@ function openLightbox(item){
 function closeLightbox(){
   lightbox.classList.remove("is-open");
   lightbox.setAttribute("aria-hidden","true");
+  currentLightboxItem = null;
 }
 document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
 lbPrev.addEventListener("click", ()=>lbGoTo(lbIndex-1));
